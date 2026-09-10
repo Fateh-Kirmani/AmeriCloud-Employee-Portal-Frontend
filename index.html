@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Portal — AmeriCloud Telecom</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="AmeriCloud Telecom employee portal. Sign in with your Microsoft 365 account.">
+  <link rel="icon" href="assets/brand/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════ VIEW 1: SIGN-IN ══════════════════════════════ -->
+<div id="signin-view">
+  <div class="signin-bg">
+    <div class="signin-card">
+      <img src="assets/brand/americloud-logo.png" alt="AmeriCloud Telecom Solutions" class="signin-logo">
+      <p class="signin-eyebrow">Employee Portal</p>
+      <h1 class="signin-heading">Welcome back.</h1>
+      <p class="signin-body">Sign in with your AmeriCloud Microsoft 365 account to access pay, timesheets, policies, and more.</p>
+      <button id="btn-signin" class="signin-btn" type="button">
+        <svg class="ms-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21" aria-hidden="true" focusable="false">
+          <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+          <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+          <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+          <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+        </svg>
+        Sign in with Microsoft
+      </button>
+      <p class="signin-trouble">Having trouble? Contact IT &mdash; <a href="mailto:fkirmani@americloudtelecom.com">fkirmani@americloudtelecom.com</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ VIEW 2: DASHBOARD ════════════════════════════ -->
+<div id="dashboard-view" hidden>
+
+  <!-- ── Sidebar ── -->
+  <aside class="portal-sidebar" id="portal-sidebar">
+    <div class="portal-sidebar__top">
+      <img src="assets/brand/americloud-logo-white.png" alt="AmeriCloud Telecom Solutions" class="portal-sidebar__logo">
+      <span class="portal-sidebar__sub">Employee Portal</span>
+    </div>
+
+    <nav class="portal-sidebar__nav" aria-label="Portal navigation">
+      <a href="#" class="portal-nav__link is-active" data-section="home">
+        <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        Home
+      </a>
+      <a href="#" class="portal-nav__link" data-section="pay">
+        <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Pay &amp; Benefits
+      </a>
+      <a href="#" class="portal-nav__link" data-section="time">
+        <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+        Time &amp; Policies
+      </a>
+      <a href="#" class="portal-nav__link" data-section="forms">
+        <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Forms &amp; Resources
+      </a>
+      <!-- Role-gated nav items — shown by portal.js based on Azure AD group -->
+      <a href="#" class="portal-nav__link portal-nav__link--role" data-section="manager" id="nav-manager" hidden>
+        <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Manager Approvals
+      </a>
+      <a href="#" class="portal-nav__link portal-nav__link--role" data-section="hr" id="nav-hr" hidden>
+        <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        HR Dashboard
+      </a>
+    </nav>
+
+    <div class="portal-sidebar__bottom">
+      <button id="btn-signout" class="portal-sidebar__signout" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="portal-overlay" id="portal-overlay"></div>
+
+  <!-- ── Main content ── -->
+  <div class="portal-content">
+
+    <!-- Mobile topbar -->
+    <header class="portal-topbar">
+      <button class="portal-topbar__burger" id="burger" type="button" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <img src="assets/brand/americloud-logo-white.png" alt="AmeriCloud Telecom" class="portal-topbar__logo">
+    </header>
+
+    <!-- ── SECTION: Home ── -->
+    <section id="section-home" class="portal-section">
+
+      <!-- Hero -->
+      <div class="portal-hero">
+        <img src="assets/photos/home-hero-network-dusk.png" alt="AmeriCloud network at dusk" class="portal-hero__img">
+        <div class="portal-hero__scrim"></div>
+        <div class="portal-hero__body">
+          <p class="portal-hero__eyebrow">Employee Portal</p>
+          <h1 class="portal-hero__heading">Welcome to<br>AmeriCloud.</h1>
+          <p class="portal-hero__sub">Everything you need, in one place.</p>
+        </div>
+      </div>
+
+      <!-- Open enrollment banner (hidden by default — remove hidden to activate) -->
+      <div class="portal-enrollment" id="enrollment-banner" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Open enrollment is now open. Enroll or make changes in Paychex Flex by <strong>[DATE]</strong>.</span>
+        <a href="https://www.paychexflex.com" target="_blank" rel="noopener" class="portal-enrollment__cta">Go to Paychex &rarr;</a>
+      </div>
+
+      <!-- Quick access tiles -->
+      <div class="portal-quickaccess">
+        <p class="portal-quickaccess__label">Quick access</p>
+        <div class="portal-tiles">
+          <a href="https://www.paychexflex.com" target="_blank" rel="noopener" class="portal-tile">
+            <svg class="portal-tile__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span class="portal-tile__title">Paychex Flex</span>
+            <span class="portal-tile__sub">Pay &amp; benefits</span>
+          </a>
+          <a href="#" class="portal-tile" data-goto="time">
+            <svg class="portal-tile__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="portal-tile__title">Timesheets</span>
+            <span class="portal-tile__sub">Download &amp; submit</span>
+          </a>
+          <a href="#" class="portal-tile" data-goto="forms">
+            <svg class="portal-tile__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span class="portal-tile__title">Report Incident</span>
+            <span class="portal-tile__sub">Safety &amp; near-miss</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Section overview -->
+      <div class="portal-overview">
+        <div class="portal-container">
+          <p class="portal-overview__eyebrow">What&rsquo;s here</p>
+          <div class="portal-overview__grid">
+            <button class="portal-overview__item" data-goto="pay">
+              <span class="portal-overview__title">Pay &amp; Benefits</span>
+              <span class="portal-overview__desc">Paychex Flex, pay stubs, W-2s, direct deposit, 401(k), and personal info.</span>
+            </button>
+            <button class="portal-overview__item" data-goto="time">
+              <span class="portal-overview__title">Time &amp; Policies</span>
+              <span class="portal-overview__desc">California and Standard timesheet downloads, Employee Handbook, and policy acknowledgments.</span>
+            </button>
+            <button class="portal-overview__item" data-goto="forms">
+              <span class="portal-overview__title">Forms &amp; Resources</span>
+              <span class="portal-overview__desc">PTO requests, safety &amp; incident reporting, company directory, and company calendar.</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /section-home -->
+
+    <!-- ── SECTION: Pay & Benefits ── -->
+    <section id="section-pay" class="portal-section" hidden>
+      <div class="portal-section__header">
+        <p class="portal-section__eyebrow">Pay &amp; Benefits</p>
+        <h2 class="portal-section__title">Pay &amp; Benefits</h2>
+        <p class="portal-section__desc">All pay and benefits information lives in Paychex Flex. Use the links below to access it.</p>
+      </div>
+      <div class="portal-container">
+        <ul class="portal-linklist">
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Paychex Flex</span>
+              <span class="portal-linkitem__desc">Pay stubs, W-2s, direct deposit setup, benefits enrollment, and 401(k).</span>
+            </div>
+            <a href="https://www.paychexflex.com" target="_blank" rel="noopener" class="portal-linkitem__action">Open Paychex &rarr;</a>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Update Personal Info</span>
+              <span class="portal-linkitem__desc">Update your home address, phone number, emergency contacts, and tax withholding (W-4).</span>
+            </div>
+            <a href="https://www.paychexflex.com" target="_blank" rel="noopener" class="portal-linkitem__action">Open Paychex &rarr;</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── SECTION: Time & Policies ── -->
+    <section id="section-time" class="portal-section" hidden>
+      <div class="portal-section__header">
+        <p class="portal-section__eyebrow">Time &amp; Policies</p>
+        <h2 class="portal-section__title">Time &amp; Policies</h2>
+        <p class="portal-section__desc">Download your timesheet, review the handbook, and complete required policy acknowledgments.</p>
+      </div>
+      <div class="portal-container">
+        <ul class="portal-linklist">
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Timesheet &mdash; California Edition</span>
+              <span class="portal-linkitem__desc">Use this if you work in California. Includes meal/rest break tracking and daily OT.</span>
+            </div>
+            <div class="portal-linkitem__actions">
+              <a href="assets/docs/AmeriCloud Telecom Weekly Timesheet - California 2026.xlsx" download class="portal-linkitem__action">Download Template</a>
+              <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-submit-ca" type="button">Submit Timesheet</button>
+            </div>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Timesheet &mdash; Standard Edition</span>
+              <span class="portal-linkitem__desc">Use this for all other states.</span>
+            </div>
+            <div class="portal-linkitem__actions">
+              <a href="assets/docs/AmeriCloud Telecom Weekly Timesheet - Standard 2026.xlsx" download class="portal-linkitem__action">Download Template</a>
+              <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-submit-std" type="button">Submit Timesheet</button>
+            </div>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Employee Handbook</span>
+              <span class="portal-linkitem__desc">Company policies, procedures, benefits overview, and code of conduct. Read it, then sign below.</span>
+            </div>
+            <div class="portal-linkitem__actions">
+              <a id="link-handbook" href="assets/docs/AmeriCloud Telecom Handbook- 2026.pdf" class="portal-linkitem__action" target="_blank" rel="noopener">View</a>
+              <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-sign-handbook" type="button">Sign Handbook</button>
+            </div>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Policies &amp; Acknowledgments</span>
+              <span class="portal-linkitem__desc">View and sign policy documents issued to you by HR.</span>
+            </div>
+            <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-open-policies-modal" type="button">My Policies</button>
+          </li>
+        </ul>
+        <input type="file" id="ts-file-ca"  accept=".xlsx,.xls,.pdf" hidden>
+        <input type="file" id="ts-file-std" accept=".xlsx,.xls,.pdf" hidden>
+        <div id="ts-upload-status" class="portal-ts-status" hidden></div>
+        <div class="portal-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+          <span>Timesheets are submitted through the portal. Deadline: <strong>Friday at 5:00 PM CST</strong>.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: Forms & Resources ── -->
+    <section id="section-forms" class="portal-section" hidden>
+      <div class="portal-section__header">
+        <p class="portal-section__eyebrow">Forms &amp; Resources</p>
+        <h2 class="portal-section__title">Forms &amp; Resources</h2>
+        <p class="portal-section__desc">PTO requests, safety &amp; incident reporting, company directory, and company calendar.</p>
+      </div>
+      <div class="portal-container">
+        <ul class="portal-linklist">
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">PTO Request</span>
+              <span class="portal-linkitem__desc">Submit a paid time off request for your manager to review and approve.</span>
+            </div>
+            <div class="portal-linkitem__actions">
+              <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-open-pto-form" type="button">Submit Request</button>
+              <button class="portal-linkitem__action" id="btn-view-my-pto" type="button">View My Requests</button>
+            </div>
+          </li>
+          <!-- Expenses & Mileage — temporarily hidden
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Expenses &amp; Mileage</span>
+              <span class="portal-linkitem__desc">Submit receipts, mileage logs, and per-diem requests for reimbursement.</span>
+            </div>
+            <a href="#" class="portal-linkitem__action">Submit &rarr;</a>
+          </li>
+          -->
+          <!-- Travel & Per-Diem Info — temporarily hidden
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Travel &amp; Per-Diem Info</span>
+              <span class="portal-linkitem__desc">Per-diem rates by location, booking policy, and site assignment information.</span>
+            </div>
+            <a href="#" class="portal-linkitem__action">View &rarr;</a>
+          </li>
+          -->
+          <li class="portal-linkitem portal-linkitem--highlight">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Safety &amp; Incident Report</span>
+              <span class="portal-linkitem__desc">Report a workplace incident, injury, or near-miss. Submit immediately after any incident.</span>
+            </div>
+            <button class="portal-linkitem__action portal-linkitem__action--red" id="btn-open-incident-form" type="button">Report Incident</button>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Company Directory</span>
+              <span class="portal-linkitem__desc">Search all employees by name or email and message them on Teams.</span>
+            </div>
+            <button class="portal-linkitem__action" id="btn-open-directory" type="button">Browse</button>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Company Calendar</span>
+              <span class="portal-linkitem__desc">Holidays, paydays, and key company deadlines.</span>
+            </div>
+            <a href="#" class="portal-linkitem__action">View &rarr;</a>
+          </li>
+        </ul>
+        <div id="panel-incident-report" class="portal-ts-panel portal-ts-panel--urgent" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">Safety &amp; Incident Report</span>
+          </div>
+          <div class="portal-ts-panel__body">
+            <p class="portal-pol-hint">Fill out this form as soon as possible after the incident. All submissions are received by HR.</p>
+            <form id="form-incident-report" class="portal-policy-form" novalidate>
+              <div class="portal-pto-dates">
+                <div class="portal-form-row">
+                  <label class="portal-form-label" for="inc-date">Date of Incident</label>
+                  <input type="date" id="inc-date" class="portal-form-input portal-pto-date">
+                </div>
+                <div class="portal-form-row">
+                  <label class="portal-form-label" for="inc-type">Incident Type</label>
+                  <select id="inc-type" class="portal-form-input portal-form-select">
+                    <option value="">Select type…</option>
+                    <option value="Injury">Injury</option>
+                    <option value="Near Miss">Near Miss</option>
+                    <option value="Property Damage">Property Damage</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="portal-form-row">
+                <label class="portal-form-label" for="inc-location">Location / Site</label>
+                <input type="text" id="inc-location" class="portal-form-input" placeholder="e.g. Warehouse B, Job Site 12, Main Office" maxlength="200" autocomplete="off">
+              </div>
+              <div class="portal-form-row">
+                <label class="portal-form-label" for="inc-desc">Description <span class="portal-form-hint">(describe what happened, who was involved, and any injuries or damage)</span></label>
+                <textarea id="inc-desc" class="portal-form-input portal-pto-reason portal-inc-desc" placeholder="Provide as much detail as possible…" rows="5" maxlength="2000"></textarea>
+              </div>
+              <div class="portal-form-actions">
+                <button type="submit" id="btn-incident-submit" class="portal-linkitem__action portal-linkitem__action--red">Submit Report</button>
+              </div>
+              <div id="incident-report-status" class="portal-ts-status" hidden></div>
+            </form>
+          </div>
+        </div>
+        <div id="panel-pto-request" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">PTO Request Form</span>
+          </div>
+          <div class="portal-ts-panel__body">
+            <form id="form-pto-request" class="portal-policy-form" novalidate>
+              <div class="portal-pto-dates">
+                <div class="portal-form-row">
+                  <label class="portal-form-label" for="pto-start">Start Date</label>
+                  <input type="date" id="pto-start" class="portal-form-input portal-pto-date">
+                </div>
+                <div class="portal-form-row">
+                  <label class="portal-form-label" for="pto-end">End Date <span class="portal-form-hint">(max 14-day span)</span></label>
+                  <input type="date" id="pto-end" class="portal-form-input portal-pto-date">
+                </div>
+              </div>
+              <div class="portal-form-row">
+                <label class="portal-form-label" for="pto-reason">Reason</label>
+                <textarea id="pto-reason" class="portal-form-input portal-pto-reason" placeholder="Briefly describe your reason for requesting time off…" rows="3" maxlength="500"></textarea>
+              </div>
+              <div class="portal-form-actions">
+                <button type="submit" id="btn-pto-submit" class="portal-linkitem__action portal-linkitem__action--primary">Submit PTO Request</button>
+              </div>
+              <div id="pto-request-status" class="portal-ts-status" hidden></div>
+            </form>
+          </div>
+        </div>
+        <div id="panel-my-pto" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">My PTO Requests</span>
+          </div>
+          <div id="body-my-pto" class="portal-ts-panel__body"></div>
+        </div>
+      </div>
+      <!-- Directory panel sits outside the 820px container so it can use full section width -->
+      <div id="panel-directory" class="portal-ts-panel portal-dir-panel" hidden>
+        <div class="portal-ts-panel__head">
+          <span class="portal-ts-panel__label">Company Directory</span>
+        </div>
+        <div class="portal-ts-panel__body">
+          <input type="search" id="dir-search" class="portal-dir-search" placeholder="Search by name or email…" autocomplete="off" spellcheck="false">
+          <p id="dir-count" class="portal-dir-count"></p>
+          <div id="dir-grid" class="portal-dir-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: Manager Approvals (role-gated) ── -->
+    <section id="section-manager" class="portal-section" hidden>
+      <div class="portal-section__header portal-section__header--role">
+        <p class="portal-section__eyebrow">Manager Tools</p>
+        <h2 class="portal-section__title">Manager Approvals</h2>
+        <p class="portal-section__desc">Review and approve timesheets and PTO requests for your crew.</p>
+      </div>
+      <div class="portal-container">
+        <ul class="portal-linklist">
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Timesheet Approvals</span>
+              <span class="portal-linkitem__desc">View and download timesheets submitted by your crew, newest first.</span>
+            </div>
+            <button class="portal-linkitem__action" id="btn-view-manager-ts" type="button">View Timesheets</button>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">PTO Approvals</span>
+              <span class="portal-linkitem__desc">Review and approve time-off requests from your team.</span>
+            </div>
+            <button class="portal-linkitem__action" id="btn-view-pto-approvals" type="button">View Requests</button>
+          </li>
+          <!--
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Expense Approvals</span>
+              <span class="portal-linkitem__desc">Review and approve expense and mileage submissions from your crew.</span>
+            </div>
+            <a href="#" class="portal-linkitem__action">Open &rarr;</a>
+          </li>
+          -->
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Team Directory</span>
+              <span class="portal-linkitem__desc">View your crew members, contact information, and message anyone on Teams.</span>
+            </div>
+            <button class="portal-linkitem__action" id="btn-open-team-directory" type="button">Browse</button>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Company Calendar</span>
+              <span class="portal-linkitem__desc">View company-wide events, holidays, and important dates.</span>
+            </div>
+            <a href="#" class="portal-linkitem__action">Open &rarr;</a>
+          </li>
+        </ul>
+        <div id="panel-manager-ts" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">Team Timesheets</span>
+            <button class="portal-ts-panel__refresh" id="btn-refresh-manager-ts" type="button">&#8635; Refresh</button>
+          </div>
+          <div id="body-manager-ts" class="portal-ts-panel__body"></div>
+        </div>
+        <div id="panel-pto-approvals" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">PTO Requests — Your Team</span>
+            <button class="portal-ts-panel__refresh" id="btn-refresh-pto-approvals" type="button">&#8635; Refresh</button>
+          </div>
+          <div id="body-pto-approvals" class="portal-ts-panel__body"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: HR Dashboard (role-gated) ── -->
+    <section id="section-hr" class="portal-section" hidden>
+      <div class="portal-section__header portal-section__header--role">
+        <p class="portal-section__eyebrow">HR Dashboard</p>
+        <h2 class="portal-section__title">HR Dashboard</h2>
+        <p class="portal-section__desc">View timesheets, issue policies, track handbook sign-offs, and review incident reports.</p>
+      </div>
+      <div class="portal-container">
+        <ul class="portal-linklist">
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">All Employee Timesheets</span>
+              <span class="portal-linkitem__desc">View and download timesheets from every employee, sorted newest first.</span>
+            </div>
+            <button class="portal-linkitem__action" id="btn-view-hr-ts" type="button">View Timesheets</button>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">PTO Approvals</span>
+              <span class="portal-linkitem__desc">Review all PTO requests, see manager decisions, and record HR approval or denial.</span>
+            </div>
+            <button class="portal-linkitem__action" id="btn-view-hr-pto" type="button">View Requests</button>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Policy Issuance &amp; Attestation Tracking</span>
+              <span class="portal-linkitem__desc">Issue policy documents to employees and track who has signed each one.</span>
+            </div>
+            <div class="portal-linkitem__actions">
+              <button class="portal-linkitem__action" id="btn-issue-policy" type="button">Issue a Policy</button>
+              <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-view-issued-policies" type="button">View Issued Policies</button>
+            </div>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Handbook Sign-off Tracking</span>
+              <span class="portal-linkitem__desc">See which employees have signed the handbook and who still needs to.</span>
+            </div>
+            <button class="portal-linkitem__action" id="btn-view-handbook-signoffs" type="button">View Sign-offs</button>
+          </li>
+          <li class="portal-linkitem portal-linkitem--highlight">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Incident Reports</span>
+              <span class="portal-linkitem__desc">View all safety and incident reports submitted by employees, newest first.</span>
+            </div>
+            <button class="portal-linkitem__action" id="btn-view-incident-reports" type="button">View Reports</button>
+          </li>
+          <!--
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Open Enrollment Status</span>
+              <span class="portal-linkitem__desc">Track benefits enrollment completion across all employees.</span>
+            </div>
+            <a href="#" class="portal-linkitem__action">Open &rarr;</a>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Onboarding Checklist</span>
+              <span class="portal-linkitem__desc">Manage new-hire onboarding: account creation, handbook acknowledgment, and required forms.</span>
+            </div>
+            <a href="#" class="portal-linkitem__action">Open &rarr;</a>
+          </li>
+          -->
+        </ul>
+        <div id="panel-hr-pto" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">PTO Requests — All Employees</span>
+            <button class="portal-ts-panel__refresh" id="btn-refresh-hr-pto" type="button">&#8635; Refresh</button>
+          </div>
+          <div id="body-hr-pto" class="portal-ts-panel__body"></div>
+        </div>
+        <div id="panel-handbook-signoffs" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">Handbook Sign-offs</span>
+            <button class="portal-ts-panel__refresh" id="btn-refresh-handbook-signoffs" type="button">&#8635; Refresh</button>
+          </div>
+          <div id="body-handbook-signoffs" class="portal-ts-panel__body"></div>
+        </div>
+        <!-- Issue a Policy panel -->
+        <div id="panel-issue-policy" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">Issue a Policy Document</span>
+          </div>
+          <div class="portal-ts-panel__body">
+            <form id="form-issue-policy" class="portal-policy-form" novalidate>
+              <div class="portal-form-row">
+                <label class="portal-form-label" for="policy-name">Policy Name</label>
+                <input type="text" id="policy-name" class="portal-form-input" placeholder="e.g. Remote Work Policy 2026" maxlength="200" autocomplete="off">
+              </div>
+              <div class="portal-form-row">
+                <label class="portal-form-label">Policy Document <span class="portal-form-hint">(PDF, max 4 MB)</span></label>
+                <label class="portal-form-file-label">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span id="policy-file-label-text">Choose a PDF file&hellip;</span>
+                  <input type="file" id="policy-file" accept=".pdf" style="position:absolute;width:1px;height:1px;opacity:0">
+                </label>
+              </div>
+              <div class="portal-form-row">
+                <label class="portal-form-label">Issue To <span class="portal-form-hint">(search or Select All, then uncheck exceptions)</span></label>
+                <div class="portal-employee-picker">
+                  <input type="text" id="policy-emp-search" class="portal-picker-search" placeholder="Search employees&hellip;" autocomplete="off">
+                  <div id="policy-emp-list" class="portal-picker-list"></div>
+                </div>
+              </div>
+              <div class="portal-form-actions">
+                <button type="submit" id="btn-issue-policy-submit" class="portal-linkitem__action portal-linkitem__action--primary">Issue Policy</button>
+              </div>
+              <div id="issue-policy-status" class="portal-ts-status" hidden></div>
+            </form>
+          </div>
+        </div>
+        <!-- View Issued Policies panel -->
+        <div id="panel-view-policies" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">Issued Policies</span>
+            <button class="portal-ts-panel__refresh" id="btn-refresh-issued-policies" type="button">&#8635; Refresh</button>
+          </div>
+          <div id="body-issued-policies" class="portal-ts-panel__body"></div>
+        </div>
+        <div id="panel-hr-ts" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">All Employee Timesheets</span>
+            <button class="portal-ts-panel__refresh" id="btn-refresh-hr-ts" type="button">&#8635; Refresh</button>
+          </div>
+          <div id="body-hr-ts" class="portal-ts-panel__body"></div>
+        </div>
+        <div id="panel-incident-reports-hr" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">Incident Reports</span>
+            <button class="portal-ts-panel__refresh" id="btn-refresh-incident-reports" type="button">&#8635; Refresh</button>
+          </div>
+          <div id="body-incident-reports-hr" class="portal-ts-panel__body"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Footer (always visible, contact info lives here) ── -->
+    <footer class="portal-foot">
+      <div class="portal-foot__contacts">
+        <div class="portal-foot__contact">
+          <span class="portal-foot__role">HR Questions</span>
+          <span class="portal-foot__value"><a href="mailto:hr@americloudtelecom.com">hr@americloudtelecom.com</a></span>
+        </div>
+        <div class="portal-foot__contact">
+          <span class="portal-foot__role">Payroll / Paychex</span>
+          <span class="portal-foot__value"><a href="mailto:accounts@americloudtelecom.com">accounts@americloudtelecom.com</a></span>
+        </div>
+        <div class="portal-foot__contact">
+          <span class="portal-foot__role">IT / Portal Help</span>
+          <span class="portal-foot__value"><a href="mailto:fkirmani@americloudtelecom.com">fkirmani@americloudtelecom.com</a></span>
+        </div>
+      </div>
+      <div class="portal-foot__bottom">
+        <span>&copy; 2026 AmeriCloud Telecom Solutions, LLC</span>
+        <nav aria-label="Footer links">
+          <a href="https://www.americloudtelecom.com" target="_blank" rel="noopener">Main Site</a>
+          <a href="https://www.americloudtelecom.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>
+        </nav>
+      </div>
+    </footer>
+
+  </div><!-- /portal-content -->
+
+</div><!-- /dashboard-view -->
+
+<!-- Employee Policies & Acknowledgments modal -->
+<div id="modal-policies" class="portal-modal" hidden>
+  <div class="portal-modal__overlay" id="modal-policies-overlay"></div>
+  <div class="portal-modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-policies-title">
+    <div class="portal-modal__head">
+      <h2 class="portal-modal__title" id="modal-policies-title">My Policies</h2>
+      <button class="portal-modal__close" id="btn-close-policies-modal" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div id="body-policies-modal" class="portal-modal__body">
+      <!-- JS renders the policy table here -->
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
+<script src="portal-config.js"></script>
+<script src="portal.js"></script>
+</body>
+</html>
