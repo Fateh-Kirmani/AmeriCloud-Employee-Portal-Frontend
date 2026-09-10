@@ -104,7 +104,9 @@
   };
 
   var loginRequest = { scopes: ['User.Read', 'openid', 'profile'] };
-  var API_BASE = 'http://localhost:3000';
+  var API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000'
+    : 'https://americloud-employee-portal-backend.vercel.app';
   function isConfigured() { return true; }
   msalInstance = new msal.PublicClientApplication(msalConfig);
 
