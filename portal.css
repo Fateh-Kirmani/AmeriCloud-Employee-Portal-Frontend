@@ -1574,3 +1574,109 @@ button { cursor: pointer; font-family: inherit; }
   max-width: 340px;
   line-height: 1.5;
 }
+
+/* ── Company Calendar ─────────────────────────────────────────────────── */
+.portal-cal-next-payday {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+  color: var(--white);
+  border-radius: 8px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+}
+.portal-cal-payday-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  opacity: .65;
+  margin-bottom: 3px;
+}
+.portal-cal-payday-date {
+  font-family: 'Archivo', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+}
+.portal-cal-payday-countdown {
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(255,255,255,.15);
+  border-radius: 20px;
+  padding: 5px 14px;
+  white-space: nowrap;
+}
+.portal-cal-section { margin-top: 20px; }
+.portal-cal-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.portal-cal-section-title {
+  font-family: 'Archivo', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+.portal-cal-year-tabs { display: flex; gap: 6px; }
+.portal-cal-year-tab {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--slate);
+  transition: background .15s, color .15s, border-color .15s;
+}
+.portal-cal-year-tab:hover { background: var(--mist); color: var(--navy); }
+.portal-cal-year-tab--active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+.portal-cal-holiday-table { margin: 0; }
+.portal-cal-holiday-name { font-size: 14px; font-weight: 500; }
+.portal-cal-holiday-date { font-size: 13px; color: var(--slate); }
+.portal-cal-observed-note { font-size: 11px; color: var(--slate-2); font-style: italic; }
+.portal-cal-past-row { opacity: .4; }
+.portal-cal-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--slate);
+  margin-bottom: 10px;
+}
+.portal-cal-toggle:hover { color: var(--navy); }
+.portal-cal-paydays-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.portal-cal-pd-yr-label {
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--slate);
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.portal-cal-pd-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--line);
+}
+.portal-cal-pd-month { color: var(--slate); }
+.portal-cal-pd-date  { font-weight: 600; color: var(--ink); }
+@media (max-width: 560px) {
+  .portal-cal-paydays-grid { grid-template-columns: 1fr; }
+  .portal-cal-next-payday  { flex-direction: column; align-items: flex-start; gap: 10px; }
+}

@@ -251,6 +251,173 @@
 
     // Available to all roles — company directory
     setupDirectory();
+
+    // Available to all roles — company calendar
+    setupCalendar();
+  }
+
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Company Calendar
+  // ══════════════════════════════════════════════════════════════════════════
+  function setupCalendar() {
+    var btn    = document.getElementById('btn-open-calendar');
+    var panel  = document.getElementById('panel-calendar');
+    var bodyEl = document.getElementById('body-calendar');
+    if (!btn || !panel || !bodyEl) return;
+
+    btn.addEventListener('click', function () {
+      if (panel.hidden) {
+        panel.hidden = false;
+        btn.textContent = 'Close ×';
+        if (!bodyEl.dataset.rendered) { renderCalendar(bodyEl); bodyEl.dataset.rendered = '1'; }
+      } else {
+        panel.hidden = true;
+        btn.textContent = 'View →';
+      }
+    });
+  }
+
+  function renderCalendar(bodyEl) {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+
+    var MONTHS_LONG  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var DAYS_LONG    = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+    function fmt(d) {
+      return DAYS_LONG[d.getDay()] + ', ' + MONTHS_LONG[d.getMonth()] + ' ' + d.getDate();
+    }
+    function fmtShort(d) {
+      return MONTHS_SHORT[d.getMonth()] + ' ' + d.getDate();
+    }
+
+    // Payday: 15th, Saturday → Monday 17th, Sunday → Monday 16th
+    function payday(year, month) {
+      var d = new Date(year, month, 15);
+      var dow = d.getDay();
+      if (dow === 6) return new Date(year, month, 17);
+      if (dow === 0) return new Date(year, month, 16);
+      return d;
+    }
+
+    // Next upcoming payday
+    var npYear = today.getFullYear(), npMonth = today.getMonth();
+    var np = payday(npYear, npMonth);
+    if (np < today) {
+      npMonth++;
+      if (npMonth > 11) { npMonth = 0; npYear++; }
+      np = payday(npYear, npMonth);
+    }
+    var diffDays  = Math.round((np - today) / (1000 * 60 * 60 * 24));
+    var diffLabel = diffDays === 0 ? 'Today!' : diffDays === 1 ? 'Tomorrow' : 'In ' + diffDays + ' days';
+
+    // Holidays
+    var HOLIDAYS = {
+      2026: [
+        { name: 'New Year\'s Day',  actual: new Date(2026, 0,  1),  observed: null },
+        { name: 'Memorial Day',     actual: new Date(2026, 4,  25), observed: null },
+        { name: 'Independence Day', actual: new Date(2026, 6,  4),  observed: new Date(2026, 6, 3)  },
+        { name: 'Labor Day',        actual: new Date(2026, 8,  7),  observed: null },
+        { name: 'Thanksgiving Day', actual: new Date(2026, 10, 26), observed: null },
+        { name: 'Christmas Day',    actual: new Date(2026, 11, 25), observed: null },
+      ],
+      2027: [
+        { name: 'New Year\'s Day',  actual: new Date(2027, 0,  1),  observed: null },
+        { name: 'Memorial Day',     actual: new Date(2027, 4,  31), observed: null },
+        { name: 'Independence Day', actual: new Date(2027, 6,  4),  observed: new Date(2027, 6, 5)  },
+        { name: 'Labor Day',        actual: new Date(2027, 8,  6),  observed: null },
+        { name: 'Thanksgiving Day', actual: new Date(2027, 10, 25), observed: null },
+        { name: 'Christmas Day',    actual: new Date(2027, 11, 25), observed: new Date(2027, 11, 24) },
+      ]
+    };
+
+    function buildHolidayTable(holidays) {
+      var html = '<table class="portal-ts-table portal-cal-holiday-table"><thead><tr><th>Holiday</th><th>Date</th></tr></thead><tbody>';
+      holidays.forEach(function (h) {
+        var effectiveDate = h.observed || h.actual;
+        var isPast = effectiveDate < today;
+        var observedNote = h.observed
+          ? '<br><span class="portal-cal-observed-note">Observed: ' + fmt(h.observed) + '</span>'
+          : '';
+        html += '<tr' + (isPast ? ' class="portal-cal-past-row"' : '') + '>'
+          + '<td class="portal-cal-holiday-name">' + escapeHtml(h.name) + '</td>'
+          + '<td class="portal-cal-holiday-date">' + fmt(h.actual) + observedNote + '</td>'
+          + '</tr>';
+      });
+      return html + '</tbody></table>';
+    }
+
+    var defaultYear = today.getFullYear() >= 2027 ? 2027 : 2026;
+
+    // ── Render ──────────────────────────────────────────────────────────────
+    var html = '';
+
+    // Next Payday card
+    html += '<div class="portal-cal-next-payday">'
+      + '<div>'
+        + '<div class="portal-cal-payday-label">Next Payday</div>'
+        + '<div class="portal-cal-payday-date">' + fmt(np) + '</div>'
+      + '</div>'
+      + '<div class="portal-cal-payday-countdown">' + diffLabel + '</div>'
+      + '</div>';
+
+    // Holidays section
+    html += '<div class="portal-cal-section">'
+      + '<div class="portal-cal-section-head">'
+        + '<span class="portal-cal-section-title">Holidays</span>'
+        + '<div class="portal-cal-year-tabs">'
+          + '<button class="portal-cal-year-tab' + (defaultYear === 2026 ? ' portal-cal-year-tab--active' : '') + '" data-cal-year="2026" type="button">2026</button>'
+          + '<button class="portal-cal-year-tab' + (defaultYear === 2027 ? ' portal-cal-year-tab--active' : '') + '" data-cal-year="2027" type="button">2027</button>'
+        + '</div>'
+      + '</div>'
+      + '<div id="cal-holidays-2026"' + (defaultYear !== 2026 ? ' hidden' : '') + '>' + buildHolidayTable(HOLIDAYS[2026]) + '</div>'
+      + '<div id="cal-holidays-2027"' + (defaultYear !== 2027 ? ' hidden' : '') + '>' + buildHolidayTable(HOLIDAYS[2027]) + '</div>'
+      + '</div>';
+
+    // All Paydays collapsible
+    html += '<div class="portal-cal-section">'
+      + '<button class="portal-cal-toggle" id="cal-toggle-paydays" type="button" aria-expanded="false">&#9660; All Paydays</button>'
+      + '<div id="cal-paydays-body" class="portal-cal-paydays-grid" hidden>';
+
+    [2026, 2027].forEach(function (yr) {
+      html += '<div class="portal-cal-pd-year"><div class="portal-cal-pd-yr-label">' + yr + '</div>';
+      for (var m = 0; m < 12; m++) {
+        var pd = payday(yr, m);
+        var isPast = pd < today;
+        var isObserved = pd.getDate() !== 15;
+        html += '<div class="portal-cal-pd-row' + (isPast ? ' portal-cal-past-row' : '') + '">'
+          + '<span class="portal-cal-pd-month">' + MONTHS_LONG[m] + '</span>'
+          + '<span class="portal-cal-pd-date">' + fmtShort(pd) + (isObserved ? ' <span class="portal-cal-observed-note">obs.</span>' : '') + '</span>'
+          + '</div>';
+      }
+      html += '</div>';
+    });
+
+    html += '</div></div>';
+
+    bodyEl.innerHTML = html;
+
+    // Year tab toggle
+    bodyEl.querySelectorAll('[data-cal-year]').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        bodyEl.querySelectorAll('[data-cal-year]').forEach(function (t) { t.classList.remove('portal-cal-year-tab--active'); });
+        tab.classList.add('portal-cal-year-tab--active');
+        var yr = tab.dataset.calYear;
+        document.getElementById('cal-holidays-2026').hidden = (yr !== '2026');
+        document.getElementById('cal-holidays-2027').hidden = (yr !== '2027');
+      });
+    });
+
+    // Paydays toggle
+    var toggleBtn   = document.getElementById('cal-toggle-paydays');
+    var paydaysBody = document.getElementById('cal-paydays-body');
+    toggleBtn.addEventListener('click', function () {
+      var open = !paydaysBody.hidden;
+      paydaysBody.hidden = open;
+      toggleBtn.setAttribute('aria-expanded', String(!open));
+      toggleBtn.innerHTML = (open ? '&#9660;' : '&#9650;') + ' All Paydays';
+    });
   }
 
 
@@ -436,7 +603,7 @@
 
     return apiCall('/policies/my').then(function (rows) {
       return rows.map(function (r) {
-        return { id: r.id, name: r.policy_name, issuedDate: r.issued_date, status: r.status, signedDate: r.signed_date };
+        return { id: r.id, issuanceId: r.issuance_id, name: r.policy_name, issuedDate: r.issued_date, status: r.status, signedDate: r.signed_date };
       });
     });
   }
@@ -460,8 +627,12 @@
         ? '<button class="portal-ts-link portal-pol-ack-btn" data-ack-id="' + escapeHtml(String(row.id)) + '" type="button">Acknowledge &#10003;</button>'
         : '';
 
+      var nameCell = (row.issuanceId && !IS_DEMO)
+        ? '<a href="#" class="portal-ts-link" data-pol-issuance-id="' + escapeHtml(String(row.issuanceId)) + '" data-pol-name="' + escapeHtml(row.name) + '">' + escapeHtml(row.name) + '</a>'
+        : escapeHtml(row.name);
+
       html += '<tr>'
-        + '<td class="portal-ts-col-name">' + escapeHtml(row.name) + '</td>'
+        + '<td class="portal-ts-col-name">' + nameCell + '</td>'
         + '<td class="portal-ts-col-date">' + (row.issuedDate ? formatDate(row.issuedDate) : '—') + '</td>'
         + '<td id="pol-status-' + escapeHtml(String(row.id)) + '">' + badge + '</td>'
         + '<td class="portal-pol-action">' + action + '</td>'
@@ -470,6 +641,13 @@
 
     html += '</tbody></table></div>';
     bodyEl.innerHTML = html;
+
+    bodyEl.querySelectorAll('[data-pol-issuance-id]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        openFileInBrowser('/policies/issued/' + a.dataset.polIssuanceId + '/url', a.dataset.polName);
+      });
+    });
 
     bodyEl.querySelectorAll('.portal-pol-ack-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -655,12 +833,6 @@
       return;
     }
 
-    if (!isConfigured()
-        || !PORTAL_CONFIG.policyIssuancesListId
-        || PORTAL_CONFIG.policyIssuancesListId === 'YOUR-POLICY-ISSUANCES-LIST-ID') {
-      showIssueStatus('error', 'Policy system is not configured yet. See README for setup steps.');
-      return;
-    }
 
     submitBtn.disabled = true;
     showIssueStatus('uploading', 'Uploading policy and creating records…');
@@ -734,10 +906,7 @@
     var acks     = (data && data.acks)     || [];
 
     if (!policies.length) {
-      var notSetup = !isConfigured() || !PORTAL_CONFIG.policyIssuancesListId || PORTAL_CONFIG.policyIssuancesListId === 'YOUR-POLICY-ISSUANCES-LIST-ID';
-      bodyEl.innerHTML = notSetup
-        ? '<p class="portal-ts-empty">Policy system is not configured yet. See README for setup steps.</p>'
-        : '<p class="portal-ts-empty">No policies have been issued yet. Click <strong>Issue a Policy</strong> to get started.</p>';
+      bodyEl.innerHTML = '<p class="portal-ts-empty">No policies have been issued yet. Click <strong>Issue a Policy</strong> to get started.</p>';
       return;
     }
 
@@ -762,9 +931,12 @@
         ? '<span class="portal-signoff-badge portal-signoff-badge--signed">Signatures Completed</span>'
         : '<span class="portal-signoff-badge portal-signoff-badge--pending">Signatures Pending</span>';
 
-      var safeId = escapeHtml(String(pol.id));
+      var safeId   = escapeHtml(String(pol.id));
+      var polLink  = IS_DEMO
+        ? escapeHtml(pol.name)
+        : '<a href="#" class="portal-ts-link" data-pol-issuance-id="' + safeId + '" data-pol-name="' + escapeHtml(pol.name) + '">' + escapeHtml(pol.name) + '</a>';
       html += '<tr>'
-        + '<td class="portal-ts-col-name">' + escapeHtml(pol.name) + '</td>'
+        + '<td class="portal-ts-col-name">' + polLink + '</td>'
         + '<td class="portal-ts-col-date">' + formatDate(pol.issuedDate) + '</td>'
         + '<td>' + statusBadge + '</td>'
         + '<td class="portal-pol-track-cell">'
@@ -778,6 +950,13 @@
 
     html += '</tbody></table></div>';
     bodyEl.innerHTML = html;
+
+    bodyEl.querySelectorAll('[data-pol-issuance-id]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        openFileInBrowser('/policies/issued/' + a.dataset.polIssuanceId + '/url', a.dataset.polName);
+      });
+    });
 
     bodyEl.querySelectorAll('.portal-pol-track-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -986,7 +1165,7 @@
     bodyEl.querySelectorAll('[data-ts-id][data-ts-name]').forEach(function (a) {
       a.addEventListener('click', function (e) {
         e.preventDefault();
-        if (!IS_DEMO) downloadFile('/timesheets/download/' + a.dataset.tsId, a.dataset.tsName);
+        if (!IS_DEMO) openFileInBrowser('/timesheets/url/' + a.dataset.tsId, a.dataset.tsName);
       });
     });
 
@@ -1126,6 +1305,21 @@
     }).catch(function (err) {
       console.error('Download error:', err);
       alert('Download failed. Please try again.');
+    });
+  }
+
+  function openFileInBrowser(apiPath, filename) {
+    apiCall(apiPath).then(function (data) {
+      var ext = (filename || '').split('.').pop().toLowerCase();
+      var url = data.url;
+      if (ext === 'pdf') {
+        window.open(url, '_blank');
+      } else {
+        window.open('https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(url), '_blank');
+      }
+    }).catch(function (err) {
+      console.error('Could not open file:', err);
+      alert('Could not open file. Please try again.');
     });
   }
 
@@ -1378,10 +1572,7 @@
 
     function renderTable(rows) {
       if (!rows || rows.length === 0) {
-        var notSetup = !IS_DEMO && (!isConfigured() || !PORTAL_CONFIG.incidentReportsListId || PORTAL_CONFIG.incidentReportsListId === 'YOUR-INCIDENT-REPORTS-LIST-ID');
-        bodyEl.innerHTML = notSetup
-          ? '<p class="portal-ts-empty">Incident reporting is not yet configured. See README for setup steps.</p>'
-          : '<p class="portal-ts-empty">No incident reports have been submitted yet.</p>';
+        bodyEl.innerHTML = '<p class="portal-ts-empty">No incident reports have been submitted yet.</p>';
         return;
       }
 

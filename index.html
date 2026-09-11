@@ -300,11 +300,17 @@
           <li class="portal-linkitem">
             <div class="portal-linkitem__body">
               <span class="portal-linkitem__title">Company Calendar</span>
-              <span class="portal-linkitem__desc">Holidays, paydays, and key company deadlines.</span>
+              <span class="portal-linkitem__desc">Holidays, paydays, and key company dates.</span>
             </div>
-            <a href="#" class="portal-linkitem__action">View &rarr;</a>
+            <button class="portal-linkitem__action" id="btn-open-calendar" type="button">View &rarr;</button>
           </li>
         </ul>
+        <div id="panel-calendar" class="portal-ts-panel" hidden>
+          <div class="portal-ts-panel__head">
+            <span class="portal-ts-panel__label">Company Calendar</span>
+          </div>
+          <div class="portal-ts-panel__body" id="body-calendar"></div>
+        </div>
         <div id="panel-incident-report" class="portal-ts-panel portal-ts-panel--urgent" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">Safety &amp; Incident Report</span>
@@ -428,13 +434,6 @@
               <span class="portal-linkitem__desc">View your crew members, contact information, and message anyone on Teams.</span>
             </div>
             <button class="portal-linkitem__action" id="btn-open-team-directory" type="button">Browse</button>
-          </li>
-          <li class="portal-linkitem">
-            <div class="portal-linkitem__body">
-              <span class="portal-linkitem__title">Company Calendar</span>
-              <span class="portal-linkitem__desc">View company-wide events, holidays, and important dates.</span>
-            </div>
-            <a href="#" class="portal-linkitem__action">Open &rarr;</a>
           </li>
         </ul>
         <div id="panel-manager-ts" class="portal-ts-panel" hidden>
