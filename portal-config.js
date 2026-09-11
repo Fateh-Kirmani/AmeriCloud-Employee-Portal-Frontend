@@ -1,89 +1,65 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   portal-config.js  —  Staff roster & SharePoint storage configuration
-   See README.md "Timesheet Storage Setup" for step-by-step setup instructions.
+   portal-config.js  —  Staff roster & directory
 ───────────────────────────────────────────────────────────────────────────── */
 var PORTAL_CONFIG = {
 
-  // ── SharePoint document library ───────────────────────────────────────────
-  // Instructions to find these IDs are in README.md "Timesheet Storage Setup".
-  sharePointSiteId:  'YOUR-SHAREPOINT-SITE-ID',   // e.g. "americloudtelecom.sharepoint.com,abc123..."
-  sharePointDriveId: 'YOUR-SHAREPOINT-DRIVE-ID',  // e.g. "b!abc123..."
-  timesheetFolder:   'Timesheets',
-
-  // ── Policies ──────────────────────────────────────────────────────────────
-  // SharePoint folder where policy PDFs are stored (inside the same drive as timesheets)
-  policyFolder:                'Policies',
-  // SharePoint list tracking each policy issuance (PolicyName, PolicyUrl, IssuedTo JSON, IssuedDate)
-  policyIssuancesListId:       'YOUR-POLICY-ISSUANCES-LIST-ID',
-  // SharePoint list tracking per-employee signing status (PolicyItemId, EmployeeEmail, EmployeeName, Status, SignedDate)
-  policyAcknowledgmentsListId: 'YOUR-POLICY-ACKNOWLEDGMENTS-LIST-ID',
-
-  // ── PTO Requests ──────────────────────────────────────────────────────────
-  // SharePoint list for employee PTO requests (see README "PTO Request Setup").
-  // Columns: EmployeeEmail, EmployeeName, StartDate, EndDate, Reason, Status
-  ptoRequestsListId: 'YOUR-PTO-REQUESTS-LIST-ID',
-
-  // ── Incident Reports ──────────────────────────────────────────────────────
-  // SharePoint list for safety & incident reports (see README "Incident Report Setup").
-  // Columns: EmployeeEmail, EmployeeName, IncidentDate, Location, IncidentType, Description
-  incidentReportsListId: 'YOUR-INCIDENT-REPORTS-LIST-ID',
-
-  // ── Employee Handbook ─────────────────────────────────────────────────────
-  // handbookUrl: direct link to the handbook PDF. Use a SharePoint URL (recommended)
-  // or 'assets/docs/handbook.pdf' if you place the file in the repo.
-  handbookUrl:           '#',  // replace with SharePoint PDF URL or local path
-
-  // DocuSign PowerForm URL — created once in DocuSign admin (see README).
-  // Portal appends ?Name={employee name}&Email={employee email} automatically.
-  docuSignPowerFormUrl:  'YOUR-DOCUSIGN-POWERFORM-URL',
-
-  // SharePoint list ID for handbook sign-off tracking (see README).
-  // List must have columns: EmployeeEmail (text), Status (Signed/Pending), SignedDate (date).
-  handbookSignoffListId: 'YOUR-HANDBOOK-SIGNOFF-LIST-ID',
-
-  // ── Company Directory ─────────────────────────────────────────────────────
-  // Sorted A–Z. Only names and emails — no PII. Update when headcount changes.
+  // ── Company Directory (A–Z by first name) ─────────────────────────────────
   directory: [
     { name: 'Abdul Fateh',               email: 'afateh@americloudtelecom.com'          },
-    { name: 'Abelino Bautista',           email: 'abautista@americloudtelecom.com'       },
+    { name: 'Abelino Bautista',          email: 'abautista@americloudtelecom.com'        },
+    { name: 'Abhay Sharma',              email: 'asharma@americloudtelecom.com'          },
     { name: 'Afzal Karim',               email: 'akarim@americloudtelecom.com'           },
     { name: 'Ahmed Ghani',               email: 'aghani@americloudtelecom.com'           },
     { name: 'Ahmed Syed',                email: 'ahsyed@americloudtelecom.com'           },
     { name: 'Ajay Kumar Andapally',      email: 'ajkumar@americloudtelecom.com'          },
-    { name: 'Alexis Pena',              email: 'apena@americloudtelecom.com'             },
+    { name: 'Akshay Gupta',              email: 'agupta@americloudtelecom.com'           },
+    { name: 'Alexis Pena',               email: 'apena@americloudtelecom.com'            },
     { name: 'Ali Ahmed Zaidi Syed',      email: 'szaidi@americloudtelecom.com'           },
     { name: 'Amaechi Nwankwo',           email: 'anwankwo@americloudtelecom.com'         },
+    { name: 'Amarjeet Singh Rathore',    email: 'arathaur@americloudtelecom.com'         },
     { name: 'Ammar Khan',                email: 'akhan@americloudtelecom.com'            },
+    { name: 'Anand Tiwari',              email: 'atiwari@americloudtelecom.com'          },
     { name: 'Anmol Ahsan',               email: 'aahsan@americloudtelecom.com'           },
+    { name: 'Apurv Nayan',               email: 'anayan@americloudtelecom.com'           },
     { name: 'Arnell Avecilla',           email: 'aavecilla@americloudtelecom.com'        },
     { name: 'Arslan Arif',               email: 'marslan@americloudtelecom.com'          },
     { name: 'Arvin Mariano Fernandez',   email: 'amariano@americloudtelecom.com'         },
+    { name: 'Asim Mallick',              email: 'amallick@americloudtelecom.com'         },
     { name: 'Ayesha Fouad',              email: 'afouad@americloudtelecom.com'           },
-    { name: 'Ayesha Syed',              email: 'accounts@americloudtelecom.com'          },
+    { name: 'Ayesha Syed',               email: 'accounts@americloudtelecom.com'         },
     { name: 'Bakhtawar Jabeen',          email: 'bjabeen@americloudtelecom.com'          },
+    { name: 'Boopathi Shanmugasundaram', email: 'sboopathi@americloudtelecom.com'        },
+    { name: 'Chandra Mohan Pal',         email: 'cmpal@americloudtelecom.com'            },
     { name: 'Chintan Kumar Patel',       email: 'cpatel@americloudtelecom.com'           },
     { name: 'Daniel Lapada',             email: 'dlapada@americloudtelecom.com'          },
+    { name: 'Dharmendra Prasad',         email: 'dprasad@americloudtelecom.com'          },
     { name: 'Dinesh Pottunuri',          email: 'dpottunuri@americloudtelecom.com'       },
     { name: 'Esteban Fernandez',         email: 'efernandez@americloudtelecom.com'       },
     { name: 'Fahad Ghulam',              email: 'fghulam@americloudtelecom.com'          },
     { name: 'Ferdinand Nicasio',         email: 'fnicasio@americloudtelecom.com'         },
     { name: 'Gary Polloso',              email: 'gpolloso@americloudtelecom.com'         },
+    { name: 'Gokul Adusumalli',          email: 'gadusumalli@americloudtelecom.com'      },
     { name: 'Hajira Bibi',               email: 'hbibi@americloudtelecom.com'            },
     { name: 'Hamza Shahzad',             email: 'hshahzad@americloudtelecom.com'         },
+    { name: 'Hirdesh Sharma',            email: 'hsharma@americloudtelecom.com'          },
     { name: 'Humzah Shoaib',             email: 'hshoaib@americloudtelecom.com'          },
     { name: 'Isaiah Nicasio',            email: 'inicasio@americloudtelecom.com'         },
     { name: 'Izza Karim',                email: 'ikarim@americloudtelecom.com'           },
     { name: 'James Faux',                email: 'jfaux@americloudtelecom.com'            },
     { name: 'Jihad Mounir',              email: 'jmounir@americloudtelecom.com'          },
+    { name: 'John Cooke',                email: 'john.cooke@americloudtelecom.com'       },
     { name: 'John Gladhill',             email: 'jgladhill@americloudtelecom.com'        },
     { name: 'Joselito Araneta',          email: 'jaraneta@americloudtelecom.com'         },
     { name: 'Kamran Khan',               email: 'kakhan@americloudtelecom.com'           },
     { name: 'Kaushik Gohel',             email: 'kgohel@americloudtelecom.com'           },
+    { name: 'Kiran Dhanalakoti',         email: 'kdhanalakoti@americloudtelecom.com'     },
     { name: 'Maham Ashraf',              email: 'mashraf@americloudtelecom.com'          },
     { name: 'Maira Waheed',              email: 'mwaheed@americloudtelecom.com'          },
     { name: 'Manish Bommakanti',         email: 'mbommakanti@americloudtelecom.com'      },
+    { name: 'Maria Naseer',              email: 'mnaseer@americloudtelecom.com'          },
     { name: 'Mateen Hussain',            email: 'mhussain@americloudtelecom.com'         },
     { name: 'Mati ul Haq',               email: 'mhaq@americloudtelecom.com'             },
+    { name: 'Meenakshi Pachauri',        email: 'mpachauri@americloudtelecom.com'        },
     { name: 'Mohammed Faizan Khan',      email: 'fakhan@americloudtelecom.com'           },
     { name: 'Mohammed Furquan Ahmed',    email: 'mfahmed@americloudtelecom.com'          },
     { name: 'Mohammed Hussain',          email: 'mohammed.hussain@americloudtelecom.com' },
@@ -97,39 +73,295 @@ var PORTAL_CONFIG = {
     { name: 'Nasrulla Ataulla',          email: 'nkhan@americloudtelecom.com'            },
     { name: 'Nishant Jawale',            email: 'njawale@americloudtelecom.com'          },
     { name: 'Nitin Nanagiri',            email: 'nnanagiri@americloudtelecom.com'        },
+    { name: 'Nitin Rai',                 email: 'nrai@americloudtelecom.com'             },
     { name: 'Orlando Medina',            email: 'omedina@americloudtelecom.com'          },
+    { name: 'Pallavi Umar',              email: 'pumar@americloudtelecom.com'            },
     { name: 'Peter Tijing',              email: 'ptijing@americloudtelecom.com'          },
     { name: 'Petterson Eden',            email: 'peden@americloudtelecom.com'            },
+    { name: 'Pongthep Kuisangiam',       email: 'pkuisangiam@americloudtelecom.com'      },
     { name: 'Pushmeena Saeed',           email: 'psaeed@americloudtelecom.com'           },
     { name: 'Qais Khadher',              email: 'qkhadher@americloudtelecom.com'         },
     { name: 'Qazi Saud Bin Saeed',       email: 'qsaud@americloudtelecom.com'            },
+    { name: 'Rajesh Bhat',               email: 'rbhat@americloudtelecom.com'            },
     { name: 'Reem Kirmani',              email: 'rkirmani@americloudtelecom.com'         },
     { name: 'Rosneidy Galindo',          email: 'rgalindo@americloudtelecom.com'         },
     { name: 'Sai Manikanta Kolla',       email: 'smkolla@americloudtelecom.com'          },
     { name: 'Saleem Waheed',             email: 'swaheed@americloudtelecom.com'          },
+    { name: 'Sampa Sarkar',              email: 'ssarkar@americloudtelecom.com'          },
     { name: 'Sarmad Shahzad',            email: 'sashahzad@americloudtelecom.com'        },
     { name: 'Sathiamurthy Laxman',       email: 'lsathiamurthi@americloudtelecom.com'   },
+    { name: 'Satyam Kumar Singh',        email: 'ssingh@americloudtelecom.com'           },
+    { name: 'Shafquat Mazhari',          email: 'smazhari@americloudtelecom.com'         },
+    { name: 'Shankar Khan',              email: 'shkhan@americloudtelecom.com'           },
+    { name: 'Smriti Rai',                email: 'smrai@americloudtelecom.com'            },
     { name: 'Soban Yousaf',              email: 'syousaf@americloudtelecom.com'          },
+    { name: 'Soubhagya Sahoo',           email: 'ssahoo@americloudtelecom.com'           },
     { name: 'Sri Vishnu Yadala',         email: 'svyadala@americloudtelecom.com'         },
-    { name: 'Syed Muhammad Fateh Kirmani', email: 'fkirmani@americloudtelecom.com'      },
-    { name: 'Syeda Maria Naseer',        email: 'mnaseer@americloudtelecom.com'          },
+    { name: 'Syed Muhammad Fateh Kirmani', email: 'fkirmani@americloudtelecom.com'       },
     { name: 'Tarab Naveed',              email: 'tnaveed@americloudtelecom.com'          },
     { name: 'Tayyab Ali',                email: 'tali@americloudtelecom.com'             },
     { name: 'Thirumalesh Naggari',       email: 'tnaggari@americloudtelecom.com'         },
+    { name: 'Vaibhav Phutela',           email: 'vphutela@americloudtelecom.com'         },
+    { name: 'Vikrant Sen Jha',           email: 'vsjha@americloudtelecom.com'            },
+    { name: 'Vineet Kumar Ray',          email: 'vray@americloudtelecom.com'             },
     { name: 'Yamen Al Zeidi',            email: 'yamenkilani@americloudtelecom.com'      },
+    { name: 'Yashika Sharma',            email: 'ysharma@americloudtelecom.com'          },
   ],
 
   // ── Staff roster ──────────────────────────────────────────────────────────
-  // Keyed by M365 email (lowercase).
-  // role:  'employee' | 'manager' | 'hr'
-  // team:  managers only — array of employee emails this manager supervises.
-  //
-  // Add one entry per person. Remove the leading // from each example line.
+  // role: 'employee' | 'manager' | 'hr'
+  // team: managers only — direct reports (email array)
   staff: {
-    // 'john.doe@americloudtelecom.com':    { name: 'John Doe',    role: 'employee' },
-    // 'jane.smith@americloudtelecom.com':  { name: 'Jane Smith',  role: 'manager',
-    //                                        team: ['john.doe@americloudtelecom.com'] },
-    // 'hr@americloudtelecom.com':          { name: 'HR Admin',    role: 'hr' },
+
+    // ── HR ───────────────────────────────────────────────────────────────────
+    'mnaseer@americloudtelecom.com':  { name: 'Maria Naseer',             role: 'hr' },
+    'ysharma@americloudtelecom.com':  { name: 'Yashika Sharma',           role: 'hr' },
+
+    // ── EXECUTIVE ────────────────────────────────────────────────────────────
+    'swaheed@americloudtelecom.com':  { name: 'Saleem Waheed',            role: 'manager', team: [
+      'akhan@americloudtelecom.com',
+      'mhussain@americloudtelecom.com',
+      'kgohel@americloudtelecom.com',
+      'ahsyed@americloudtelecom.com',
+      'accounts@americloudtelecom.com',
+      'john.cooke@americloudtelecom.com',
+      'kdhanalakoti@americloudtelecom.com',
+      'peden@americloudtelecom.com',
+      'efernandez@americloudtelecom.com',
+      'kakhan@americloudtelecom.com',
+      'cmpal@americloudtelecom.com',
+      'msheykh@americloudtelecom.com',
+      'psaeed@americloudtelecom.com',
+      'mohammed.hussain@americloudtelecom.com',
+      'gadusumalli@americloudtelecom.com',
+      'njawale@americloudtelecom.com',
+      'yamenkilani@americloudtelecom.com',
+      'nbihan@americloudtelecom.com',
+    ]},
+    'aghani@americloudtelecom.com':   { name: 'Ahmed Ghani',              role: 'manager', team: [
+      'akhan@americloudtelecom.com',
+      'mhussain@americloudtelecom.com',
+      'kgohel@americloudtelecom.com',
+      'ahsyed@americloudtelecom.com',
+      'accounts@americloudtelecom.com',
+      'john.cooke@americloudtelecom.com',
+      'kdhanalakoti@americloudtelecom.com',
+      'peden@americloudtelecom.com',
+      'efernandez@americloudtelecom.com',
+      'kakhan@americloudtelecom.com',
+      'cmpal@americloudtelecom.com',
+      'msheykh@americloudtelecom.com',
+      'psaeed@americloudtelecom.com',
+      'mohammed.hussain@americloudtelecom.com',
+      'gadusumalli@americloudtelecom.com',
+      'njawale@americloudtelecom.com',
+      'yamenkilani@americloudtelecom.com',
+      'nbihan@americloudtelecom.com',
+    ]},
+    'kgohel@americloudtelecom.com':        { name: 'Kaushik Gohel',       role: 'employee' },
+    'john.cooke@americloudtelecom.com':    { name: 'John Cooke',           role: 'employee' },
+    'kdhanalakoti@americloudtelecom.com':  { name: 'Kiran Dhanalakoti',    role: 'employee' },
+    'gadusumalli@americloudtelecom.com':   { name: 'Gokul Adusumalli',     role: 'employee' },
+    'msheykh@americloudtelecom.com':       { name: 'Muhammad Bilal Sheykh',role: 'employee' },
+    'psaeed@americloudtelecom.com':        { name: 'Pushmeena Saeed',      role: 'employee' },
+
+    // ── EXECUTIVE / HR ───────────────────────────────────────────────────────
+    'ahsyed@americloudtelecom.com':   { name: 'Ahmed Syed',               role: 'manager', team: [
+      'mnaseer@americloudtelecom.com',
+    ]},
+
+    // ── CONSTRUCTION ─────────────────────────────────────────────────────────
+    'njawale@americloudtelecom.com':  { name: 'Nishant Jawale',           role: 'manager', team: [
+      'afateh@americloudtelecom.com',
+      'nkhan@americloudtelecom.com',
+      'nrasool@americloudtelecom.com',
+      'aavecilla@americloudtelecom.com',
+      'jmounir@americloudtelecom.com',
+      'hsharma@americloudtelecom.com',
+    ]},
+    'afateh@americloudtelecom.com':    { name: 'Abdul Fateh',             role: 'employee' },
+    'nkhan@americloudtelecom.com':     { name: 'Nasrulla Ataulla',         role: 'employee' },
+    'nrasool@americloudtelecom.com':   { name: 'Nadeem Rasool',            role: 'employee' },
+    'aavecilla@americloudtelecom.com': { name: 'Arnell Avecilla',          role: 'employee' },
+    'jmounir@americloudtelecom.com':   { name: 'Jihad Mounir',             role: 'employee' },
+    'hsharma@americloudtelecom.com':   { name: 'Hirdesh Sharma',           role: 'employee' },
+
+    // ── DESIGN ───────────────────────────────────────────────────────────────
+    'nbihan@americloudtelecom.com':       { name: 'Narender Bihan',        role: 'manager', team: [
+      'nbakhshi@americloudtelecom.com',
+      'hshoaib@americloudtelecom.com',
+      'pkuisangiam@americloudtelecom.com',
+    ]},
+    'nbakhshi@americloudtelecom.com':     { name: 'Naaman Bakshi',         role: 'employee' },
+    'hshoaib@americloudtelecom.com':      { name: 'Humzah Shoaib',         role: 'employee' },
+    'pkuisangiam@americloudtelecom.com':  { name: 'Pongthep Kuisangiam',   role: 'employee' },
+
+    // ── INTEGRATION ──────────────────────────────────────────────────────────
+    'peden@americloudtelecom.com':    { name: 'Petterson Eden',            role: 'manager', team: [
+      'apena@americloudtelecom.com',
+      'mfahmed@americloudtelecom.com',
+      'ransari@americloudtelecom.com',
+      'agupta@americloudtelecom.com',
+      'anayan@americloudtelecom.com',
+      'dprasad@americloudtelecom.com',
+      'ssarkar@americloudtelecom.com',
+    ]},
+    'apena@americloudtelecom.com':    { name: 'Alexis Pena',               role: 'employee' },
+    'mfahmed@americloudtelecom.com':  { name: 'Mohammed Furquan Ahmed',    role: 'employee' },
+    'ransari@americloudtelecom.com':  { name: 'Mohammed Rayyan Ansari',    role: 'employee' },
+    'agupta@americloudtelecom.com':   { name: 'Akshay Gupta',              role: 'employee' },
+    'anayan@americloudtelecom.com':   { name: 'Apurv Nayan',               role: 'employee' },
+    'dprasad@americloudtelecom.com':  { name: 'Dharmendra Prasad',         role: 'employee' },
+    'ssarkar@americloudtelecom.com':  { name: 'Sampa Sarkar',              role: 'employee' },
+
+    // ── COMMISSIONING & INTEGRATION ──────────────────────────────────────────
+    'efernandez@americloudtelecom.com': { name: 'Esteban Fernandez',       role: 'manager', team: [
+      'afouad@americloudtelecom.com',
+      'hshahzad@americloudtelecom.com',
+      'tnaveed@americloudtelecom.com',
+      'aahsan@americloudtelecom.com',
+      'sashahzad@americloudtelecom.com',
+      'hbibi@americloudtelecom.com',
+      'omedina@americloudtelecom.com',
+      'rgalindo@americloudtelecom.com',
+      'nbihan@americloudtelecom.com',
+    ]},
+    'omedina@americloudtelecom.com':   { name: 'Orlando Medina',           role: 'employee' },
+    'rgalindo@americloudtelecom.com':  { name: 'Rosneidy Galindo',         role: 'employee' },
+    'afouad@americloudtelecom.com':    { name: 'Ayesha Fouad',             role: 'employee' },
+    'hshahzad@americloudtelecom.com':  { name: 'Hamza Shahzad',            role: 'employee' },
+    'tnaveed@americloudtelecom.com':   { name: 'Tarab Naveed',             role: 'employee' },
+    'aahsan@americloudtelecom.com':    { name: 'Anmol Ahsan',              role: 'employee' },
+    'sashahzad@americloudtelecom.com': { name: 'Sarmad Shahzad',           role: 'employee' },
+    'hbibi@americloudtelecom.com':     { name: 'Hajira Bibi',              role: 'employee' },
+
+    // ── OPERATIONS ───────────────────────────────────────────────────────────
+    'cmpal@americloudtelecom.com':    { name: 'Chandra Mohan Pal',         role: 'manager', team: [
+      'qkhadher@americloudtelecom.com',
+      'anwankwo@americloudtelecom.com',
+      'pumar@americloudtelecom.com',
+      'rbhat@americloudtelecom.com',
+      'smazhari@americloudtelecom.com',
+      'vphutela@americloudtelecom.com',
+      'vsjha@americloudtelecom.com',
+      'vray@americloudtelecom.com',
+      'amallick@americloudtelecom.com',
+      'asharma@americloudtelecom.com',
+      'arathaur@americloudtelecom.com',
+      'atiwari@americloudtelecom.com',
+      'mpachauri@americloudtelecom.com',
+      'nrai@americloudtelecom.com',
+      'ysharma@americloudtelecom.com',
+    ]},
+    'qkhadher@americloudtelecom.com':  { name: 'Qais Khadher',             role: 'employee' },
+    'anwankwo@americloudtelecom.com':  { name: 'Amaechi Nwankwo',          role: 'employee' },
+    'pumar@americloudtelecom.com':     { name: 'Pallavi Umar',              role: 'employee' },
+    'rbhat@americloudtelecom.com':     { name: 'Rajesh Bhat',               role: 'employee' },
+    'smazhari@americloudtelecom.com':  { name: 'Shafquat Mazhari',          role: 'employee' },
+    'vphutela@americloudtelecom.com':  { name: 'Vaibhav Phutela',           role: 'employee' },
+    'vsjha@americloudtelecom.com':     { name: 'Vikrant Sen Jha',           role: 'employee' },
+    'vray@americloudtelecom.com':      { name: 'Vineet Kumar Ray',          role: 'employee' },
+    'amallick@americloudtelecom.com':  { name: 'Asim Mallick',              role: 'employee' },
+    'asharma@americloudtelecom.com':   { name: 'Abhay Sharma',              role: 'employee' },
+    'arathaur@americloudtelecom.com':  { name: 'Amarjeet Singh Rathore',    role: 'employee' },
+    'atiwari@americloudtelecom.com':   { name: 'Anand Tiwari',              role: 'employee' },
+    'mpachauri@americloudtelecom.com': { name: 'Meenakshi Pachauri',        role: 'employee' },
+    'nrai@americloudtelecom.com':      { name: 'Nitin Rai',                 role: 'employee' },
+
+    // ── MACRO SERVICES ───────────────────────────────────────────────────────
+    'mohammed.hussain@americloudtelecom.com': { name: 'Mohammed Hussain',   role: 'manager', team: [
+      'jaraneta@americloudtelecom.com',
+      'gpolloso@americloudtelecom.com',
+      'fnicasio@americloudtelecom.com',
+      'dlapada@americloudtelecom.com',
+      'mbommakanti@americloudtelecom.com',
+      'abautista@americloudtelecom.com',
+      'smkolla@americloudtelecom.com',
+      'ptijing@americloudtelecom.com',
+      'svyadala@americloudtelecom.com',
+      'ajkumar@americloudtelecom.com',
+      'dpottunuri@americloudtelecom.com',
+      'jfaux@americloudtelecom.com',
+      'fakhan@americloudtelecom.com',
+      'ssingh@americloudtelecom.com',
+      'smrai@americloudtelecom.com',
+      'mwaheed@americloudtelecom.com',
+      'fghulam@americloudtelecom.com',
+    ]},
+    'jaraneta@americloudtelecom.com':    { name: 'Joselito Araneta',        role: 'employee' },
+    'gpolloso@americloudtelecom.com':    { name: 'Gary Polloso',             role: 'employee' },
+    'fnicasio@americloudtelecom.com':    { name: 'Ferdinand Nicasio',        role: 'employee' },
+    'dlapada@americloudtelecom.com':     { name: 'Daniel Lapada',            role: 'employee' },
+    'mbommakanti@americloudtelecom.com': { name: 'Manish Bommakanti',        role: 'employee' },
+    'abautista@americloudtelecom.com':   { name: 'Abelino Bautista',         role: 'employee' },
+    'smkolla@americloudtelecom.com':     { name: 'Sai Manikanta Kolla',      role: 'employee' },
+    'ptijing@americloudtelecom.com':     { name: 'Peter Tijing',             role: 'employee' },
+    'svyadala@americloudtelecom.com':    { name: 'Sri Vishnu Yadala',        role: 'employee' },
+    'ajkumar@americloudtelecom.com':     { name: 'Ajay Kumar Andapally',     role: 'employee' },
+    'dpottunuri@americloudtelecom.com':  { name: 'Dinesh Pottunuri',         role: 'employee' },
+    'jfaux@americloudtelecom.com':       { name: 'James Faux',               role: 'employee' },
+    'fakhan@americloudtelecom.com':      { name: 'Mohammed Faizan Khan',     role: 'employee' },
+    'ssingh@americloudtelecom.com':      { name: 'Satyam Kumar Singh',       role: 'employee' },
+    'smrai@americloudtelecom.com':       { name: 'Smriti Rai',               role: 'employee' },
+    'mwaheed@americloudtelecom.com':     { name: 'Maira Waheed',             role: 'employee' },
+    'fghulam@americloudtelecom.com':     { name: 'Fahad Ghulam',             role: 'employee' },
+
+    // ── SERVICE DELIVERY ─────────────────────────────────────────────────────
+    'akhan@americloudtelecom.com':    { name: 'Ammar Khan',                role: 'manager', team: [
+      'shkhan@americloudtelecom.com',
+      'ssahoo@americloudtelecom.com',
+      'mashraf@americloudtelecom.com',
+      'marslan@americloudtelecom.com',
+      'mzbaig@americloudtelecom.com',
+      'qsaud@americloudtelecom.com',
+      'bjabeen@americloudtelecom.com',
+      'syousaf@americloudtelecom.com',
+      'efernandez@americloudtelecom.com',
+      'peden@americloudtelecom.com',
+      'kakhan@americloudtelecom.com',
+      'cmpal@americloudtelecom.com',
+      'msheykh@americloudtelecom.com',
+      'psaeed@americloudtelecom.com',
+    ]},
+    'shkhan@americloudtelecom.com':    { name: 'Shankar Khan',              role: 'employee' },
+    'ssahoo@americloudtelecom.com':    { name: 'Soubhagya Sahoo',           role: 'employee' },
+    'mashraf@americloudtelecom.com':   { name: 'Maham Ashraf',              role: 'employee' },
+    'marslan@americloudtelecom.com':   { name: 'Arslan Arif',               role: 'employee' },
+    'mzbaig@americloudtelecom.com':    { name: 'Muhammad Zargham Baig',     role: 'employee' },
+    'qsaud@americloudtelecom.com':     { name: 'Qazi Saud Bin Saeed',       role: 'employee' },
+    'bjabeen@americloudtelecom.com':   { name: 'Bakhtawar Jabeen',          role: 'employee' },
+    'syousaf@americloudtelecom.com':   { name: 'Soban Yousaf',              role: 'employee' },
+
+    // ── SALES & GROWTH ───────────────────────────────────────────────────────
+    'mhussain@americloudtelecom.com': { name: 'Mateen Hussain',            role: 'manager', team: [
+      'fkirmani@americloudtelecom.com',
+      'mhaq@americloudtelecom.com',
+      'mmohammed@americloud.net',
+      'mohammed.hussain@americloudtelecom.com',
+      'gadusumalli@americloudtelecom.com',
+      'njawale@americloudtelecom.com',
+      'yamenkilani@americloudtelecom.com',
+      'cmpal@americloudtelecom.com',
+      'nbihan@americloudtelecom.com',
+    ]},
+    'fkirmani@americloudtelecom.com':  { name: 'Syed Muhammad Fateh Kirmani', role: 'employee' },
+    'mhaq@americloudtelecom.com':      { name: 'Mati ul Haq',              role: 'employee' },
+    'mmohammed@americloud.net':        { name: 'Mustafa Mohammed',         role: 'employee' },
+
+    // ── ACCOUNTING ───────────────────────────────────────────────────────────
+    'accounts@americloudtelecom.com': { name: 'Ayesha Syed',              role: 'manager', team: [
+      'rkirmani@americloudtelecom.com',
+      'ikarim@americloudtelecom.com',
+    ]},
+    'rkirmani@americloudtelecom.com':  { name: 'Reem Kirmani',             role: 'employee' },
+    'ikarim@americloudtelecom.com':    { name: 'Izza Karim',               role: 'employee' },
+
+    // ── TMO ──────────────────────────────────────────────────────────────────
+    'kakhan@americloudtelecom.com':    { name: 'Kamran Khan',              role: 'manager', team: [
+      'sboopathi@americloudtelecom.com',
+    ]},
+    'sboopathi@americloudtelecom.com': { name: 'Boopathi Shanmugasundaram', role: 'employee' },
+
   }
 
 };
