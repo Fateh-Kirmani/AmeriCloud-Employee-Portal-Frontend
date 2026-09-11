@@ -148,6 +148,19 @@
     var userEmail       = account ? account.username.toLowerCase() : 'demo@americloudtelecom.com';
     var userDisplayName = account ? (account.name || account.username) : 'Demo User';
 
+    // ── Show signed-in user ───────────────────────────────────────────────
+    var sidebarUser = document.getElementById('sidebar-user');
+    if (sidebarUser) {
+      document.getElementById('sidebar-user-name').textContent  = userDisplayName;
+      document.getElementById('sidebar-user-email').textContent = userEmail;
+      sidebarUser.hidden = false;
+    }
+    var topbarName = document.getElementById('topbar-user-name');
+    if (topbarName) {
+      topbarName.textContent = userDisplayName;
+      topbarName.hidden = false;
+    }
+
     // ── Role detection ────────────────────────────────────────────────────
     var isManager = false;
     var isHR      = false;
