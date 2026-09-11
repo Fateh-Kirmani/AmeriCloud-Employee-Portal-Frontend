@@ -1209,32 +1209,9 @@
     }
 
     function loadDirectory() {
-      grid.innerHTML = '<p class="portal-ts-loading">Loading directory…</p>';
-      if (IS_DEMO) {
-        roster = (PORTAL_CONFIG.directory || []).slice();
-        rosterLoaded = true;
-        renderGrid(roster);
-        return;
-      }
-      getGraphToken().then(function (token) {
-        return fetch(
-          'https://graph.microsoft.com/v1.0/users?$select=displayName,mail,jobTitle,department&$top=999&$filter=accountEnabled eq true',
-          { headers: { 'Authorization': 'Bearer ' + token } }
-        );
-      }).then(function (r) {
-        if (!r.ok) throw new Error('Graph error ' + r.status);
-        return r.json();
-      }).then(function (data) {
-        roster = (data.value || [])
-          .filter(function (u) { return u.mail; })
-          .map(function (u) { return { name: u.displayName || u.mail, email: u.mail, title: u.jobTitle || '', dept: u.department || '' }; })
-          .sort(function (a, b) { return a.name.localeCompare(b.name); });
-        rosterLoaded = true;
-        renderGrid(roster);
-      }).catch(function (err) {
-        console.error('Directory load error:', err);
-        grid.innerHTML = '<p class="portal-ts-empty portal-ts-empty--error">Could not load directory. You may need to approve the permission request that appeared.</p>';
-      });
+      roster = (PORTAL_CONFIG.directory || []).slice();
+      rosterLoaded = true;
+      renderGrid(roster);
     }
 
     function renderGrid(entries) {
