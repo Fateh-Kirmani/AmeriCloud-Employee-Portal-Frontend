@@ -14,6 +14,24 @@ var PORTAL_CONFIG = {
       body:     'Your new self-service portal is live. Access pay information, submit incident reports, review the Employee Handbook, and more — all from one place.',
       pinned:   true,
     },
+    {
+      date:     '2026-09-15',
+      category: 'Portal',
+      title:    'Company Directory Now Organized by Country',
+      body:     'The Company Directory has been updated and is now grouped by United States, India, and Pakistan, making it easier to find colleagues across all regions. Open it from the Forms & Resources section.',
+    },
+    {
+      date:     '2026-09-15',
+      category: 'Portal',
+      title:    'Company Calendar Available',
+      body:     'View the 2026 and 2027 holiday schedule and upcoming paydays in the new Company Calendar. Find it under Forms & Resources.',
+    },
+    {
+      date:     '2026-09-15',
+      category: 'Portal',
+      title:    'Policies Now Viewable In-Browser',
+      body:     'Issued policies can now be opened and read directly in the portal without downloading. Look for underlined policy names in the Time & Policies section.',
+    },
   ],
 
   // ── Company Directory (A–Z by first name) ─────────────────────────────────
