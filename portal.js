@@ -270,6 +270,9 @@
     // Available to all roles — incident report form
     setupIncidentReport(userEmail, userDisplayName);
 
+    // Available to all roles — company news
+    setupNews();
+
     // Available to all roles — company directory
     setupDirectory();
 
@@ -1382,6 +1385,50 @@
     return sLabel + '–' + MONTHS[end.getMonth()] + ' ' + end.getDate() + ', ' + endYear;
   }
 
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Company News
+  // ══════════════════════════════════════════════════════════════════════════
+  function setupNews() {
+    var listEl = document.getElementById('news-list');
+    if (!listEl) return;
+
+    var BADGE_COLORS = {
+      General:    '#0f1e42',
+      HR:         '#9f1239',
+      Operations: '#065f46',
+      Leadership: '#5b21b6',
+      Safety:     '#92400e',
+    };
+
+    var items = (PORTAL_CONFIG.news || []).slice();
+    // Pinned items first, then newest-first
+    items.sort(function (a, b) {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return  1;
+      return (b.date || '').localeCompare(a.date || '');
+    });
+
+    if (!items.length) return;
+
+    listEl.innerHTML = items.map(function (item) {
+      var color     = BADGE_COLORS[item.category] || BADGE_COLORS.General;
+      var dateStr   = '';
+      if (item.date) {
+        var d = new Date(item.date + 'T00:00:00');
+        dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      }
+      return '<div class="portal-news-card' + (item.pinned ? ' portal-news-card--pinned' : '') + '">'
+        + '<div class="portal-news-meta">'
+        + (item.category ? '<span class="portal-news-badge" style="background:' + color + '">' + escapeHtml(item.category) + '</span>' : '')
+        + (dateStr ? '<span class="portal-news-date">' + dateStr + '</span>' : '')
+        + (item.pinned ? '<span class="portal-news-pin" title="Pinned">&#128204;</span>' : '')
+        + '</div>'
+        + '<p class="portal-news-title">' + escapeHtml(item.title) + '</p>'
+        + '<p class="portal-news-body">' + escapeHtml(item.body) + '</p>'
+        + '</div>';
+    }).join('');
+  }
 
   // ══════════════════════════════════════════════════════════════════════════
   // Company Directory — searchable employee list with Teams chat links
