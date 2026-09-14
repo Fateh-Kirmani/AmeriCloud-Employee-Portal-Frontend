@@ -1463,9 +1463,43 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 .portal-dir-grid {
+  display: block;
+}
+
+/* Country section grouping */
+.portal-dir-country {
+  margin-bottom: 28px;
+}
+.portal-dir-country-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 5px;
+  margin-bottom: 12px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.portal-dir-country-head--us       { background: #0f1e42; }
+.portal-dir-country-head--india    { background: #b84e00; }
+.portal-dir-country-head--pakistan { background: #166534; }
+.portal-dir-country-count {
+  font-weight: 400;
+  opacity: .75;
+}
+.portal-dir-country-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+}
+@media (max-width: 900px) {
+  .portal-dir-country-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .portal-dir-country-grid { grid-template-columns: 1fr; }
 }
 
 .portal-dir-card {
@@ -1547,12 +1581,6 @@ button { cursor: pointer; font-family: inherit; }
   margin: 0;
 }
 
-@media (max-width: 900px) {
-  .portal-dir-grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 560px) {
-  .portal-dir-grid { grid-template-columns: 1fr; }
-}
 
 /* ══════════════════════════════════════════════════════════════════════
    INCIDENT REPORT — FORM & HR TABLE

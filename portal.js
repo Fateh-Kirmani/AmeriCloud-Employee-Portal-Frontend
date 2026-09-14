@@ -1421,28 +1421,55 @@
       renderGrid(roster);
     }
 
+    function renderCard(emp) {
+      var initial  = emp.name.charAt(0).toUpperCase();
+      var color    = COLORS[emp.name.charCodeAt(0) % COLORS.length];
+      var teamsUrl = 'https://teams.microsoft.com/l/chat/0/0?users=' + encodeURIComponent(emp.email);
+      return '<div class="portal-dir-card">'
+        + '<div class="portal-dir-avatar" style="background:' + color + '">' + escapeHtml(initial) + '</div>'
+        + '<div class="portal-dir-info">'
+        + '<span class="portal-dir-name">' + escapeHtml(emp.name) + '</span>'
+        + '<span class="portal-dir-email">' + escapeHtml(emp.email) + '</span>'
+        + (emp.title ? '<span class="portal-dir-title">' + escapeHtml(emp.title) + (emp.dept ? ' — ' + escapeHtml(emp.dept) : '') + '</span>' : '')
+        + '</div>'
+        + '<a href="' + teamsUrl + '" target="_blank" rel="noopener" class="portal-dir-teams" title="Message ' + escapeHtml(emp.name) + ' on Teams">'
+        + '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>'
+        + ' Chat</a>'
+        + '</div>';
+    }
+
+    var COUNTRY_ORDER  = ['US', 'India', 'Pakistan'];
+    var COUNTRY_LABELS = { US: 'United States', India: 'India', Pakistan: 'Pakistan' };
+
     function renderGrid(entries) {
       if (count) count.textContent = entries.length + ' of ' + roster.length + ' people';
       if (!entries.length) {
         grid.innerHTML = '<p class="portal-dir-empty">No results match your search.</p>';
         return;
       }
-      grid.innerHTML = entries.map(function (emp) {
-        var initial  = emp.name.charAt(0).toUpperCase();
-        var color    = COLORS[emp.name.charCodeAt(0) % COLORS.length];
-        var teamsUrl = 'https://teams.microsoft.com/l/chat/0/0?users=' + encodeURIComponent(emp.email);
-        return '<div class="portal-dir-card">'
-          + '<div class="portal-dir-avatar" style="background:' + color + '">' + escapeHtml(initial) + '</div>'
-          + '<div class="portal-dir-info">'
-          + '<span class="portal-dir-name">' + escapeHtml(emp.name) + '</span>'
-          + '<span class="portal-dir-email">' + escapeHtml(emp.email) + '</span>'
-          + (emp.title ? '<span class="portal-dir-title">' + escapeHtml(emp.title) + (emp.dept ? ' — ' + escapeHtml(emp.dept) : '') + '</span>' : '')
+
+      // Group by country
+      var groups = {};
+      COUNTRY_ORDER.forEach(function (c) { groups[c] = []; });
+      entries.forEach(function (emp) {
+        var c = emp.country || 'US';
+        if (!groups[c]) groups[c] = [];
+        groups[c].push(emp);
+      });
+
+      var html = '';
+      COUNTRY_ORDER.forEach(function (c) {
+        var grp = groups[c];
+        if (!grp || !grp.length) return;
+        html += '<div class="portal-dir-country">'
+          + '<div class="portal-dir-country-head portal-dir-country-head--' + c.toLowerCase() + '">'
+          + escapeHtml(COUNTRY_LABELS[c])
+          + ' <span class="portal-dir-country-count">(' + grp.length + ')</span>'
           + '</div>'
-          + '<a href="' + teamsUrl + '" target="_blank" rel="noopener" class="portal-dir-teams" title="Message ' + escapeHtml(emp.name) + ' on Teams">'
-          + '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>'
-          + ' Chat</a>'
+          + '<div class="portal-dir-country-grid">' + grp.map(renderCard).join('') + '</div>'
           + '</div>';
-      }).join('');
+      });
+      grid.innerHTML = html;
     }
   }
 
