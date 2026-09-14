@@ -1394,11 +1394,8 @@
     if (!listEl) return;
 
     var BADGE_COLORS = {
-      General:    '#0f1e42',
-      HR:         '#9f1239',
-      Operations: '#065f46',
-      Leadership: '#5b21b6',
-      Safety:     '#92400e',
+      Company: '#0f1e42',
+      Portal:  '#2563eb',
     };
 
     var items = (PORTAL_CONFIG.news || []).slice();
@@ -1412,7 +1409,7 @@
     if (!items.length) return;
 
     listEl.innerHTML = items.map(function (item) {
-      var color     = BADGE_COLORS[item.category] || BADGE_COLORS.General;
+      var color     = BADGE_COLORS[item.category] || BADGE_COLORS.Portal;
       var dateStr   = '';
       if (item.date) {
         var d = new Date(item.date + 'T00:00:00');

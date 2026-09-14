@@ -4,12 +4,12 @@
 var PORTAL_CONFIG = {
 
   // ── Company News & Announcements ──────────────────────────────────────────
-  // category options: 'General' | 'HR' | 'Operations' | 'Leadership' | 'Safety'
+  // category options: 'Company' | 'Portal' (default: 'Portal')
   // pinned: true keeps the item at the top regardless of date order
   news: [
     {
       date:     '2026-09-15',
-      category: 'General',
+      category: 'Portal',
       title:    'Employee Portal Now Live',
       body:     'Your new self-service portal is live. Access pay information, submit incident reports, review the Employee Handbook, and more — all from one place.',
       pinned:   true,
