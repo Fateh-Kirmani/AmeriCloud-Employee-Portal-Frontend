@@ -131,7 +131,7 @@
             <span class="portal-tile__title">Paychex Flex</span>
             <span class="portal-tile__sub">Pay &amp; benefits</span>
           </a>
-          <a href="#" class="portal-tile" data-goto="time">
+          <a href="#" class="portal-tile" data-goto="time" id="tile-timesheets" hidden>
             <svg class="portal-tile__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <span class="portal-tile__title">Timesheets</span>
             <span class="portal-tile__sub">Download &amp; submit</span>
@@ -203,7 +203,7 @@
       </div>
       <div class="portal-container">
         <ul class="portal-linklist">
-          <li class="portal-linkitem">
+          <li class="portal-linkitem" id="ts-item-ca" hidden>
             <div class="portal-linkitem__body">
               <span class="portal-linkitem__title">Timesheet &mdash; California Edition</span>
               <span class="portal-linkitem__desc">Use this if you work in California. Includes meal/rest break tracking and daily OT.</span>
@@ -213,7 +213,7 @@
               <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-submit-ca" type="button">Submit Timesheet</button>
             </div>
           </li>
-          <li class="portal-linkitem">
+          <li class="portal-linkitem" id="ts-item-std" hidden>
             <div class="portal-linkitem__body">
               <span class="portal-linkitem__title">Timesheet &mdash; Standard Edition</span>
               <span class="portal-linkitem__desc">Use this for all other states.</span>

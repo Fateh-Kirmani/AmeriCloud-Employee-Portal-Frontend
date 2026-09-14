@@ -228,11 +228,19 @@
     // ── Handbook ──────────────────────────────────────────────────────────
     setupHandbook(userEmail, userDisplayName);
 
-    // ── Timesheet upload ──────────────────────────────────────────────────
-    setupTimesheetUpload(userEmail, userDisplayName);
-
     // ── Timesheet viewer ──────────────────────────────────────────────────
     var staffEntry = PORTAL_CONFIG.staff[userEmail] || null;
+
+    if (isManager || isHR) {
+      // Reveal timesheet items and tile for manager/HR
+      var tileTs = document.getElementById('tile-timesheets');
+      var tsCA   = document.getElementById('ts-item-ca');
+      var tsStd  = document.getElementById('ts-item-std');
+      if (tileTs) tileTs.hidden = false;
+      if (tsCA)   tsCA.hidden   = false;
+      if (tsStd)  tsStd.hidden  = false;
+      setupTimesheetUpload(userEmail, userDisplayName);
+    }
 
     if (isManager) {
       var team = (staffEntry && staffEntry.team) ? staffEntry.team : [];
