@@ -242,8 +242,12 @@
       setupTimesheetUpload(userEmail, userDisplayName);
     }
 
+    var team = (staffEntry && staffEntry.team) ? staffEntry.team : [];
+
+    // Available to all roles — greeting + at-a-glance strip
+    setupHomeGreeting(userDisplayName, isManager, isHR, team);
+
     if (isManager) {
-      var team = (staffEntry && staffEntry.team) ? staffEntry.team : [];
       // In demo mode use null so mock data shows for any team
       setupTimesheetViewer('manager', IS_DEMO ? null : team);
       setupPTOApprovals(IS_DEMO ? null : team, 'manager');
@@ -1385,6 +1389,72 @@
     return sLabel + '–' + MONTHS[end.getMonth()] + ' ' + end.getDate() + ', ' + endYear;
   }
 
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Home greeting + at-a-glance strip
+  // ══════════════════════════════════════════════════════════════════════════
+  function setupHomeGreeting(userDisplayName, isManager, isHR, team) {
+    var welcomeEl  = document.getElementById('home-welcome');
+    var greetingEl = document.getElementById('home-greeting');
+    var glanceEl   = document.getElementById('home-glance');
+    if (!welcomeEl || !greetingEl || !glanceEl) return;
+
+    // Time-of-day greeting
+    var hour      = new Date().getHours();
+    var tod       = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    var firstName = userDisplayName.split(' ')[0];
+    greetingEl.textContent = tod + ', ' + firstName + '.';
+    welcomeEl.hidden = false;
+
+    // Next payday
+    function paydayFor(yr, mo) {
+      var d = new Date(yr, mo, 15);
+      if (d.getDay() === 6) d.setDate(17);
+      if (d.getDay() === 0) d.setDate(16);
+      return d;
+    }
+    var now   = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var pd    = paydayFor(today.getFullYear(), today.getMonth());
+    if (pd < today) {
+      var nm = today.getMonth() === 11 ? 0 : today.getMonth() + 1;
+      var ny = today.getMonth() === 11 ? today.getFullYear() + 1 : today.getFullYear();
+      pd = paydayFor(ny, nm);
+    }
+    var diffDays = Math.round((pd - today) / 86400000);
+    var pdStr    = pd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    var pdSub    = diffDays === 0 ? 'Today — payday! 🎉' : 'in ' + diffDays + ' day' + (diffDays === 1 ? '' : 's');
+
+    glanceEl.innerHTML = '<div class="portal-glance-card portal-glance-card--highlight">'
+      + '<span class="portal-glance-card__label">Next Payday</span>'
+      + '<span class="portal-glance-card__value">' + escapeHtml(pdStr) + '</span>'
+      + '<span class="portal-glance-card__sub">' + escapeHtml(pdSub) + '</span>'
+      + '</div>';
+
+    // Pending policy signatures (employees only)
+    if (!isManager && !isHR && !IS_DEMO) {
+      apiCall('/policies/my').then(function (data) {
+        var pending = (data || []).filter(function (p) { return p.status === 'pending'; }).length;
+        glanceEl.innerHTML += '<div class="portal-glance-card' + (pending > 0 ? ' portal-glance-card--alert' : '') + '">'
+          + '<span class="portal-glance-card__label">Policies to Sign</span>'
+          + '<span class="portal-glance-card__value">' + pending + '</span>'
+          + '<span class="portal-glance-card__sub">' + (pending === 0 ? 'All up to date' : 'Awaiting your signature') + '</span>'
+          + '</div>';
+      }).catch(function () {});
+    }
+
+    // Pending timesheet reviews (managers only)
+    if (isManager && !IS_DEMO && team && team.length) {
+      apiCall('/timesheets/team?emails=' + encodeURIComponent(team.join(','))).then(function (data) {
+        var pending = (data || []).filter(function (t) { return t.status === 'pending'; }).length;
+        glanceEl.innerHTML += '<div class="portal-glance-card' + (pending > 0 ? ' portal-glance-card--alert' : '') + '">'
+          + '<span class="portal-glance-card__label">Timesheets to Review</span>'
+          + '<span class="portal-glance-card__value">' + pending + '</span>'
+          + '<span class="portal-glance-card__sub">' + (pending === 0 ? 'Nothing pending' : 'Awaiting your review') + '</span>'
+          + '</div>';
+      }).catch(function () {});
+    }
+  }
 
   // ══════════════════════════════════════════════════════════════════════════
   // Company News

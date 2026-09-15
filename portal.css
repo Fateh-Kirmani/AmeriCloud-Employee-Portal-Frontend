@@ -1740,6 +1740,58 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   HOME GREETING + AT-A-GLANCE
+═══════════════════════════════════════════════════════════════════════════ */
+.portal-home-welcome {
+  padding: 28px clamp(20px, 4vw, 48px) 0;
+}
+.portal-greeting {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 16px;
+}
+.portal-glance {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.portal-glance-card {
+  flex: 1;
+  min-width: 160px;
+  max-width: 260px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.portal-glance-card--highlight { border-left: 3px solid var(--navy); }
+.portal-glance-card--alert     { border-left: 3px solid #9f1239; }
+.portal-glance-card__label {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--slate-2);
+}
+.portal-glance-card__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.2;
+}
+.portal-glance-card__sub {
+  font-size: .75rem;
+  color: var(--slate);
+}
+@media (max-width: 560px) {
+  .portal-glance-card { max-width: 100%; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    COMPANY NEWS
 ═══════════════════════════════════════════════════════════════════════════ */
 .portal-news-section {
