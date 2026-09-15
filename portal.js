@@ -259,11 +259,15 @@
       setupHandbookSignoffViewer();
       setupHRPolicies();
       setupHRIncidentReports();
+      setupHREfs();
       setupPTOApprovals(null, 'hr');
     }
 
     // Available to all roles — shows policies issued to the signed-in employee
     setupEmployeePolicies(userEmail);
+
+    // Available to all roles — shows EFS if issued to this employee
+    setupEmployeeEfs(userEmail);
 
     // Available to all roles — PTO request form
     setupPTORequest(userEmail, userDisplayName);
@@ -573,6 +577,356 @@
 
     html += '</tbody></table></div>';
     bodyEl.innerHTML = html;
+  }
+
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════════
+  // Employee — Essential Functions Statement (EFS)
+  // ══════════════════════════════════════════════════════════════════════════
+  function setupEmployeeEfs() {
+    if (IS_DEMO) return;
+    var item    = document.getElementById('efs-item');
+    var descEl  = document.getElementById('efs-item-desc');
+    var actionsEl = document.getElementById('efs-item-actions');
+    var viewBtn = document.getElementById('btn-view-my-efs');
+    var signBtn = document.getElementById('btn-sign-my-efs');
+    if (!item) return;
+
+    apiCall('/efs/my').then(function (docs) {
+      if (!docs || !docs.length) return;
+
+      // Prioritise most-recent Pending; fall back to most-recent overall
+      var pending = docs.filter(function (d) { return d.status === 'Pending'; });
+      var current = pending.length ? pending[0] : docs[0];
+
+      item.hidden = false;
+
+      if (current.status === 'Signed') {
+        var signedDate = current.signed_date
+          ? new Date(current.signed_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+          : '';
+        if (descEl) descEl.textContent = 'Your Essential Functions Statement is on file.' + (signedDate ? ' Signed on ' + signedDate + '.' : '');
+        if (signBtn) signBtn.hidden = true;
+      }
+
+      if (viewBtn) {
+        viewBtn.addEventListener('click', function () {
+          viewBtn.disabled = true;
+          viewBtn.textContent = 'Loading…';
+          apiCall('/efs/view/' + current.id).then(function (data) {
+            window.open(data.url, '_blank', 'noopener');
+          }).catch(function () {
+            alert('Could not load the document. Please try again.');
+          }).finally(function () {
+            viewBtn.disabled = false;
+            viewBtn.textContent = 'View';
+          });
+        });
+      }
+
+      if (signBtn && current.status === 'Pending') {
+        signBtn.addEventListener('click', function () {
+          if (!confirm('By clicking OK you are electronically signing your Essential Functions Statement. Continue?')) return;
+          signBtn.disabled = true;
+          signBtn.textContent = 'Signing…';
+          apiCall('/efs/sign/' + current.id, { method: 'POST' }).then(function () {
+            signBtn.hidden = true;
+            var badge = document.createElement('span');
+            badge.className = 'portal-signoff-badge portal-signoff-badge--signed';
+            badge.textContent = '✓ Signed';
+            if (actionsEl) actionsEl.appendChild(badge);
+            if (descEl) descEl.textContent = 'Your Essential Functions Statement is on file. Signed today.';
+          }).catch(function () {
+            signBtn.disabled = false;
+            signBtn.textContent = 'Sign EFS';
+            alert('Could not record your signature. Please try again.');
+          });
+        });
+      }
+    }).catch(function () {});
+  }
+
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // HR — Employee Onboarding / EFS management
+  // ══════════════════════════════════════════════════════════════════════════
+  function setupHREfs() {
+    var onboardingBtn = document.getElementById('btn-onboarding');
+    var selectPanel   = document.getElementById('panel-onboarding-select');
+    var efsHubPanel   = document.getElementById('panel-efs-hub');
+    var issuePanel    = document.getElementById('panel-issue-efs');
+    var viewPanel     = document.getElementById('panel-view-efs');
+    if (!onboardingBtn || !selectPanel) return;
+
+    var viewLoaded = false;
+    var _efsPickerSelected = [];
+
+    function closeAllEfsPanels() {
+      selectPanel.hidden = true;
+      if (efsHubPanel)  efsHubPanel.hidden  = true;
+      if (issuePanel)   issuePanel.hidden    = true;
+      if (viewPanel)    viewPanel.hidden     = true;
+    }
+
+    // Step 1 — open document-type selector
+    onboardingBtn.addEventListener('click', function () {
+      if (selectPanel.hidden) {
+        closeAllEfsPanels();
+        selectPanel.hidden = false;
+      } else {
+        closeAllEfsPanels();
+      }
+    });
+
+    // Step 2 — EFS selected → show action hub
+    var selectEfsBtn = document.getElementById('btn-select-efs');
+    if (selectEfsBtn) {
+      selectEfsBtn.addEventListener('click', function () {
+        selectPanel.hidden = true;
+        if (efsHubPanel) efsHubPanel.hidden = false;
+      });
+    }
+
+    // Step 3a — Issue new EFS
+    var issueEfsBtn = document.getElementById('btn-issue-efs');
+    if (issueEfsBtn && issuePanel) {
+      issueEfsBtn.addEventListener('click', function () {
+        if (issuePanel.hidden) {
+          issuePanel.hidden = false;
+          if (viewPanel) viewPanel.hidden = true;
+          _efsPickerSelected = [];
+          var efsSearch = document.getElementById('efs-emp-search');
+          if (efsSearch) efsSearch.value = '';
+          buildEfsPicker('');
+        } else {
+          issuePanel.hidden = true;
+        }
+      });
+
+      var efsFileInput = document.getElementById('efs-file');
+      if (efsFileInput) {
+        efsFileInput.addEventListener('change', function () {
+          var lbl = document.getElementById('efs-file-label-text');
+          if (lbl && this.files.length) lbl.textContent = this.files[0].name;
+        });
+      }
+
+      var efsSearchInput = document.getElementById('efs-emp-search');
+      if (efsSearchInput) {
+        efsSearchInput.addEventListener('input', function () { buildEfsPicker(this.value); });
+      }
+
+      var efsForm = document.getElementById('form-issue-efs');
+      if (efsForm) {
+        efsForm.addEventListener('submit', function (e) { e.preventDefault(); handleEfsIssue(); });
+      }
+    }
+
+    // Step 3b — View EFS records
+    var viewEfsBtn = document.getElementById('btn-view-efs-records');
+    if (viewEfsBtn && viewPanel) {
+      viewEfsBtn.addEventListener('click', function () {
+        if (viewPanel.hidden) {
+          viewPanel.hidden = false;
+          if (issuePanel) issuePanel.hidden = true;
+          if (!viewLoaded) { loadEfsRecords(); viewLoaded = true; }
+        } else {
+          viewPanel.hidden = true;
+        }
+      });
+
+      var refreshEfsBtn = document.getElementById('btn-refresh-efs');
+      if (refreshEfsBtn) {
+        refreshEfsBtn.addEventListener('click', function () { viewLoaded = false; loadEfsRecords(); viewLoaded = true; });
+      }
+    }
+
+    function buildEfsPicker(filter) {
+      var listEl = document.getElementById('efs-emp-list');
+      if (!listEl) return;
+
+      var employees = IS_DEMO ? DEMO_STAFF : Object.keys(PORTAL_CONFIG.staff).map(function (email) {
+        return { email: email, name: PORTAL_CONFIG.staff[email].name || email };
+      }).sort(function (a, b) { return a.name.localeCompare(b.name); });
+
+      var term     = (filter || '').toLowerCase();
+      var filtered = term
+        ? employees.filter(function (e) {
+            return e.name.toLowerCase().indexOf(term) !== -1 || e.email.toLowerCase().indexOf(term) !== -1;
+          })
+        : employees;
+
+      var allChecked = filtered.length > 0 && filtered.every(function (e) { return _efsPickerSelected.indexOf(e.email) !== -1; });
+
+      var html = '<label class="portal-picker-item portal-picker-selectall">'
+        + '<input type="checkbox" id="efs-picker-all" class="portal-picker-cb"' + (allChecked ? ' checked' : '') + '> '
+        + '<span>Select All (' + filtered.length + ')</span></label>';
+
+      filtered.forEach(function (emp) {
+        var checked = _efsPickerSelected.indexOf(emp.email) !== -1 ? ' checked' : '';
+        html += '<label class="portal-picker-item">'
+          + '<input type="checkbox" class="efs-picker-emp-cb portal-picker-cb" value="' + escapeHtml(emp.email) + '"' + checked + '> '
+          + '<span class="portal-picker-name">' + escapeHtml(emp.name) + '</span>'
+          + '<span class="portal-picker-email">' + escapeHtml(emp.email) + '</span>'
+          + '</label>';
+      });
+      listEl.innerHTML = html;
+
+      var selectAll = document.getElementById('efs-picker-all');
+      if (selectAll) {
+        selectAll.addEventListener('change', function () {
+          filtered.forEach(function (emp) {
+            var idx = _efsPickerSelected.indexOf(emp.email);
+            if (selectAll.checked && idx === -1) _efsPickerSelected.push(emp.email);
+            else if (!selectAll.checked && idx !== -1) _efsPickerSelected.splice(idx, 1);
+          });
+          listEl.querySelectorAll('.efs-picker-emp-cb').forEach(function (cb) { cb.checked = selectAll.checked; });
+        });
+      }
+
+      listEl.querySelectorAll('.efs-picker-emp-cb').forEach(function (cb) {
+        cb.addEventListener('change', function () {
+          var idx = _efsPickerSelected.indexOf(cb.value);
+          if (cb.checked && idx === -1) _efsPickerSelected.push(cb.value);
+          else if (!cb.checked && idx !== -1) _efsPickerSelected.splice(idx, 1);
+          var nowAll = filtered.every(function (e) { return _efsPickerSelected.indexOf(e.email) !== -1; });
+          if (selectAll) selectAll.checked = nowAll;
+        });
+      });
+    }
+
+    function handleEfsIssue() {
+      var fileInput = document.getElementById('efs-file');
+      var submitBtn = document.getElementById('btn-issue-efs-submit');
+      if (!fileInput || !submitBtn) return;
+
+      var file           = fileInput.files[0];
+      var selectedEmails = _efsPickerSelected.slice();
+
+      if (!file)                       { showEfsStatus('error', 'Please select an EFS document.'); return; }
+      if (!selectedEmails.length)      { showEfsStatus('error', 'Please select at least one employee.'); return; }
+      if (file.size > 10 * 1024 * 1024) { showEfsStatus('error', 'File exceeds 10 MB. Please use a smaller file.'); return; }
+
+      if (IS_DEMO) {
+        showEfsStatus('success', 'Demo: EFS would be issued to ' + selectedEmails.length + ' employee(s).');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      showEfsStatus('uploading', 'Uploading EFS document…');
+
+      var fd = new FormData();
+      fd.append('file', file);
+      fd.append('issued_to', JSON.stringify(selectedEmails));
+
+      getApiToken().then(function (token) {
+        return fetch(API_BASE + '/efs/issue', {
+          method:  'POST',
+          headers: { 'Authorization': 'Bearer ' + token },
+          body:    fd,
+        });
+      }).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        showEfsStatus('success', '✓ EFS issued to ' + selectedEmails.length + ' employee(s).');
+        fileInput.value = '';
+        var lbl = document.getElementById('efs-file-label-text');
+        if (lbl) lbl.textContent = 'Choose a PDF or Word file…';
+        _efsPickerSelected = [];
+        buildEfsPicker('');
+        var efsSearch = document.getElementById('efs-emp-search');
+        if (efsSearch) efsSearch.value = '';
+        submitBtn.disabled = false;
+        viewLoaded = false;
+      }).catch(function () {
+        showEfsStatus('error', 'Upload failed. Please try again.');
+        submitBtn.disabled = false;
+      });
+    }
+
+    function showEfsStatus(type, msg) {
+      var el = document.getElementById('issue-efs-status');
+      if (!el) return;
+      el.hidden    = false;
+      el.className = 'portal-ts-status portal-ts-status--' + type;
+      el.textContent = msg;
+      if (type === 'success') setTimeout(function () { el.hidden = true; }, 8000);
+    }
+
+    function loadEfsRecords() {
+      var bodyEl = document.getElementById('body-efs-records');
+      if (!bodyEl) return;
+      bodyEl.innerHTML = '<p class="portal-ts-loading">Loading EFS records…</p>';
+      apiCall('/efs/issued').then(function (data) {
+        renderEfsRecords(data, bodyEl);
+      }).catch(function () {
+        bodyEl.innerHTML = '<p class="portal-ts-empty portal-ts-empty--error">Could not load records. Click Refresh to try again.</p>';
+      });
+    }
+
+    function renderEfsRecords(data, bodyEl) {
+      if (!data || !data.length) {
+        bodyEl.innerHTML = '<p class="portal-ts-empty">No EFS documents have been issued yet.</p>';
+        return;
+      }
+
+      var html = '<div class="portal-ts-table-wrap"><table class="portal-ts-table"><thead><tr>'
+        + '<th>Issued Date</th><th>Recipients</th><th>Signatures</th><th>Track</th></tr></thead><tbody>';
+
+      data.forEach(function (doc) {
+        var issuedDate   = doc.issued_date ? new Date(doc.issued_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+        var total        = doc.acknowledgments.length;
+        var signedCount  = doc.acknowledgments.filter(function (a) { return a.status === 'Signed'; }).length;
+        var allSigned    = signedCount === total && total > 0;
+        var statusBadge  = allSigned
+          ? '<span class="portal-signoff-badge portal-signoff-badge--signed">All Signed (' + total + '/' + total + ')</span>'
+          : '<span class="portal-signoff-badge portal-signoff-badge--pending">' + signedCount + '/' + total + ' Signed</span>';
+
+        html += '<tr>'
+          + '<td class="portal-ts-col-date">' + issuedDate + '</td>'
+          + '<td>' + total + ' employee' + (total === 1 ? '' : 's') + '</td>'
+          + '<td>' + statusBadge + '</td>'
+          + '<td><button class="portal-pol-track-btn" data-efs-doc-id="' + doc.id + '" type="button">Track Signatures</button></td>'
+          + '</tr>'
+          + '<tr class="portal-pol-ack-row" id="efs-ack-' + doc.id + '" hidden>'
+          + '<td colspan="4" class="portal-pol-ack-cell">'
+          + renderEfsAckTable(doc.acknowledgments)
+          + '</td></tr>';
+      });
+
+      html += '</tbody></table></div>';
+      bodyEl.innerHTML = html;
+
+      bodyEl.querySelectorAll('.portal-pol-track-btn[data-efs-doc-id]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var ackRow = document.getElementById('efs-ack-' + btn.dataset.efsDocId);
+          if (!ackRow) return;
+          ackRow.hidden   = !ackRow.hidden;
+          btn.textContent = ackRow.hidden ? 'Track Signatures' : 'Hide Signatures';
+        });
+      });
+    }
+
+    function renderEfsAckTable(acks) {
+      if (!acks || !acks.length) return '<p class="portal-pol-ack-empty">No recipients.</p>';
+      var html = '<table class="portal-efs-ack-table"><thead><tr><th>Employee</th><th>Status</th><th>Signed Date</th></tr></thead><tbody>';
+      acks.forEach(function (a) {
+        var signed = a.status === 'Signed';
+        var badge  = signed
+          ? '<span class="portal-signoff-badge portal-signoff-badge--signed">✓ Signed</span>'
+          : '<span class="portal-signoff-badge portal-signoff-badge--pending">Pending</span>';
+        var date = a.signed_date
+          ? new Date(a.signed_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          : '—';
+        html += '<tr>'
+          + '<td>' + escapeHtml(a.employee_name || a.employee_email) + '</td>'
+          + '<td>' + badge + '</td>'
+          + '<td>' + date + '</td>'
+          + '</tr>';
+      });
+      html += '</tbody></table>';
+      return html;
+    }
   }
 
 

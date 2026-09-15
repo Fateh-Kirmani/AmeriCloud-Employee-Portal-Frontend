@@ -1368,6 +1368,72 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 /* ══════════════════════════════════════════════════════════════════════
+   EMPLOYEE ONBOARDING — document type selection
+═══════════════════════════════════════════════════════════════════════ */
+.portal-onboarding-hint {
+  font-size: .82rem;
+  color: var(--slate);
+  margin: 0 0 12px;
+}
+.portal-onboarding-doc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  max-width: 420px;
+  background: var(--white);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.portal-onboarding-doc-card:hover {
+  border-color: var(--navy);
+  box-shadow: 0 2px 8px rgba(15,30,66,.08);
+}
+.portal-onboarding-doc-title {
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+.portal-onboarding-doc-desc {
+  font-size: .78rem;
+  color: var(--slate);
+  line-height: 1.45;
+}
+
+/* Panel head multiple-action buttons */
+.portal-ts-panel__actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* EFS acknowledgment sub-table (reuses pol-ack styles but needs its own tag) */
+.portal-efs-ack-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.portal-efs-ack-table th {
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--slate-2);
+  text-align: left;
+  background: var(--mist);
+}
+.portal-efs-ack-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.portal-efs-ack-table tr:last-child td { border-bottom: none; }
+
+/* ══════════════════════════════════════════════════════════════════════
    PTO REQUEST FORM
 ═══════════════════════════════════════════════════════════════════════ */
 .portal-pto-dates {
