@@ -1435,8 +1435,7 @@
         if (e.country && acc.indexOf(e.country) === -1) acc.push(e.country);
         return acc;
       }, []);
-      var pdLabel = diffDays === 0 ? 'Payday is today' : 'Next payday: ' + pdStr + ' · ' + diffDays + ' day' + (diffDays === 1 ? '' : 's') + ' away';
-      tickerInner.textContent = pdLabel + '  •  ' + empCount + ' employees  •  ' + countries.join(' · ');
+      tickerInner.textContent = empCount + ' employees  •  ' + countries.join(' · ');
       tickerEl.hidden = false;
     }
 
