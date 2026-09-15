@@ -413,6 +413,10 @@ button { cursor: pointer; font-family: inherit; }
   display: block;
 }
 
+@keyframes hero-breathe {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .82; }
+}
 .portal-hero__scrim {
   position: absolute;
   inset: 0;
@@ -422,6 +426,7 @@ button { cursor: pointer; font-family: inherit; }
     rgba(10, 21, 48, .55) 50%,
     rgba(10, 21, 48, .2) 100%
   );
+  animation: hero-breathe 10s ease-in-out infinite;
 }
 
 .portal-hero__body {
@@ -468,6 +473,21 @@ button { cursor: pointer; font-family: inherit; }
   font-size: clamp(14px, 2vw, 17px);
   color: rgba(255,255,255,.8);
   font-weight: 500;
+}
+
+/* ── Hero ticker ─────────────────────────────────────────────────────── */
+.portal-hero-ticker {
+  background: #0a1530;
+  padding: 7px clamp(20px, 4vw, 48px);
+}
+.portal-hero-ticker__inner {
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Open enrollment banner ──────────────────────────────────────────── */
@@ -1824,7 +1844,26 @@ button { cursor: pointer; font-family: inherit; }
   transition: box-shadow .15s;
 }
 .portal-news-card:hover { box-shadow: 0 2px 8px rgba(15,30,66,.08); }
-.portal-news-card--pinned { border-left-color: #b84e00; }
+.portal-news-card--pinned   { border-left-color: #b84e00; }
+.portal-news-card--featured {
+  border-left-width: 5px;
+  padding: 22px 24px;
+}
+.portal-news-card--featured .portal-news-title {
+  font-size: 1.1rem;
+}
+.portal-news-card--featured .portal-news-body {
+  font-size: .9rem;
+}
+.portal-news-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+@media (max-width: 640px) {
+  .portal-news-grid { grid-template-columns: 1fr; }
+}
 .portal-news-meta {
   display: flex;
   align-items: center;

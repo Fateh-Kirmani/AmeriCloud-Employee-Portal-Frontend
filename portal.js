@@ -1425,6 +1425,21 @@
     var pdStr    = pd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     var pdSub    = diffDays === 0 ? 'Today — payday! 🎉' : 'in ' + diffDays + ' day' + (diffDays === 1 ? '' : 's');
 
+    // Populate hero ticker
+    var tickerEl    = document.getElementById('hero-ticker');
+    var tickerInner = document.getElementById('hero-ticker-inner');
+    if (tickerEl && tickerInner) {
+      var dir       = PORTAL_CONFIG.directory || [];
+      var empCount  = dir.length;
+      var countries = dir.reduce(function (acc, e) {
+        if (e.country && acc.indexOf(e.country) === -1) acc.push(e.country);
+        return acc;
+      }, []);
+      var pdLabel = diffDays === 0 ? 'Payday is today' : 'Next payday: ' + pdStr + ' · ' + diffDays + ' day' + (diffDays === 1 ? '' : 's') + ' away';
+      tickerInner.textContent = pdLabel + '  •  ' + empCount + ' employees  •  ' + countries.join(' · ');
+      tickerEl.hidden = false;
+    }
+
     glanceEl.innerHTML = '<div class="portal-glance-card portal-glance-card--highlight">'
       + '<span class="portal-glance-card__label">Next Payday</span>'
       + '<span class="portal-glance-card__value">' + escapeHtml(pdStr) + '</span>'
@@ -1463,13 +1478,9 @@
     var listEl = document.getElementById('news-list');
     if (!listEl) return;
 
-    var BADGE_COLORS = {
-      Company: '#0f1e42',
-      Portal:  '#2563eb',
-    };
+    var BADGE_COLORS = { Company: '#0f1e42', Portal: '#2563eb' };
 
     var items = (PORTAL_CONFIG.news || []).slice();
-    // Pinned items first, then newest-first
     items.sort(function (a, b) {
       if (a.pinned && !b.pinned) return -1;
       if (!a.pinned && b.pinned) return  1;
@@ -1478,23 +1489,34 @@
 
     if (!items.length) return;
 
-    listEl.innerHTML = items.map(function (item) {
-      var color     = BADGE_COLORS[item.category] || BADGE_COLORS.Portal;
-      var dateStr   = '';
+    function cardHtml(item, featured) {
+      var color   = BADGE_COLORS[item.category] || BADGE_COLORS.Portal;
+      var dateStr = '';
       if (item.date) {
         var d = new Date(item.date + 'T00:00:00');
         dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       }
-      return '<div class="portal-news-card' + (item.pinned ? ' portal-news-card--pinned' : '') + '">'
+      return '<div class="portal-news-card'
+        + (item.pinned  ? ' portal-news-card--pinned'   : '')
+        + (featured     ? ' portal-news-card--featured'  : '')
+        + '">'
         + '<div class="portal-news-meta">'
         + (item.category ? '<span class="portal-news-badge" style="background:' + color + '">' + escapeHtml(item.category) + '</span>' : '')
-        + (dateStr ? '<span class="portal-news-date">' + dateStr + '</span>' : '')
-        + (item.pinned ? '<span class="portal-news-pin" title="Pinned">&#128204;</span>' : '')
+        + (dateStr       ? '<span class="portal-news-date">' + dateStr + '</span>' : '')
+        + (item.pinned   ? '<span class="portal-news-pin" title="Pinned">&#128204;</span>' : '')
         + '</div>'
         + '<p class="portal-news-title">' + escapeHtml(item.title) + '</p>'
-        + '<p class="portal-news-body">' + escapeHtml(item.body) + '</p>'
+        + '<p class="portal-news-body">'  + escapeHtml(item.body)  + '</p>'
         + '</div>';
-    }).join('');
+    }
+
+    var html = cardHtml(items[0], true);
+    if (items.length > 1) {
+      html += '<div class="portal-news-grid">'
+        + items.slice(1).map(function (item) { return cardHtml(item, false); }).join('')
+        + '</div>';
+    }
+    listEl.innerHTML = html;
   }
 
   // ══════════════════════════════════════════════════════════════════════════
