@@ -15,6 +15,12 @@ var PORTAL_CONFIG = {
       pinned:   true,
     },
     {
+      date:     '2026-09-15',
+      category: 'Portal',
+      title:    '401(k) and Benefits Portals Now Linked',
+      body:     'Your retirement and insurance portals are now accessible directly from the Pay & Benefits section. Use ePlan Services to manage your 401(k) contributions and investment elections, and Employee Navigator to view your health, dental, and vision coverage or make changes during open enrollment.',
+    },
+    {
       date:     '2026-02-09',
       category: 'Company',
       title:    'AmeriCloud at Super Bowl 60 — Engineering the Connection Behind the Celebration',
