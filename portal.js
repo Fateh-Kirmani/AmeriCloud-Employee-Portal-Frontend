@@ -1449,7 +1449,7 @@
     // Pending policy signatures — shown for all roles
     if (!IS_DEMO) {
       apiCall('/policies/my').then(function (data) {
-        var pending = (data || []).filter(function (p) { return p.status === 'pending'; }).length;
+        var pending = (data || []).filter(function (p) { return p.status === 'Pending'; }).length;
         glanceEl.innerHTML += '<div class="portal-glance-card' + (pending > 0 ? ' portal-glance-card--alert' : '') + '">'
           + '<span class="portal-glance-card__label">Policies to Sign</span>'
           + '<span class="portal-glance-card__value">' + pending + '</span>'
