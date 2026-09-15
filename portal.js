@@ -1446,8 +1446,8 @@
       + '<span class="portal-glance-card__sub">' + escapeHtml(pdSub) + '</span>'
       + '</div>';
 
-    // Pending policy signatures (employees only)
-    if (!isManager && !isHR && !IS_DEMO) {
+    // Pending policy signatures — shown for all roles
+    if (!IS_DEMO) {
       apiCall('/policies/my').then(function (data) {
         var pending = (data || []).filter(function (p) { return p.status === 'pending'; }).length;
         glanceEl.innerHTML += '<div class="portal-glance-card' + (pending > 0 ? ' portal-glance-card--alert' : '') + '">'
@@ -1458,7 +1458,7 @@
       }).catch(function () {});
     }
 
-    // Pending timesheet reviews (managers only)
+    // Pending timesheet reviews — managers with a team
     if (isManager && !IS_DEMO && team && team.length) {
       apiCall('/timesheets/team?emails=' + encodeURIComponent(team.join(','))).then(function (data) {
         var pending = (data || []).filter(function (t) { return t.status === 'pending'; }).length;
@@ -1496,17 +1496,21 @@
         var d = new Date(item.date + 'T00:00:00');
         dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       }
-      return '<div class="portal-news-card'
-        + (item.pinned  ? ' portal-news-card--pinned'   : '')
-        + (featured     ? ' portal-news-card--featured'  : '')
-        + '">'
-        + '<div class="portal-news-meta">'
+      var cls = 'portal-news-card'
+        + (item.pinned ? ' portal-news-card--pinned'  : '')
+        + (featured    ? ' portal-news-card--featured' : '');
+      var meta = '<div class="portal-news-meta">'
         + (item.category ? '<span class="portal-news-badge" style="background:' + color + '">' + escapeHtml(item.category) + '</span>' : '')
         + (dateStr       ? '<span class="portal-news-date">' + dateStr + '</span>' : '')
         + (item.pinned   ? '<span class="portal-news-pin" title="Pinned">&#128204;</span>' : '')
-        + '</div>'
+        + '</div>';
+      return '<div class="' + cls + '">'
+        + '<div class="portal-news-card-head">' + meta
         + '<p class="portal-news-title">' + escapeHtml(item.title) + '</p>'
-        + '<p class="portal-news-body">'  + escapeHtml(item.body)  + '</p>'
+        + '</div>'
+        + '<div class="portal-news-card-body">'
+        + '<p class="portal-news-body">' + escapeHtml(item.body) + '</p>'
+        + '</div>'
         + '</div>';
     }
 
