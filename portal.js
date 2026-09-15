@@ -228,34 +228,24 @@
     // ── Handbook ──────────────────────────────────────────────────────────
     setupHandbook(userEmail, userDisplayName);
 
-    // ── Timesheet viewer ──────────────────────────────────────────────────
+    // ── Timesheet form ────────────────────────────────────────────────────
     var staffEntry = PORTAL_CONFIG.staff[userEmail] || null;
-
-    if (isManager || isHR) {
-      // Reveal timesheet items and tile for manager/HR
-      var tileTs = document.getElementById('tile-timesheets');
-      var tsCA   = document.getElementById('ts-item-ca');
-      var tsStd  = document.getElementById('ts-item-std');
-      if (tileTs) tileTs.hidden = false;
-      if (tsCA)   tsCA.hidden   = false;
-      if (tsStd)  tsStd.hidden  = false;
-      setupTimesheetUpload(userEmail, userDisplayName);
-    }
-
     var team = (staffEntry && staffEntry.team) ? staffEntry.team : [];
+
+    // Timesheet form — available to all employees
+    setupTimesheetForm(userEmail, userDisplayName, staffEntry);
 
     // Available to all roles — greeting + at-a-glance strip
     setupHomeGreeting(userDisplayName, isManager, isHR, team);
 
     if (isManager) {
-      // In demo mode use null so mock data shows for any team
-      setupTimesheetViewer('manager', IS_DEMO ? null : team);
+      setupFormTimesheetViewer('manager', IS_DEMO ? null : team);
       setupPTOApprovals(IS_DEMO ? null : team, 'manager');
     }
 
     if (isHR) {
       var allEmails = Object.keys(PORTAL_CONFIG.staff);
-      setupTimesheetViewer('hr', IS_DEMO ? null : allEmails);
+      setupFormTimesheetViewer('hr', null);
       setupHandbookSignoffViewer();
       setupHRPolicies();
       setupHRIncidentReports();
@@ -1351,6 +1341,602 @@
         + '</tr>';
     });
     html += '</tbody></table>';
+    return html;
+  }
+
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Timesheet Form — employee inline form (Standard + CA)
+  // ══════════════════════════════════════════════════════════════════════════
+  function setupTimesheetForm(userEmail, userDisplayName, staffEntry) {
+    var tsCA  = document.getElementById('ts-item-ca');
+    var tsStd = document.getElementById('ts-item-std');
+
+    var workState = (staffEntry && staffEntry.state) ? staffEntry.state.toUpperCase() : '';
+    if (workState === 'CA') {
+      if (tsCA) tsCA.hidden = false;
+    } else if (workState) {
+      if (tsStd) tsStd.hidden = false;
+    } else {
+      if (tsCA) tsCA.hidden = false;
+      if (tsStd) tsStd.hidden = false;
+    }
+
+    var btnStd  = document.getElementById('btn-open-ts-form-std');
+    var btnCA   = document.getElementById('btn-open-ts-form-ca');
+    var panelStd = document.getElementById('panel-ts-form-std');
+    var panelCA  = document.getElementById('panel-ts-form-ca');
+
+    function wireForm(btn, panel, tsType) {
+      if (!btn || !panel) return;
+      btn.addEventListener('click', function () {
+        if (panel.hidden) {
+          panel.hidden = false;
+          btn.textContent = 'Close Form';
+          if (!panel.dataset.built) {
+            buildTimesheetForm(panel, tsType, userEmail, userDisplayName, staffEntry);
+            panel.dataset.built = '1';
+          }
+        } else {
+          panel.hidden = true;
+          btn.textContent = 'Fill Out Form';
+        }
+      });
+    }
+
+    wireForm(btnStd, panelStd, 'standard');
+    wireForm(btnCA,  panelCA,  'ca');
+  }
+
+
+  function buildTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry) {
+    var isCA = tsType === 'ca';
+
+    function lastSunday() {
+      var d = new Date();
+      d.setDate(d.getDate() - d.getDay());
+      return d.toISOString().slice(0, 10);
+    }
+
+    var staffState   = (staffEntry && staffEntry.state)      ? staffEntry.state      : (isCA ? 'CA' : '');
+    var staffManager = (staffEntry && staffEntry.manager)     ? staffEntry.manager    : '';
+    var staffId      = (staffEntry && staffEntry.employeeId)  ? staffEntry.employeeId : '';
+    var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    var html = '<div class="portal-ts-panel__head">'
+      + '<span class="portal-ts-panel__label">Weekly Timesheet — ' + (isCA ? 'California' : 'Standard') + '</span>'
+      + '</div>'
+      + '<div class="portal-ts-panel__body">'
+      + '<div class="portal-ts-form-header">'
+      + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Week Starting (Sunday)</label>'
+      + '<input type="date" id="tsf-week-start" class="portal-form-input portal-ts-date-input" value="' + lastSunday() + '"></div>'
+      + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Employee ID</label>'
+      + '<input type="text" id="tsf-emp-id" class="portal-form-input portal-ts-short-input" value="' + escapeHtml(staffId) + '" placeholder="ID" maxlength="20"></div>'
+      + (isCA ? '' : '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Work State</label>'
+        + '<input type="text" id="tsf-state" class="portal-form-input portal-ts-short-input" value="' + escapeHtml(staffState) + '" placeholder="e.g. TX" maxlength="2"></div>')
+      + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Manager Name</label>'
+      + '<input type="text" id="tsf-manager" class="portal-form-input" value="' + escapeHtml(staffManager) + '" placeholder="Manager full name" maxlength="100"></div>'
+      + '</div>';
+
+    html += '<div class="portal-ts-form-table-wrap"><table class="portal-ts-form-table" id="tsf-table">'
+      + '<thead><tr><th>Day</th><th>Date</th><th>Project Code</th>'
+      + '<th>Shift Start</th><th>Rest 1 Start</th><th>Rest 1 End</th>'
+      + '<th>Meal Start</th><th>Meal End</th>'
+      + (isCA ? '<th>Meal Waiver</th>' : '')
+      + '<th>Rest 2 Start</th><th>Rest 2 End</th><th>Shift End</th>'
+      + '<th>Hours</th><th>Notes</th>'
+      + '</tr></thead><tbody>';
+
+    for (var i = 0; i < 7; i++) {
+      html += '<tr class="tsf-day-row" data-day-index="' + i + '">'
+        + '<td class="tsf-day-label">' + DAYS[i] + '</td>'
+        + '<td class="tsf-date-cell" id="tsf-date-' + i + '">—</td>'
+        + '<td><input type="text" class="portal-form-input tsf-proj" data-day="' + i + '" placeholder="Code" maxlength="30"></td>'
+        + '<td><input type="time" class="tsf-time tsf-shift-start" data-day="' + i + '"></td>'
+        + '<td><input type="time" class="tsf-time tsf-rest1s"      data-day="' + i + '"></td>'
+        + '<td><input type="time" class="tsf-time tsf-rest1e"      data-day="' + i + '"></td>'
+        + '<td><input type="time" class="tsf-time tsf-meals"       data-day="' + i + '"></td>'
+        + '<td><input type="time" class="tsf-time tsf-meale"       data-day="' + i + '"></td>'
+        + (isCA ? '<td><select class="tsf-meal-waiver" data-day="' + i + '"><option value=""></option><option value="Y">Y</option><option value="N">N</option></select></td>' : '')
+        + '<td><input type="time" class="tsf-time tsf-rest2s"      data-day="' + i + '"></td>'
+        + '<td><input type="time" class="tsf-time tsf-rest2e"      data-day="' + i + '"></td>'
+        + '<td><input type="time" class="tsf-time tsf-shift-end"   data-day="' + i + '"></td>'
+        + '<td class="tsf-hours-cell" id="tsf-hours-' + i + '">—</td>'
+        + '<td><input type="text" class="portal-form-input tsf-notes" data-day="' + i + '" placeholder="Notes" maxlength="200"></td>'
+        + '</tr>';
+    }
+    html += '</tbody></table></div>';
+
+    if (isCA) {
+      html += '<div class="portal-ts-form-ot-summary">'
+        + '<table class="portal-ts-form-ot-table">'
+        + '<thead><tr><th>Day</th><th>Hours</th><th>Regular</th><th>OT 1.5×</th><th>OT 2.0×</th><th>Missed Meal</th><th>Missed Rest</th><th>Premium Hrs</th></tr></thead>'
+        + '<tbody id="tsf-ot-body"></tbody><tfoot id="tsf-ot-foot"></tfoot>'
+        + '</table></div>';
+    } else {
+      html += '<div class="portal-ts-form-summary">'
+        + '<div class="tsf-summary-row"><span>Total Hours</span><span id="tsf-total-hours">0.00</span></div>'
+        + '<div class="tsf-summary-row"><span>Regular (≤40h)</span><span id="tsf-reg-hours">0.00</span></div>'
+        + '<div class="tsf-summary-row"><span>Overtime (&gt;40h)</span><span id="tsf-ot-hours">0.00</span></div>'
+        + '</div>';
+    }
+
+    html += '<div class="portal-ts-pto-row"><label class="portal-form-label">PTO Hours this week</label>'
+      + '<input type="number" id="tsf-pto" class="portal-form-input portal-ts-short-input" min="0" max="40" step="0.5" value="0"></div>';
+
+    if (isCA) {
+      html += '<div class="portal-ts-7thday-row">'
+        + '<label><input type="checkbox" id="tsf-7th-day"> Saturday is my 7th consecutive workday (all hours at OT rate)</label>'
+        + '</div>';
+    }
+
+    html += '<div class="portal-form-actions">'
+      + '<button type="button" id="tsf-submit-' + tsType + '" class="portal-linkitem__action portal-linkitem__action--primary">Submit Timesheet</button>'
+      + '</div>'
+      + '<div id="tsf-status-' + tsType + '" class="portal-ts-status" hidden></div>'
+      + '</div>';
+
+    panelEl.innerHTML = html;
+
+    // Date label wiring
+    function updateDateLabels() {
+      var wsEl = panelEl.querySelector('#tsf-week-start');
+      if (!wsEl || !wsEl.value) return;
+      var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var p = wsEl.value.split('-');
+      var sun = new Date(+p[0], +p[1] - 1, +p[2]);
+      for (var d = 0; d < 7; d++) {
+        var el = panelEl.querySelector('#tsf-date-' + d);
+        if (!el) continue;
+        var curr = new Date(sun); curr.setDate(curr.getDate() + d);
+        el.textContent = MONTHS[curr.getMonth()] + ' ' + curr.getDate();
+      }
+    }
+    var wsInput = panelEl.querySelector('#tsf-week-start');
+    if (wsInput) { wsInput.addEventListener('change', updateDateLabels); updateDateLabels(); }
+
+    function toMins(t) {
+      if (!t) return null;
+      var p = t.split(':');
+      return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+    }
+
+    function calcDayHours(row) {
+      var s = toMins(row.querySelector('.tsf-shift-start').value);
+      var e = toMins(row.querySelector('.tsf-shift-end').value);
+      if (s === null || e === null) return 0;
+      if (e < s) e += 1440;
+      var tot = e - s;
+      var ms = toMins(row.querySelector('.tsf-meals').value);
+      var me = toMins(row.querySelector('.tsf-meale').value);
+      if (ms !== null && me !== null) { if (me < ms) me += 1440; tot -= (me - ms); }
+      return Math.max(0, tot / 60);
+    }
+
+    function recalcAll() {
+      var rows   = panelEl.querySelectorAll('.tsf-day-row');
+      var DLABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      var cb7     = panelEl.querySelector('#tsf-7th-day');
+
+      if (isCA) {
+        var totH = 0, totReg = 0, tot15 = 0, tot20 = 0, totMM = 0, totMR = 0, totPrem = 0;
+        var bodyHtml = '';
+
+        rows.forEach(function (row, i) {
+          var h = calcDayHours(row);
+          var hoursEl = panelEl.querySelector('#tsf-hours-' + i);
+          if (hoursEl) hoursEl.textContent = h > 0 ? h.toFixed(2) : '—';
+
+          if (h === 0) {
+            bodyHtml += '<tr><td>' + DLABELS[i] + '</td>' + '<td>—</td>'.repeat(7) + '</tr>';
+            return;
+          }
+
+          var dayIs7th = cb7 && cb7.checked && (i === 6);
+          var reg = 0, ot15 = 0, ot20 = 0;
+          if (dayIs7th) {
+            ot15 = Math.min(h, 8); ot20 = Math.max(0, h - 8);
+          } else {
+            reg  = Math.min(h, 8);
+            ot15 = Math.max(0, Math.min(h - 8, 4));
+            ot20 = Math.max(0, h - 12);
+          }
+
+          var waiver = (row.querySelector('.tsf-meal-waiver') || {}).value || '';
+          var mealS  = row.querySelector('.tsf-meals').value;
+          var mealE  = row.querySelector('.tsf-meale').value;
+          var r1s    = row.querySelector('.tsf-rest1s').value;
+          var r1e    = row.querySelector('.tsf-rest1e').value;
+          var r2s    = row.querySelector('.tsf-rest2s').value;
+          var r2e    = row.querySelector('.tsf-rest2e').value;
+
+          var mm = 0, mr = 0;
+          if (h > 5 && waiver !== 'Y') {
+            if (!mealS || !mealE) { mm = 1; }
+            else { var ms2 = toMins(mealS), me2 = toMins(mealE); if (me2 < ms2) me2 += 1440; if ((me2 - ms2) < 30) mm = 1; }
+          }
+          function restOk(rs, re) {
+            if (!rs || !re) return false;
+            var a = toMins(rs), b = toMins(re); if (b < a) b += 1440; return (b - a) >= 10;
+          }
+          if (h >= 3.5 && !restOk(r1s, r1e)) mr++;
+          if (h >= 7   && !restOk(r2s, r2e)) mr++;
+
+          var prem = mm + mr;
+          totH += h; totReg += reg; tot15 += ot15; tot20 += ot20; totMM += mm; totMR += mr; totPrem += prem;
+
+          function f(n) { return n > 0 ? n.toFixed(2) : '—'; }
+          bodyHtml += '<tr><td>' + DLABELS[i] + '</td><td>' + h.toFixed(2) + '</td>'
+            + '<td>' + f(reg) + '</td><td>' + f(ot15) + '</td><td>' + f(ot20) + '</td>'
+            + '<td>' + (mm || '—') + '</td><td>' + (mr || '—') + '</td><td>' + (prem || '—') + '</td></tr>';
+        });
+
+        var bodyEl2 = panelEl.querySelector('#tsf-ot-body');
+        var footEl  = panelEl.querySelector('#tsf-ot-foot');
+        if (bodyEl2) bodyEl2.innerHTML = bodyHtml;
+        if (footEl) footEl.innerHTML = '<tr class="tsf-ot-total"><td><strong>Total</strong></td>'
+          + '<td><strong>' + totH.toFixed(2) + '</strong></td>'
+          + '<td><strong>' + totReg.toFixed(2) + '</strong></td>'
+          + '<td><strong>' + tot15.toFixed(2) + '</strong></td>'
+          + '<td><strong>' + tot20.toFixed(2) + '</strong></td>'
+          + '<td><strong>' + (totMM || '—') + '</strong></td>'
+          + '<td><strong>' + (totMR || '—') + '</strong></td>'
+          + '<td><strong>' + (totPrem || '—') + '</strong></td></tr>';
+
+      } else {
+        var totalH = 0;
+        rows.forEach(function (row, i) {
+          var h = calcDayHours(row);
+          var hoursEl = panelEl.querySelector('#tsf-hours-' + i);
+          if (hoursEl) hoursEl.textContent = h > 0 ? h.toFixed(2) : '—';
+          totalH += h;
+        });
+        var regH = Math.min(totalH, 40), otH = Math.max(0, totalH - 40);
+        var t = panelEl.querySelector('#tsf-total-hours');
+        var r = panelEl.querySelector('#tsf-reg-hours');
+        var o = panelEl.querySelector('#tsf-ot-hours');
+        if (t) t.textContent = totalH.toFixed(2);
+        if (r) r.textContent = regH.toFixed(2);
+        if (o) o.textContent = otH.toFixed(2);
+      }
+    }
+
+    panelEl.querySelectorAll('.tsf-time, .tsf-meal-waiver').forEach(function (el) {
+      el.addEventListener('change', recalcAll);
+    });
+    var cb7El = panelEl.querySelector('#tsf-7th-day');
+    if (cb7El) cb7El.addEventListener('change', recalcAll);
+    recalcAll();
+
+    var submitBtn = panelEl.querySelector('#tsf-submit-' + tsType);
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function () {
+        submitTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry, isCA);
+      });
+    }
+  }
+
+
+  function submitTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry, isCA) {
+    var weekStartEl = panelEl.querySelector('#tsf-week-start');
+    var empIdEl     = panelEl.querySelector('#tsf-emp-id');
+    var stateEl     = panelEl.querySelector('#tsf-state');
+    var managerEl   = panelEl.querySelector('#tsf-manager');
+    var ptoEl       = panelEl.querySelector('#tsf-pto');
+    var statusEl    = panelEl.querySelector('#tsf-status-' + tsType);
+    var submitBtn   = panelEl.querySelector('#tsf-submit-' + tsType);
+
+    function showSt(type, msg) {
+      if (!statusEl) return;
+      statusEl.hidden = false;
+      statusEl.className = 'portal-ts-status portal-ts-status--' + type;
+      statusEl.textContent = msg;
+      if (type === 'success') setTimeout(function () { statusEl.hidden = true; }, 9000);
+    }
+
+    if (!weekStartEl || !weekStartEl.value) { showSt('error', 'Please select the week starting date.'); return; }
+
+    function toMins(t) {
+      if (!t) return null;
+      var p = t.split(':'); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+    }
+
+    var cb7 = panelEl.querySelector('#tsf-7th-day');
+    var is7thChecked = cb7 && cb7.checked;
+    var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var parts = weekStartEl.value.split('-');
+    var sunday = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    var days = [];
+
+    panelEl.querySelectorAll('.tsf-day-row').forEach(function (row, i) {
+      var curr = new Date(sunday); curr.setDate(curr.getDate() + i);
+      var dateStr = curr.getFullYear() + '-' + String(curr.getMonth()+1).padStart(2,'0') + '-' + String(curr.getDate()).padStart(2,'0');
+      var ss = row.querySelector('.tsf-shift-start').value;
+      var se = row.querySelector('.tsf-shift-end').value;
+      var ms = row.querySelector('.tsf-meals').value;
+      var me = row.querySelector('.tsf-meale').value;
+      var h = 0;
+      if (ss && se) {
+        var sv = toMins(ss), ev = toMins(se);
+        if (ev < sv) ev += 1440;
+        var tot = ev - sv;
+        if (ms && me) { var msv = toMins(ms), mev = toMins(me); if (mev < msv) mev += 1440; tot -= (mev - msv); }
+        h = Math.max(0, tot / 60);
+      }
+      var waiverEl = row.querySelector('.tsf-meal-waiver');
+      days.push({
+        date:        dateStr,
+        day:         DAYS[i],
+        projectCode: (row.querySelector('.tsf-proj')   || {}).value || '',
+        shiftStart:  ss,
+        rest1Start:  row.querySelector('.tsf-rest1s').value,
+        rest1End:    row.querySelector('.tsf-rest1e').value,
+        mealStart:   ms,
+        mealEnd:     me,
+        mealWaiver:  waiverEl ? waiverEl.value : '',
+        rest2Start:  row.querySelector('.tsf-rest2s').value,
+        rest2End:    row.querySelector('.tsf-rest2e').value,
+        shiftEnd:    se,
+        hoursWorked: Math.round(h * 100) / 100,
+        is7thDay:    isCA && is7thChecked && (i === 6),
+        notes:       (row.querySelector('.tsf-notes')  || {}).value || ''
+      });
+    });
+
+    if (!days.some(function (d) { return d.shiftStart || d.shiftEnd; })) {
+      showSt('error', 'Please fill in at least one day\'s shift times.');
+      return;
+    }
+
+    if (IS_DEMO) {
+      showSt('success', '✓ Demo: Timesheet for week of ' + weekStartEl.value + ' would be submitted.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    showSt('uploading', 'Submitting timesheet…');
+
+    apiCall('/timesheets/form/submit', {
+      method: 'POST',
+      body: JSON.stringify({
+        ts_type:      tsType,
+        week_start:   weekStartEl.value,
+        employee_id:  empIdEl  ? empIdEl.value.trim()  : '',
+        work_state:   stateEl  ? stateEl.value.trim().toUpperCase() : (isCA ? 'CA' : ''),
+        manager_name: managerEl ? managerEl.value.trim() : '',
+        pto_hours:    ptoEl ? parseFloat(ptoEl.value || '0') : 0,
+        days:         days
+      })
+    }).then(function () {
+      showSt('success', '✓ Timesheet submitted for week of ' + weekStartEl.value + '. Your manager and HR have been notified.');
+      submitBtn.disabled = false;
+    }).catch(function (err) {
+      console.error('TS form submit error:', err);
+      showSt('error', 'Submission failed. Please try again or contact IT.');
+      submitBtn.disabled = false;
+    });
+  }
+
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Form Timesheet Viewer — manager & HR
+  // ══════════════════════════════════════════════════════════════════════════
+  function setupFormTimesheetViewer(role, emails) {
+    var isHRRole   = (role === 'hr');
+    var btnId      = isHRRole ? 'btn-view-hr-ts-form'       : 'btn-view-manager-ts-form';
+    var panelId    = isHRRole ? 'panel-hr-ts-form'           : 'panel-manager-ts-form';
+    var bodyId     = isHRRole ? 'body-hr-ts-form'            : 'body-manager-ts-form';
+    var refreshId  = isHRRole ? 'btn-refresh-hr-ts-form'     : 'btn-refresh-manager-ts-form';
+
+    var btn     = document.getElementById(btnId);
+    var panel   = document.getElementById(panelId);
+    var bodyEl  = document.getElementById(bodyId);
+    var refresh = document.getElementById(refreshId);
+    if (!btn || !panel || !bodyEl) return;
+
+    var loaded = false;
+
+    btn.addEventListener('click', function () {
+      if (panel.hidden) {
+        panel.hidden = false;
+        btn.textContent = 'Hide Timesheets';
+        if (!loaded) { doLoad(); loaded = true; }
+      } else {
+        panel.hidden = true;
+        btn.textContent = 'View Timesheets';
+      }
+    });
+
+    if (refresh) refresh.addEventListener('click', function () { loaded = false; doLoad(); loaded = true; });
+
+    function doLoad() {
+      bodyEl.innerHTML = '<p class="portal-ts-loading">Loading timesheets…</p>';
+
+      if (IS_DEMO) {
+        renderFormTsList([], bodyEl, isHRRole);
+        return;
+      }
+
+      var path = isHRRole
+        ? '/timesheets/form/all'
+        : (emails && emails.length ? '/timesheets/form/team?emails=' + encodeURIComponent(emails.join(',')) : '/timesheets/form/team?emails=');
+
+      apiCall(path).then(function (data) {
+        renderFormTsList(data, bodyEl, isHRRole);
+      }).catch(function (err) {
+        console.error('Form TS load error:', err);
+        bodyEl.innerHTML = '<p class="portal-ts-empty portal-ts-empty--error">Could not load. Click Refresh to try again.</p>';
+      });
+    }
+  }
+
+
+  function renderFormTsList(rows, bodyEl, isHR) {
+    if (!rows || !rows.length) {
+      bodyEl.innerHTML = '<p class="portal-ts-empty">No timesheet submissions yet.</p>';
+      return;
+    }
+
+    var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    function fmtWeek(ds) {
+      if (!ds) return '—';
+      var p = ds.split('-'); var d = new Date(+p[0], +p[1]-1, +p[2]);
+      return 'Week of ' + MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+    }
+
+    var html = '<div class="portal-ts-wrap"><table class="portal-ts-table">'
+      + '<thead><tr><th>Employee</th><th>Week</th><th>Type</th><th>Submitted</th><th>Status</th>'
+      + (isHR ? '<th>Excel</th>' : '<th>Action</th>')
+      + '</tr></thead><tbody>';
+
+    rows.forEach(function (row) {
+      var st = row.status || 'pending';
+      var badge = st === 'approved'
+        ? '<span class="portal-signoff-badge portal-signoff-badge--signed">Approved</span>'
+        : st === 'rejected'
+          ? '<span class="portal-pto-badge--denied">Rejected</span>'
+          : '<span class="portal-signoff-badge portal-signoff-badge--pending">Pending</span>';
+
+      var weekLink = '<a href="#" class="portal-ts-link portal-tsf-detail-link" data-tsf-id="' + row.id + '">' + escapeHtml(fmtWeek(row.week_start)) + '</a>';
+
+      var actionCell = '';
+      if (isHR) {
+        actionCell = st === 'approved'
+          ? '<button class="portal-ts-link portal-tsf-excel-btn" data-tsf-id="' + row.id + '" type="button">Download Excel</button>'
+          : '<span class="portal-ts-nolink">—</span>';
+      } else {
+        actionCell = st === 'pending'
+          ? '<div class="portal-pto-actions" id="tsf-act-' + row.id + '">'
+            + '<button class="portal-pto-approve portal-tsf-act-btn" data-tsf-id="' + row.id + '" data-action="approve" type="button" title="Approve">&#10003;</button>'
+            + '<button class="portal-pto-deny    portal-tsf-act-btn" data-tsf-id="' + row.id + '" data-action="reject"  type="button" title="Reject">&#10007;</button>'
+            + '</div>'
+          : '<span class="portal-pto-actioned">—</span>';
+      }
+
+      html += '<tr>'
+        + '<td class="portal-ts-col-name">' + escapeHtml(row.employee_name || row.employee_email) + '</td>'
+        + '<td class="portal-ts-col-file">' + weekLink + '</td>'
+        + '<td>' + escapeHtml((row.ts_type || 'standard').toUpperCase()) + '</td>'
+        + '<td class="portal-ts-col-date">' + formatDate(row.submitted_at) + '</td>'
+        + '<td id="tsf-status-row-' + row.id + '">' + badge + '</td>'
+        + '<td>' + actionCell + '</td>'
+        + '</tr>'
+        + '<tr id="tsf-detail-row-' + row.id + '" hidden>'
+        + '<td colspan="6" class="portal-pol-ack-cell" id="tsf-detail-cell-' + row.id + '"><p class="portal-ts-loading">Loading…</p></td>'
+        + '</tr>';
+    });
+
+    html += '</tbody></table></div>';
+    bodyEl.innerHTML = html;
+
+    bodyEl.querySelectorAll('.portal-tsf-detail-link').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var id  = a.dataset.tsfId;
+        var row = document.getElementById('tsf-detail-row-'  + id);
+        var cel = document.getElementById('tsf-detail-cell-' + id);
+        if (!row) return;
+        row.hidden = !row.hidden;
+        if (!row.hidden && !cel.dataset.loaded) {
+          apiCall('/timesheets/form/' + id).then(function (data) {
+            cel.innerHTML = renderFormTsDetail(data);
+            cel.dataset.loaded = '1';
+          }).catch(function () {
+            cel.innerHTML = '<p class="portal-ts-empty portal-ts-empty--error">Could not load detail.</p>';
+          });
+        }
+      });
+    });
+
+    bodyEl.querySelectorAll('.portal-tsf-act-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id     = btn.dataset.tsfId;
+        var action = btn.dataset.action;
+        var actEl  = document.getElementById('tsf-act-' + id);
+        var stCell = document.getElementById('tsf-status-row-' + id);
+        if (actEl) actEl.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+        apiCall('/timesheets/form/' + id + '/' + action, { method: 'POST' })
+          .then(function () {
+            if (actEl)  actEl.outerHTML = '<span class="portal-pto-actioned">—</span>';
+            if (stCell) stCell.innerHTML = action === 'approve'
+              ? '<span class="portal-signoff-badge portal-signoff-badge--signed">Approved</span>'
+              : '<span class="portal-pto-badge--denied">Rejected</span>';
+          })
+          .catch(function (err) {
+            console.error('TSF action error:', err);
+            if (actEl) actEl.querySelectorAll('button').forEach(function (b) { b.disabled = false; });
+          });
+      });
+    });
+
+    bodyEl.querySelectorAll('.portal-tsf-excel-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.dataset.tsfId;
+        btn.disabled = true; btn.textContent = 'Preparing…';
+        apiCall('/timesheets/form/' + id + '/excel')
+          .then(function (data) { window.open(data.url, '_blank', 'noopener'); })
+          .catch(function () { alert('Could not generate Excel. Try again.'); })
+          .then(function () { btn.disabled = false; btn.textContent = 'Download Excel'; });
+      });
+    });
+  }
+
+
+  function renderFormTsDetail(data) {
+    var isCA = data.ts_type === 'ca';
+    var days = [];
+    try { days = JSON.parse(data.form_data); } catch (e) { days = []; }
+
+    var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    function fmtDate(ds) {
+      if (!ds) return '—';
+      var p = ds.split('-'); var d = new Date(+p[0], +p[1]-1, +p[2]);
+      return MONTHS[d.getMonth()] + ' ' + d.getDate();
+    }
+
+    var html = '<div class="portal-tsf-detail">';
+    html += '<div class="portal-tsf-detail-meta">'
+      + '<span><strong>Employee:</strong> ' + escapeHtml(data.employee_name || data.employee_email) + '</span>'
+      + '<span><strong>Week of:</strong> ' + escapeHtml(data.week_start || '') + '</span>'
+      + (data.manager_name ? '<span><strong>Manager:</strong> ' + escapeHtml(data.manager_name) + '</span>' : '')
+      + (data.work_state   ? '<span><strong>State:</strong> '   + escapeHtml(data.work_state)   + '</span>' : '')
+      + '</div>';
+
+    html += '<div class="portal-ts-form-table-wrap"><table class="portal-ts-form-table">'
+      + '<thead><tr><th>Day</th><th>Date</th><th>Project</th><th>Shift Start</th>'
+      + '<th>Rest 1</th><th>Meal</th>'
+      + (isCA ? '<th>Waiver</th>' : '')
+      + '<th>Rest 2</th><th>Shift End</th><th>Hours</th><th>Notes</th>'
+      + '</tr></thead><tbody>';
+
+    var totalH = 0;
+    days.forEach(function (d) {
+      var r1  = (d.rest1Start && d.rest1End) ? d.rest1Start + '–' + d.rest1End : '—';
+      var meal = (d.mealStart  && d.mealEnd)  ? d.mealStart  + '–' + d.mealEnd  : '—';
+      var r2  = (d.rest2Start && d.rest2End) ? d.rest2Start + '–' + d.rest2End : '—';
+      totalH += (d.hoursWorked || 0);
+      html += '<tr>'
+        + '<td class="tsf-day-label">'  + escapeHtml(d.day   || '') + '</td>'
+        + '<td class="tsf-date-cell">'  + escapeHtml(fmtDate(d.date)) + '</td>'
+        + '<td>' + escapeHtml(d.projectCode || '—') + '</td>'
+        + '<td>' + escapeHtml(d.shiftStart  || '—') + '</td>'
+        + '<td>' + escapeHtml(r1) + '</td>'
+        + '<td>' + escapeHtml(meal) + '</td>'
+        + (isCA ? '<td>' + escapeHtml(d.mealWaiver || '—') + '</td>' : '')
+        + '<td>' + escapeHtml(r2) + '</td>'
+        + '<td>' + escapeHtml(d.shiftEnd   || '—') + '</td>'
+        + '<td class="tsf-hours-cell">' + (d.hoursWorked > 0 ? d.hoursWorked.toFixed(2) : '—') + '</td>'
+        + '<td>' + escapeHtml(d.notes || '') + '</td>'
+        + '</tr>';
+    });
+    html += '<tr class="tsf-ot-total"><td colspan="' + (isCA ? '9' : '8') + '" style="text-align:right;padding-right:8px"><strong>Total Hours</strong></td>'
+      + '<td class="tsf-hours-cell"><strong>' + totalH.toFixed(2) + '</strong></td><td></td></tr>';
+    html += '</tbody></table></div>';
+
+    if (data.pto_hours > 0) {
+      html += '<p style="margin:8px 0;font-size:.83rem;color:var(--slate)">PTO Hours: <strong>' + data.pto_hours + '</strong></p>';
+    }
+    html += '</div>';
     return html;
   }
 

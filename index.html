@@ -198,21 +198,21 @@
           <li class="portal-linkitem" id="ts-item-ca" hidden>
             <div class="portal-linkitem__body">
               <span class="portal-linkitem__title">Timesheet &mdash; California Edition</span>
-              <span class="portal-linkitem__desc">Use this if you work in California. Includes meal/rest break tracking and daily OT.</span>
+              <span class="portal-linkitem__desc">Use this if you work in California. Includes meal/rest break tracking and daily OT calculations.</span>
             </div>
             <div class="portal-linkitem__actions">
               <a href="assets/docs/AmeriCloud Telecom Weekly Timesheet - California 2026.xlsx" download class="portal-linkitem__action">Download Template</a>
-              <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-submit-ca" type="button">Submit Timesheet</button>
+              <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-open-ts-form-ca" type="button">Fill Out Form</button>
             </div>
           </li>
           <li class="portal-linkitem" id="ts-item-std" hidden>
             <div class="portal-linkitem__body">
               <span class="portal-linkitem__title">Timesheet &mdash; Standard Edition</span>
-              <span class="portal-linkitem__desc">Use this for all other states.</span>
+              <span class="portal-linkitem__desc">Use this for all other states. Fill in your hours and submit directly in the portal.</span>
             </div>
             <div class="portal-linkitem__actions">
               <a href="assets/docs/AmeriCloud Telecom Weekly Timesheet - Standard 2026.xlsx" download class="portal-linkitem__action">Download Template</a>
-              <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-submit-std" type="button">Submit Timesheet</button>
+              <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-open-ts-form-std" type="button">Fill Out Form</button>
             </div>
           </li>
           <li class="portal-linkitem">
@@ -243,9 +243,8 @@
             <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-open-policies-modal" type="button">My Policies</button>
           </li>
         </ul>
-        <input type="file" id="ts-file-ca"  accept=".xlsx,.xls,.pdf" hidden>
-        <input type="file" id="ts-file-std" accept=".xlsx,.xls,.pdf" hidden>
-        <div id="ts-upload-status" class="portal-ts-status" hidden></div>
+        <div id="panel-ts-form-std" class="portal-ts-panel" hidden></div>
+        <div id="panel-ts-form-ca"  class="portal-ts-panel" hidden></div>
         <div class="portal-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
           <span>Timesheets are submitted through the portal. Deadline: <strong>Friday at 5:00 PM CST</strong>.</span>
@@ -415,9 +414,9 @@
           <li class="portal-linkitem">
             <div class="portal-linkitem__body">
               <span class="portal-linkitem__title">Timesheet Approvals</span>
-              <span class="portal-linkitem__desc">View and download timesheets submitted by your crew, newest first.</span>
+              <span class="portal-linkitem__desc">Review and approve portal-submitted timesheets from your crew. Click a week to see the full breakdown.</span>
             </div>
-            <button class="portal-linkitem__action" id="btn-view-manager-ts" type="button">View Timesheets</button>
+            <button class="portal-linkitem__action" id="btn-view-manager-ts-form" type="button">View Timesheets</button>
           </li>
           <li class="portal-linkitem">
             <div class="portal-linkitem__body">
@@ -443,12 +442,12 @@
             <button class="portal-linkitem__action" id="btn-open-team-directory" type="button">Browse</button>
           </li>
         </ul>
-        <div id="panel-manager-ts" class="portal-ts-panel" hidden>
+        <div id="panel-manager-ts-form" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">Team Timesheets</span>
-            <button class="portal-ts-panel__refresh" id="btn-refresh-manager-ts" type="button">&#8635; Refresh</button>
+            <button class="portal-ts-panel__refresh" id="btn-refresh-manager-ts-form" type="button">&#8635; Refresh</button>
           </div>
-          <div id="body-manager-ts" class="portal-ts-panel__body"></div>
+          <div id="body-manager-ts-form" class="portal-ts-panel__body"></div>
         </div>
         <div id="panel-pto-approvals" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
@@ -472,9 +471,9 @@
           <li class="portal-linkitem">
             <div class="portal-linkitem__body">
               <span class="portal-linkitem__title">All Employee Timesheets</span>
-              <span class="portal-linkitem__desc">View and download timesheets from every employee, sorted newest first.</span>
+              <span class="portal-linkitem__desc">View all portal-submitted timesheets. Click a week to see the full breakdown, then download the filled Excel.</span>
             </div>
-            <button class="portal-linkitem__action" id="btn-view-hr-ts" type="button">View Timesheets</button>
+            <button class="portal-linkitem__action" id="btn-view-hr-ts-form" type="button">View Timesheets</button>
           </li>
           <li class="portal-linkitem">
             <div class="portal-linkitem__body">
@@ -573,12 +572,12 @@
           </div>
           <div id="body-issued-policies" class="portal-ts-panel__body"></div>
         </div>
-        <div id="panel-hr-ts" class="portal-ts-panel" hidden>
+        <div id="panel-hr-ts-form" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">All Employee Timesheets</span>
-            <button class="portal-ts-panel__refresh" id="btn-refresh-hr-ts" type="button">&#8635; Refresh</button>
+            <button class="portal-ts-panel__refresh" id="btn-refresh-hr-ts-form" type="button">&#8635; Refresh</button>
           </div>
-          <div id="body-hr-ts" class="portal-ts-panel__body"></div>
+          <div id="body-hr-ts-form" class="portal-ts-panel__body"></div>
         </div>
         <div id="panel-incident-reports-hr" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
