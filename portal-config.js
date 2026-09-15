@@ -15,6 +15,12 @@ var PORTAL_CONFIG = {
       pinned:   true,
     },
     {
+      date:     '2026-02-09',
+      category: 'Company',
+      title:    'AmeriCloud at Super Bowl 60 — Engineering the Connection Behind the Celebration',
+      body:     'AmeriCloud Telecom Solutions proudly partnered with T-Mobile as the in-venue wireless network partner at Super Bowl 60, helping engineer the connectivity that powered the fan experience from kickoff to the final confetti drop. Our team physically walked every inch of the venue to validate coverage across all critical zones, leveraging system-level DAS and RAN expertise and AI-driven real-time optimization to deliver a high-capacity, highly reliable wireless experience under unprecedented live-event demand. From the biggest stage in football, our focus now shifts to the next global stage: FIFA.',
+    },
+    {
       date:     '2026-09-15',
       category: 'Portal',
       title:    'Company Directory Now Organized by Country',
