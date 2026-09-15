@@ -507,12 +507,15 @@
             </div>
             <button class="portal-linkitem__action" id="btn-view-incident-reports" type="button">View Reports</button>
           </li>
-          <li class="portal-linkitem portal-linkitem--highlight">
+          <li class="portal-linkitem">
             <div class="portal-linkitem__body">
-              <span class="portal-linkitem__title">Employee Onboarding</span>
-              <span class="portal-linkitem__desc">Issue and track onboarding documents for employees, including the Essential Functions Statement.</span>
+              <span class="portal-linkitem__title">EFS Issuance</span>
+              <span class="portal-linkitem__desc">Issue Essential Functions Statements to employees and track who has signed.</span>
             </div>
-            <button class="portal-linkitem__action" id="btn-onboarding" type="button">Manage Documents</button>
+            <div class="portal-linkitem__actions">
+              <button class="portal-linkitem__action" id="btn-issue-efs" type="button">Issue EFS</button>
+              <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-view-efs-records" type="button">View Acknowledgements</button>
+            </div>
           </li>
         </ul>
         <div id="panel-hr-pto" class="portal-ts-panel" hidden>
@@ -583,31 +586,6 @@
             <button class="portal-ts-panel__refresh" id="btn-refresh-incident-reports" type="button">&#8635; Refresh</button>
           </div>
           <div id="body-incident-reports-hr" class="portal-ts-panel__body"></div>
-        </div>
-
-        <!-- Employee Onboarding — document type selection -->
-        <div id="panel-onboarding-select" class="portal-ts-panel" hidden>
-          <div class="portal-ts-panel__head">
-            <span class="portal-ts-panel__label">Employee Onboarding — Select Document</span>
-          </div>
-          <div class="portal-ts-panel__body">
-            <p class="portal-onboarding-hint">Choose a document type to issue or track:</p>
-            <button class="portal-onboarding-doc-card" id="btn-select-efs" type="button">
-              <span class="portal-onboarding-doc-title">Essential Functions Statement</span>
-              <span class="portal-onboarding-doc-desc">Annual document outlining an employee's essential job functions. Issue to specific employees and track their signatures.</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- EFS action hub -->
-        <div id="panel-efs-hub" class="portal-ts-panel" hidden>
-          <div class="portal-ts-panel__head">
-            <span class="portal-ts-panel__label">Essential Functions Statement</span>
-            <div class="portal-ts-panel__actions">
-              <button class="portal-ts-panel__refresh" id="btn-issue-efs" type="button">Issue New EFS</button>
-              <button class="portal-ts-panel__refresh" id="btn-view-efs-records" type="button">View EFS Records</button>
-            </div>
-          </div>
         </div>
 
         <!-- Issue EFS form -->

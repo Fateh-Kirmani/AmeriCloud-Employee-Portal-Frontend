@@ -649,97 +649,64 @@
 
 
   // ══════════════════════════════════════════════════════════════════════════
-  // HR — Employee Onboarding / EFS management
+  // HR — EFS Issuance & Acknowledgement Tracking
   // ══════════════════════════════════════════════════════════════════════════
   function setupHREfs() {
-    var onboardingBtn = document.getElementById('btn-onboarding');
-    var selectPanel   = document.getElementById('panel-onboarding-select');
-    var efsHubPanel   = document.getElementById('panel-efs-hub');
-    var issuePanel    = document.getElementById('panel-issue-efs');
-    var viewPanel     = document.getElementById('panel-view-efs');
-    if (!onboardingBtn || !selectPanel) return;
+    var issueBtn  = document.getElementById('btn-issue-efs');
+    var viewBtn   = document.getElementById('btn-view-efs-records');
+    var issuePanel = document.getElementById('panel-issue-efs');
+    var viewPanel  = document.getElementById('panel-view-efs');
+    if (!issueBtn || !viewBtn || !issuePanel || !viewPanel) return;
 
     var viewLoaded = false;
     var _efsPickerSelected = [];
 
-    function closeAllEfsPanels() {
-      selectPanel.hidden = true;
-      if (efsHubPanel)  efsHubPanel.hidden  = true;
-      if (issuePanel)   issuePanel.hidden    = true;
-      if (viewPanel)    viewPanel.hidden     = true;
-    }
-
-    // Step 1 — open document-type selector
-    onboardingBtn.addEventListener('click', function () {
-      if (selectPanel.hidden) {
-        closeAllEfsPanels();
-        selectPanel.hidden = false;
+    issueBtn.addEventListener('click', function () {
+      if (issuePanel.hidden) {
+        issuePanel.hidden = false;
+        viewPanel.hidden  = true;
+        viewBtn.textContent = 'View Acknowledgements';
+        _efsPickerSelected = [];
+        var efsSearch = document.getElementById('efs-emp-search');
+        if (efsSearch) efsSearch.value = '';
+        buildEfsPicker('');
       } else {
-        closeAllEfsPanels();
+        issuePanel.hidden = true;
       }
     });
 
-    // Step 2 — EFS selected → show action hub
-    var selectEfsBtn = document.getElementById('btn-select-efs');
-    if (selectEfsBtn) {
-      selectEfsBtn.addEventListener('click', function () {
-        selectPanel.hidden = true;
-        if (efsHubPanel) efsHubPanel.hidden = false;
+    viewBtn.addEventListener('click', function () {
+      if (viewPanel.hidden) {
+        viewPanel.hidden  = false;
+        issuePanel.hidden = true;
+        issueBtn.textContent = 'Issue EFS';
+        if (!viewLoaded) { loadEfsRecords(); viewLoaded = true; }
+      } else {
+        viewPanel.hidden = true;
+      }
+    });
+
+    var refreshEfsBtn = document.getElementById('btn-refresh-efs');
+    if (refreshEfsBtn) {
+      refreshEfsBtn.addEventListener('click', function () { viewLoaded = false; loadEfsRecords(); viewLoaded = true; });
+    }
+
+    var efsFileInput = document.getElementById('efs-file');
+    if (efsFileInput) {
+      efsFileInput.addEventListener('change', function () {
+        var lbl = document.getElementById('efs-file-label-text');
+        if (lbl && this.files.length) lbl.textContent = this.files[0].name;
       });
     }
 
-    // Step 3a — Issue new EFS
-    var issueEfsBtn = document.getElementById('btn-issue-efs');
-    if (issueEfsBtn && issuePanel) {
-      issueEfsBtn.addEventListener('click', function () {
-        if (issuePanel.hidden) {
-          issuePanel.hidden = false;
-          if (viewPanel) viewPanel.hidden = true;
-          _efsPickerSelected = [];
-          var efsSearch = document.getElementById('efs-emp-search');
-          if (efsSearch) efsSearch.value = '';
-          buildEfsPicker('');
-        } else {
-          issuePanel.hidden = true;
-        }
-      });
-
-      var efsFileInput = document.getElementById('efs-file');
-      if (efsFileInput) {
-        efsFileInput.addEventListener('change', function () {
-          var lbl = document.getElementById('efs-file-label-text');
-          if (lbl && this.files.length) lbl.textContent = this.files[0].name;
-        });
-      }
-
-      var efsSearchInput = document.getElementById('efs-emp-search');
-      if (efsSearchInput) {
-        efsSearchInput.addEventListener('input', function () { buildEfsPicker(this.value); });
-      }
-
-      var efsForm = document.getElementById('form-issue-efs');
-      if (efsForm) {
-        efsForm.addEventListener('submit', function (e) { e.preventDefault(); handleEfsIssue(); });
-      }
+    var efsSearchInput = document.getElementById('efs-emp-search');
+    if (efsSearchInput) {
+      efsSearchInput.addEventListener('input', function () { buildEfsPicker(this.value); });
     }
 
-    // Step 3b — View EFS records
-    var viewEfsBtn = document.getElementById('btn-view-efs-records');
-    if (viewEfsBtn && viewPanel) {
-      viewEfsBtn.addEventListener('click', function () {
-        if (viewPanel.hidden) {
-          viewPanel.hidden = false;
-          if (issuePanel) issuePanel.hidden = true;
-          if (!viewLoaded) { loadEfsRecords(); viewLoaded = true; }
-        } else {
-          viewPanel.hidden = true;
-        }
-      });
-
-      var refreshEfsBtn = document.getElementById('btn-refresh-efs');
-      if (refreshEfsBtn) {
-        refreshEfsBtn.addEventListener('click', function () { viewLoaded = false; loadEfsRecords(); viewLoaded = true; });
-      }
+    var efsForm = document.getElementById('form-issue-efs');
+    if (efsForm) {
+      efsForm.addEventListener('submit', function (e) { e.preventDefault(); handleEfsIssue(); });
     }
 
     function buildEfsPicker(filter) {
