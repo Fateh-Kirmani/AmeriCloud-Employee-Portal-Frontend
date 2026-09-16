@@ -1375,6 +1375,13 @@
     if (tsFormClose)   tsFormClose.addEventListener('click', closeTsFormModal);
     if (tsFormOverlay) tsFormOverlay.addEventListener('click', closeTsFormModal);
 
+    // Wire Non-Billable Codes modal close (once)
+    var codesModal   = document.getElementById('modal-ts-codes');
+    var codesClose   = document.getElementById('btn-close-ts-codes-modal');
+    var codesOverlay = document.getElementById('modal-ts-codes-overlay');
+    if (codesClose)   codesClose.addEventListener('click',   function () { if (codesModal) codesModal.hidden = true; });
+    if (codesOverlay) codesOverlay.addEventListener('click', function () { if (codesModal) codesModal.hidden = true; });
+
     function wireForm(btn, tsType) {
       if (!btn || !tsFormModal || !tsFormBody) return;
       btn.addEventListener('click', function () {
@@ -1407,6 +1414,8 @@
     var staffId      = (staffEntry && staffEntry.employeeId)  ? staffEntry.employeeId : '';
     var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+    var todayIso = new Date().toISOString().slice(0, 10);
+
     var html = '<div class="portal-ts-form-header">'
       + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Week Starting (Sunday)</label>'
       + '<input type="date" id="tsf-week-start" class="portal-form-input portal-ts-date-input" value="' + lastSunday() + '"></div>'
@@ -1416,6 +1425,13 @@
         + '<input type="text" id="tsf-state" class="portal-form-input portal-ts-short-input" value="' + escapeHtml(staffState) + '" placeholder="e.g. TX" maxlength="2"></div>')
       + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Manager Name</label>'
       + '<input type="text" id="tsf-manager" class="portal-form-input" value="' + escapeHtml(staffManager) + '" placeholder="Manager full name" maxlength="100"></div>'
+      + '</div>';
+
+    html += '<div class="portal-ts-form-note">'
+      + '<p>ONE LINE PER DAY. In <strong>Project Code</strong> put the code from the tracker — three capital letters then nine digits, e.g. <strong>ERI202607135</strong>. For a non-billable day put the LBR code instead (see Codes List). '
+      + 'Enter times in 24-hour format: <strong>0900 = 9:00 AM, 1300 = 1:00 PM, 1730 = 5:30 PM, 2200 = 10:00 PM.</strong> '
+      + 'Meal time is unpaid; rest breaks are paid up to 10 minutes each and any extra is deducted. Submit by <strong>Monday 12:00 PM</strong> for the prior week.</p>'
+      + '<button type="button" class="portal-ts-codes-btn" id="btn-ts-codes-' + tsType + '">Non-Billable Codes</button>'
       + '</div>';
 
     html += '<div class="portal-ts-form-table-wrap"><table class="portal-ts-form-table" id="tsf-table">'
@@ -1432,15 +1448,15 @@
         + '<td class="tsf-day-label">' + DAYS[i] + '</td>'
         + '<td class="tsf-date-cell" id="tsf-date-' + i + '">—</td>'
         + '<td><input type="text" class="portal-form-input tsf-proj" data-day="' + i + '" placeholder="Code" maxlength="30"></td>'
-        + '<td><input type="time" class="tsf-time tsf-shift-start" data-day="' + i + '"></td>'
-        + '<td><input type="time" class="tsf-time tsf-rest1s"      data-day="' + i + '"></td>'
-        + '<td><input type="time" class="tsf-time tsf-rest1e"      data-day="' + i + '"></td>'
-        + '<td><input type="time" class="tsf-time tsf-meals"       data-day="' + i + '"></td>'
-        + '<td><input type="time" class="tsf-time tsf-meale"       data-day="' + i + '"></td>'
+        + '<td><input type="text" class="tsf-time tsf-shift-start portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+        + '<td><input type="text" class="tsf-time tsf-rest1s      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+        + '<td><input type="text" class="tsf-time tsf-rest1e      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+        + '<td><input type="text" class="tsf-time tsf-meals       portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+        + '<td><input type="text" class="tsf-time tsf-meale       portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
         + (isCA ? '<td><select class="tsf-meal-waiver" data-day="' + i + '"><option value=""></option><option value="Y">Y</option><option value="N">N</option></select></td>' : '')
-        + '<td><input type="time" class="tsf-time tsf-rest2s"      data-day="' + i + '"></td>'
-        + '<td><input type="time" class="tsf-time tsf-rest2e"      data-day="' + i + '"></td>'
-        + '<td><input type="time" class="tsf-time tsf-shift-end"   data-day="' + i + '"></td>'
+        + '<td><input type="text" class="tsf-time tsf-rest2s      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+        + '<td><input type="text" class="tsf-time tsf-rest2e      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+        + '<td><input type="text" class="tsf-time tsf-shift-end   portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
         + '<td class="tsf-hours-cell" id="tsf-hours-' + i + '">—</td>'
         + '<td><input type="text" class="portal-form-input tsf-notes" data-day="' + i + '" placeholder="Notes" maxlength="200"></td>'
         + '</tr>';
@@ -1469,6 +1485,16 @@
         + '<label><input type="checkbox" id="tsf-7th-day"> Saturday is my 7th consecutive workday (all hours at OT rate)</label>'
         + '</div>';
     }
+
+    html += '<div class="portal-ts-attestation">'
+      + '<div class="portal-ts-attestation-title">EMPLOYEE ATTESTATION</div>'
+      + '<p class="portal-ts-attestation-text">I certify that this timesheet accurately reflects all hours I worked and all meal and rest periods I took, waived, or missed. I took every rest and meal break shown, free of duty and uninterrupted; I noted in the Notes column any meal that was interrupted or worked through. On any day I marked Meal Waiver = Y, my shift was 6 hours or less and I voluntarily chose to waive my meal period. I was not pressured to under-report hours or over-report breaks.</p>'
+      + '<div class="portal-ts-sig-grid">'
+      + '<div><label>Employee Signature</label><input type="text" id="tsf-emp-sig" class="portal-form-input" placeholder="Type your full name" maxlength="100"></div>'
+      + '<div><label>Date</label><input type="date" id="tsf-emp-sig-date" class="portal-form-input portal-ts-date-input" value="' + todayIso + '"></div>'
+      + '<div><label>Supervisor Signature <em>(filled by manager when approving)</em></label><input type="text" class="portal-form-input" placeholder="—" disabled></div>'
+      + '<div><label>Date</label><input type="date" class="portal-form-input portal-ts-date-input" disabled></div>'
+      + '</div></div>';
 
     html += '<div class="portal-ts-form-submit-row">'
       + '<button type="button" id="tsf-clear-' + tsType + '" class="portal-ts-form-clear-btn">Clear Form</button>'
@@ -1603,10 +1629,19 @@
 
     panelEl.querySelectorAll('.tsf-time, .tsf-meal-waiver').forEach(function (el) {
       el.addEventListener('change', recalcAll);
+      el.addEventListener('input',  recalcAll);
     });
     var cb7El = panelEl.querySelector('#tsf-7th-day');
     if (cb7El) cb7El.addEventListener('change', recalcAll);
     recalcAll();
+
+    var codesBtn = panelEl.querySelector('#btn-ts-codes-' + tsType);
+    if (codesBtn) {
+      codesBtn.addEventListener('click', function () {
+        var m = document.getElementById('modal-ts-codes');
+        if (m) m.hidden = false;
+      });
+    }
 
     var submitBtn = panelEl.querySelector('#tsf-submit-' + tsType);
     if (submitBtn) {
@@ -1634,13 +1669,15 @@
 
 
   function submitTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry, isCA) {
-    var weekStartEl = panelEl.querySelector('#tsf-week-start');
-    var empIdEl     = panelEl.querySelector('#tsf-emp-id');
-    var stateEl     = panelEl.querySelector('#tsf-state');
-    var managerEl   = panelEl.querySelector('#tsf-manager');
-    var ptoEl       = panelEl.querySelector('#tsf-pto');
-    var statusEl    = panelEl.querySelector('#tsf-status-' + tsType);
-    var submitBtn   = panelEl.querySelector('#tsf-submit-' + tsType);
+    var weekStartEl  = panelEl.querySelector('#tsf-week-start');
+    var empIdEl      = panelEl.querySelector('#tsf-emp-id');
+    var stateEl      = panelEl.querySelector('#tsf-state');
+    var managerEl    = panelEl.querySelector('#tsf-manager');
+    var ptoEl        = panelEl.querySelector('#tsf-pto');
+    var empSigEl     = panelEl.querySelector('#tsf-emp-sig');
+    var empSigDateEl = panelEl.querySelector('#tsf-emp-sig-date');
+    var statusEl     = panelEl.querySelector('#tsf-status-' + tsType);
+    var submitBtn    = panelEl.querySelector('#tsf-submit-' + tsType);
 
     function showSt(type, msg) {
       if (!statusEl) return;
@@ -1715,13 +1752,15 @@
     apiCall('/timesheets/form/submit', {
       method: 'POST',
       body: JSON.stringify({
-        ts_type:      tsType,
-        week_start:   weekStartEl.value,
-        employee_id:  empIdEl  ? empIdEl.value.trim()  : '',
-        work_state:   stateEl  ? stateEl.value.trim().toUpperCase() : (isCA ? 'CA' : ''),
-        manager_name: managerEl ? managerEl.value.trim() : '',
-        pto_hours:    ptoEl ? parseFloat(ptoEl.value || '0') : 0,
-        days:         days
+        ts_type:           tsType,
+        week_start:        weekStartEl.value,
+        employee_id:       empIdEl      ? empIdEl.value.trim()      : '',
+        work_state:        stateEl      ? stateEl.value.trim().toUpperCase() : (isCA ? 'CA' : ''),
+        manager_name:      managerEl    ? managerEl.value.trim()    : '',
+        pto_hours:         ptoEl        ? parseFloat(ptoEl.value || '0') : 0,
+        employee_sig:      empSigEl     ? empSigEl.value.trim()     : '',
+        employee_sig_date: empSigDateEl ? empSigDateEl.value        : '',
+        days:              days
       })
     }).then(function () {
       showSt('success', '✓ Timesheet submitted for week of ' + weekStartEl.value + '. Your manager and HR have been notified.');
@@ -1813,13 +1852,11 @@
           ? '<span class="portal-pto-badge--denied">Rejected</span>'
           : '<span class="portal-signoff-badge portal-signoff-badge--pending">Pending</span>';
 
-      var weekLink = '<a href="#" class="portal-ts-link portal-tsf-detail-link" data-tsf-id="' + row.id + '">' + escapeHtml(fmtWeek(row.week_start)) + '</a>';
+      var weekLink = '<a href="#" class="portal-ts-link portal-tsf-detail-link" data-tsf-id="' + row.id + '" data-tsf-status="' + st + '" data-tsf-role="' + (isHR ? 'hr' : 'manager') + '">' + escapeHtml(fmtWeek(row.week_start)) + '</a>';
 
       var actionCell = '';
       if (isHR) {
-        actionCell = st === 'approved'
-          ? '<button class="portal-ts-link portal-tsf-excel-btn" data-tsf-id="' + row.id + '" type="button">Download Excel</button>'
-          : '<span class="portal-ts-nolink">—</span>';
+        actionCell = '<span class="portal-ts-nolink">—</span>';
       } else {
         actionCell = st === 'pending'
           ? '<div class="portal-pto-actions" id="tsf-act-' + row.id + '">'
@@ -1856,13 +1893,77 @@
     bodyEl.querySelectorAll('.portal-tsf-detail-link').forEach(function (a) {
       a.addEventListener('click', function (e) {
         e.preventDefault();
-        var id = a.dataset.tsfId;
+        var id        = a.dataset.tsfId;
+        var role      = a.dataset.tsfRole || 'manager';
+        var status    = a.dataset.tsfStatus || 'pending';
         var weekLabel = a.textContent;
         if (tsDetailTitle) tsDetailTitle.textContent = weekLabel;
         if (tsDetailBody)  tsDetailBody.innerHTML = '<p class="portal-ts-loading">Loading…</p>';
         if (tsDetailModal) tsDetailModal.hidden = false;
         apiCall('/timesheets/form/' + id).then(function (data) {
-          if (tsDetailBody) tsDetailBody.innerHTML = renderFormTsDetail(data);
+          if (!tsDetailBody) return;
+          tsDetailBody.innerHTML = renderFormTsDetail(data, { role: role, submissionId: id, status: status });
+
+          // Wire manager approval actions in detail modal
+          var appBtn = tsDetailBody.querySelector('.tsfd-approve-btn');
+          var rejBtn = tsDetailBody.querySelector('.tsfd-reject-btn');
+          var xlsBtn = tsDetailBody.querySelector('.tsfd-excel-btn');
+
+          if (appBtn) {
+            appBtn.addEventListener('click', function () {
+              var mgrSigEl  = tsDetailBody.querySelector('#tsfd-mgr-sig');
+              var mgrDateEl = tsDetailBody.querySelector('#tsfd-mgr-sig-date');
+              var payload = {
+                manager_sig:      mgrSigEl  ? mgrSigEl.value.trim()  : '',
+                manager_sig_date: mgrDateEl ? mgrDateEl.value        : ''
+              };
+              appBtn.disabled = true; appBtn.textContent = 'Approving…';
+              apiCall('/timesheets/form/' + id + '/approve', { method: 'POST', body: JSON.stringify(payload) })
+                .then(function () {
+                  if (tsDetailModal) tsDetailModal.hidden = true;
+                  var stCell = document.getElementById('tsf-status-row-' + id);
+                  var actEl  = document.getElementById('tsf-act-' + id);
+                  if (stCell) stCell.innerHTML = '<span class="portal-signoff-badge portal-signoff-badge--signed">Approved</span>';
+                  if (actEl)  actEl.outerHTML = '<span class="portal-pto-actioned">—</span>';
+                  a.dataset.tsfStatus = 'approved';
+                })
+                .catch(function (err) { alert('Approval failed: ' + err.message); appBtn.disabled = false; appBtn.textContent = 'Approve'; });
+            });
+          }
+
+          if (rejBtn) {
+            rejBtn.addEventListener('click', function () {
+              rejBtn.disabled = true; rejBtn.textContent = 'Rejecting…';
+              apiCall('/timesheets/form/' + id + '/reject', { method: 'POST' })
+                .then(function () {
+                  if (tsDetailModal) tsDetailModal.hidden = true;
+                  var stCell = document.getElementById('tsf-status-row-' + id);
+                  var actEl  = document.getElementById('tsf-act-' + id);
+                  if (stCell) stCell.innerHTML = '<span class="portal-pto-badge--denied">Rejected</span>';
+                  if (actEl)  actEl.outerHTML = '<span class="portal-pto-actioned">—</span>';
+                  a.dataset.tsfStatus = 'rejected';
+                })
+                .catch(function (err) { alert('Rejection failed: ' + err.message); rejBtn.disabled = false; rejBtn.textContent = 'Reject'; });
+            });
+          }
+
+          if (xlsBtn) {
+            xlsBtn.addEventListener('click', function () {
+              xlsBtn.disabled = true; xlsBtn.textContent = 'Preparing…';
+              getApiToken().then(function (token) {
+                return fetch(API_BASE + '/timesheets/form/' + id + '/excel', { headers: { 'Authorization': 'Bearer ' + token } });
+              }).then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.blob();
+              }).then(function (blob) {
+                var url = URL.createObjectURL(blob);
+                var dl = document.createElement('a'); dl.href = url; dl.download = 'timesheet-' + id + '.xlsx';
+                document.body.appendChild(dl); dl.click(); document.body.removeChild(dl);
+                setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+              }).catch(function () { alert('Could not generate Excel. Please try again.'); })
+                .then(function () { xlsBtn.disabled = false; xlsBtn.textContent = 'Download Excel'; });
+            });
+          }
         }).catch(function () {
           if (tsDetailBody) tsDetailBody.innerHTML = '<p class="portal-ts-empty portal-ts-empty--error">Could not load detail.</p>';
         });
@@ -1890,34 +1991,14 @@
       });
     });
 
-    bodyEl.querySelectorAll('.portal-tsf-excel-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var id = btn.dataset.tsfId;
-        btn.disabled = true; btn.textContent = 'Preparing…';
-        getApiToken().then(function (token) {
-          return fetch(API_BASE + '/timesheets/form/' + id + '/excel', {
-            headers: { 'Authorization': 'Bearer ' + token }
-          });
-        }).then(function (r) {
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          return r.blob();
-        }).then(function (blob) {
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement('a');
-          a.href = url; a.download = 'timesheet-' + id + '.xlsx';
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-          setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-        }).catch(function () {
-          alert('Could not generate Excel. Please try again.');
-        }).then(function () {
-          btn.disabled = false; btn.textContent = 'Download Excel';
-        });
-      });
-    });
   }
 
 
-  function renderFormTsDetail(data) {
+  function renderFormTsDetail(data, opts) {
+    opts = opts || {};
+    var viewRole  = opts.role || 'manager';
+    var subId     = opts.submissionId || '';
+    var subStatus = opts.status || data.status || 'pending';
     var isCA = data.ts_type === 'ca';
     var days = [];
     if (Array.isArray(data.form_data)) {
@@ -2012,6 +2093,37 @@
     if (data.pto_hours > 0) {
       html += '<p style="margin:8px 0;font-size:.83rem;color:var(--slate)">PTO Hours: <strong>' + data.pto_hours + '</strong></p>';
     }
+
+    // Attestation / signature section
+    var todayIso2 = new Date().toISOString().slice(0, 10);
+    html += '<div class="portal-ts-attestation" style="margin-top:16px">'
+      + '<div class="portal-ts-attestation-title">EMPLOYEE ATTESTATION</div>'
+      + '<p class="portal-ts-attestation-text">I certify that this timesheet accurately reflects all hours I worked and all meal and rest periods I took, waived, or missed. I took every rest and meal break shown, free of duty and uninterrupted; I noted in the Notes column any meal that was interrupted or worked through. On any day I marked Meal Waiver = Y, my shift was 6 hours or less and I voluntarily chose to waive my meal period. I was not pressured to under-report hours or over-report breaks.</p>'
+      + '<div class="portal-ts-sig-grid">'
+      + '<div><label>Employee Signature</label><input type="text" class="portal-form-input" value="' + escapeHtml(data.employee_sig || '') + '" readonly></div>'
+      + '<div><label>Date</label><input type="date" class="portal-form-input portal-ts-date-input" value="' + escapeHtml(data.employee_sig_date || '') + '" readonly></div>';
+
+    if (viewRole === 'manager' && subStatus === 'pending') {
+      html += '<div><label>Supervisor Signature</label><input type="text" id="tsfd-mgr-sig" class="portal-form-input" placeholder="Your full name" maxlength="100" value="' + escapeHtml(data.manager_sig || '') + '"></div>'
+        + '<div><label>Date</label><input type="date" id="tsfd-mgr-sig-date" class="portal-form-input portal-ts-date-input" value="' + escapeHtml(data.manager_sig_date || todayIso2) + '"></div>';
+    } else {
+      html += '<div><label>Supervisor Signature</label><input type="text" class="portal-form-input" value="' + escapeHtml(data.manager_sig || '') + '" readonly></div>'
+        + '<div><label>Date</label><input type="date" class="portal-form-input portal-ts-date-input" value="' + escapeHtml(data.manager_sig_date || '') + '" readonly></div>';
+    }
+    html += '</div></div>';
+
+    // Role-specific action buttons
+    if (viewRole === 'manager' && subStatus === 'pending') {
+      html += '<div class="portal-ts-form-submit-row" style="margin-top:16px">'
+        + '<button type="button" class="tsfd-reject-btn portal-ts-form-clear-btn">Reject</button>'
+        + '<button type="button" class="tsfd-approve-btn portal-ts-form-submit-btn">Approve &amp; Sign</button>'
+        + '</div>';
+    } else if (viewRole === 'hr') {
+      html += '<div class="portal-ts-form-submit-row" style="margin-top:16px">'
+        + '<button type="button" class="tsfd-excel-btn portal-ts-form-submit-btn">Download Excel</button>'
+        + '</div>';
+    }
+
     html += '</div>';
     return html;
   }

@@ -674,6 +674,36 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
+<!-- Non-Billable Time Codes Modal -->
+<div id="modal-ts-codes" class="portal-modal" hidden>
+  <div class="portal-modal__overlay" id="modal-ts-codes-overlay"></div>
+  <div class="portal-modal__box" role="dialog" aria-modal="true">
+    <div class="portal-modal__head">
+      <h2 class="portal-modal__title">Non-Billable Time Codes</h2>
+      <button class="portal-modal__close" id="btn-close-ts-codes-modal" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div class="portal-modal__body">
+      <p style="font-size:.82rem;color:var(--red);background:#fff5f5;border:1px solid #fecaca;border-radius:6px;padding:10px 14px;margin:0 0 16px">
+        These nine codes are for time you do not bill to a customer. On such a day, type the LBR code into the <strong>Project Code</strong> column on the timesheet. On a normal day, type the project code your manager gave you. Do not type a service code. Expenses go on RAMP, not here.
+      </p>
+      <table class="portal-ts-form-table" style="width:100%">
+        <thead><tr><th>Code</th><th>What it is</th><th>When to use it</th></tr></thead>
+        <tbody>
+          <tr><td><strong>LBR1010</strong></td><td>Idle / Bench Time</td><td>Available, unassigned, no active project</td></tr>
+          <tr><td><strong>LBR1020</strong></td><td>Paid Time Off (PTO)</td><td>Vacation and personal PTO</td></tr>
+          <tr><td><strong>LBR1030</strong></td><td>Holiday</td><td>Company-observed holiday</td></tr>
+          <tr><td><strong>LBR1040</strong></td><td>Sick / Safe Time</td><td>Sick or protected safe time</td></tr>
+          <tr><td><strong>LBR1050</strong></td><td>Bereavement / Jury Duty</td><td>Bereavement, jury, witness leave</td></tr>
+          <tr><td><strong>LBR1060</strong></td><td>Training and Certification</td><td>Time in training or certification</td></tr>
+          <tr><td><strong>LBR1070</strong></td><td>Non-Billable Travel Time</td><td>Travel hours not chargeable to a customer. Travel we DO bill is SVC2000.</td></tr>
+          <tr><td><strong>LBR1080</strong></td><td>Administrative / Internal</td><td>Internal meetings, admin, timesheets</td></tr>
+          <tr><td><strong>LBR1090</strong></td><td>Safety / Stand-Down</td><td>Safety stand-downs, toolbox talks</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- Timesheet Form Modal -->
 <div id="modal-ts-form" class="portal-modal" hidden>
   <div class="portal-modal__overlay" id="modal-ts-form-overlay"></div>

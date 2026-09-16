@@ -2192,6 +2192,93 @@ button { cursor: pointer; font-family: inherit; }
 }
 .portal-ts-form-clear-btn:hover { background: #e8eaf0; color: var(--navy); }
 
+/* Instructional note above form table */
+.portal-ts-form-note {
+  background: #f0f4ff;
+  border: 1px solid #c7d2fe;
+  border-left: 3px solid var(--navy);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: .8rem;
+  line-height: 1.55;
+  color: var(--slate);
+  margin-bottom: 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.portal-ts-form-note p { margin: 0; flex: 1; min-width: 260px; }
+/* Time text inputs in the form table — narrow to fit */
+.tsf-time-input {
+  width: 62px;
+  min-width: 62px;
+  text-align: center;
+  padding-left: 4px;
+  padding-right: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.portal-ts-codes-btn {
+  flex-shrink: 0;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--white);
+  border: 1px solid var(--navy);
+  border-radius: 5px;
+  padding: 5px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+  align-self: center;
+}
+.portal-ts-codes-btn:hover { background: var(--navy); color: var(--white); }
+
+/* Employee Attestation section */
+.portal-ts-attestation {
+  margin-top: 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.portal-ts-attestation-title {
+  background: var(--navy);
+  color: var(--white);
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  padding: 8px 14px;
+}
+.portal-ts-attestation-text {
+  font-size: .78rem;
+  line-height: 1.5;
+  color: var(--slate);
+  padding: 10px 14px;
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+}
+.portal-ts-sig-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr 1fr;
+  gap: 12px 16px;
+  padding: 14px;
+}
+@media (max-width: 700px) {
+  .portal-ts-sig-grid { grid-template-columns: 1fr 1fr; }
+}
+.portal-ts-sig-grid label {
+  display: block;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--slate);
+  margin-bottom: 4px;
+}
+.portal-ts-sig-grid label em { font-weight: 400; color: var(--slate-2); }
+.portal-ts-sig-grid input { width: 100%; }
+
 /* Form submission detail (manager/HR read view) */
 .portal-tsf-detail { padding: 12px 0 4px; }
 .portal-tsf-detail-meta {
