@@ -390,7 +390,9 @@ var PORTAL_CONFIG = {
       'cmpal@americloudtelecom.com',
       'nbihan@americloudtelecom.com',
     ]},
-    'fkirmani@americloudtelecom.com':  { name: 'Syed Muhammad Fateh Kirmani', role: 'employee' },
+    'fkirmani@americloudtelecom.com':  { name: 'Syed Muhammad Fateh Kirmani', role: 'manager', team: [
+      'fkirmani@americloudtelecom.com',
+    ]},
     'mhaq@americloudtelecom.com':      { name: 'Mati ul Haq',              role: 'employee' },
     'mmohammed@americloud.net':        { name: 'Mustafa Mohammed',         role: 'employee' },
 
