@@ -2149,6 +2149,28 @@ button { cursor: pointer; font-family: inherit; }
 .portal-ts-7thday-row { margin: 4px 0 8px; font-size: .82rem; }
 .portal-ts-7thday-row input[type="checkbox"] { margin-right: 6px; }
 
+.portal-ts-form-submit-row {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 2px solid var(--line);
+}
+.portal-ts-form-submit-btn {
+  font-family: 'Archivo', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--navy);
+  border: none;
+  border-radius: 6px;
+  padding: 12px 32px;
+  cursor: pointer;
+  transition: background .15s;
+  width: 100%;
+  letter-spacing: .01em;
+}
+.portal-ts-form-submit-btn:hover:not(:disabled) { background: var(--navy-2); }
+.portal-ts-form-submit-btn:disabled { opacity: .55; cursor: wait; }
+
 /* Form submission detail (manager/HR read view) */
 .portal-tsf-detail { padding: 12px 0 4px; }
 .portal-tsf-detail-meta {

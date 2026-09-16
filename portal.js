@@ -1470,8 +1470,8 @@
         + '</div>';
     }
 
-    html += '<div class="portal-form-actions">'
-      + '<button type="button" id="tsf-submit-' + tsType + '" class="portal-linkitem__action portal-linkitem__action--primary">Submit Timesheet</button>'
+    html += '<div class="portal-ts-form-submit-row">'
+      + '<button type="button" id="tsf-submit-' + tsType + '" class="portal-ts-form-submit-btn">Submit Timesheet</button>'
       + '</div>'
       + '<div id="tsf-status-' + tsType + '" class="portal-ts-status" hidden></div>'
       + '</div>';
@@ -1885,7 +1885,11 @@
   function renderFormTsDetail(data) {
     var isCA = data.ts_type === 'ca';
     var days = [];
-    try { days = JSON.parse(data.form_data); } catch (e) { days = []; }
+    if (Array.isArray(data.form_data)) {
+      days = data.form_data;
+    } else {
+      try { days = JSON.parse(data.form_data); } catch (e) { days = []; }
+    }
 
     var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     function fmtDate(ds) {
