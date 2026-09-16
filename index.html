@@ -389,17 +389,6 @@
           <div id="body-my-pto" class="portal-ts-panel__body"></div>
         </div>
       </div>
-      <!-- Directory panel sits outside the 820px container so it can use full section width -->
-      <div id="panel-directory" class="portal-ts-panel portal-dir-panel" hidden>
-        <div class="portal-ts-panel__head">
-          <span class="portal-ts-panel__label">Company Directory</span>
-        </div>
-        <div class="portal-ts-panel__body">
-          <input type="search" id="dir-search" class="portal-dir-search" placeholder="Search by name or email…" autocomplete="off" spellcheck="false">
-          <p id="dir-count" class="portal-dir-count"></p>
-          <div id="dir-grid" class="portal-dir-grid"></div>
-        </div>
-      </div>
     </section>
 
     <!-- ── SECTION: Manager Approvals (role-gated) ── -->
@@ -628,6 +617,18 @@
 
       </div>
     </section>
+
+    <!-- Directory panel — lives outside all sections so it works from any tab -->
+    <div id="panel-directory" class="portal-ts-panel portal-dir-panel" hidden>
+      <div class="portal-ts-panel__head">
+        <span class="portal-ts-panel__label">Company Directory</span>
+      </div>
+      <div class="portal-ts-panel__body">
+        <input type="search" id="dir-search" class="portal-dir-search" placeholder="Search by name or email…" autocomplete="off" spellcheck="false">
+        <p id="dir-count" class="portal-dir-count"></p>
+        <div id="dir-grid" class="portal-dir-grid"></div>
+      </div>
+    </div>
 
     <!-- ── Footer (always visible, contact info lives here) ── -->
     <footer class="portal-foot">
