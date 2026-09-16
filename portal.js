@@ -1494,6 +1494,13 @@
       + '<div><label>Date</label><input type="date" id="tsf-emp-sig-date" class="portal-form-input portal-ts-date-input" value="' + todayIso + '"></div>'
       + '<div><label>Supervisor Signature <em>(filled by manager when approving)</em></label><input type="text" class="portal-form-input" placeholder="—" disabled></div>'
       + '<div><label>Date</label><input type="date" class="portal-form-input portal-ts-date-input" disabled></div>'
+      + '</div></div>'
+      + '<div class="portal-ts-attestation" style="margin-top:10px">'
+      + '<div class="portal-ts-attestation-title">VOLUNTARY MEAL / REST BREAK WAIVER &nbsp;&mdash;&nbsp; complete ONLY if a break was voluntarily skipped</div>'
+      + '<p class="portal-ts-attestation-text">I confirm that I was provided the opportunity to take all required meal and rest breaks but voluntarily chose not to take one or more of them on the dates above. In California, this also documents waiver of the first meal period on a shift of 6 hours or less, or the second meal period on a shift of 12 hours or less. This form is not to be used if a break was not provided by the company.</p>'
+      + '<div class="portal-ts-sig-grid portal-ts-sig-grid--half">'
+      + '<div><label>Employee Signature <em>(leave blank if no waiver applies)</em></label><input type="text" id="tsf-waiver-sig" class="portal-form-input" placeholder="Type your full name if applicable" maxlength="100"></div>'
+      + '<div><label>Date</label><input type="date" id="tsf-waiver-sig-date" class="portal-form-input portal-ts-date-input"></div>'
       + '</div></div>';
 
     html += '<div class="portal-ts-form-submit-row">'
@@ -1669,15 +1676,17 @@
 
 
   function submitTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry, isCA) {
-    var weekStartEl  = panelEl.querySelector('#tsf-week-start');
-    var empIdEl      = panelEl.querySelector('#tsf-emp-id');
-    var stateEl      = panelEl.querySelector('#tsf-state');
-    var managerEl    = panelEl.querySelector('#tsf-manager');
-    var ptoEl        = panelEl.querySelector('#tsf-pto');
-    var empSigEl     = panelEl.querySelector('#tsf-emp-sig');
-    var empSigDateEl = panelEl.querySelector('#tsf-emp-sig-date');
-    var statusEl     = panelEl.querySelector('#tsf-status-' + tsType);
-    var submitBtn    = panelEl.querySelector('#tsf-submit-' + tsType);
+    var weekStartEl    = panelEl.querySelector('#tsf-week-start');
+    var empIdEl        = panelEl.querySelector('#tsf-emp-id');
+    var stateEl        = panelEl.querySelector('#tsf-state');
+    var managerEl      = panelEl.querySelector('#tsf-manager');
+    var ptoEl          = panelEl.querySelector('#tsf-pto');
+    var empSigEl       = panelEl.querySelector('#tsf-emp-sig');
+    var empSigDateEl   = panelEl.querySelector('#tsf-emp-sig-date');
+    var waiverSigEl    = panelEl.querySelector('#tsf-waiver-sig');
+    var waiverDateEl   = panelEl.querySelector('#tsf-waiver-sig-date');
+    var statusEl       = panelEl.querySelector('#tsf-status-' + tsType);
+    var submitBtn      = panelEl.querySelector('#tsf-submit-' + tsType);
 
     function showSt(type, msg) {
       if (!statusEl) return;
@@ -1760,6 +1769,8 @@
         pto_hours:         ptoEl        ? parseFloat(ptoEl.value || '0') : 0,
         employee_sig:      empSigEl     ? empSigEl.value.trim()     : '',
         employee_sig_date: empSigDateEl ? empSigDateEl.value        : '',
+        waiver_sig:        waiverSigEl  ? waiverSigEl.value.trim()  : '',
+        waiver_sig_date:   waiverDateEl ? waiverDateEl.value        : '',
         days:              days
       })
     }).then(function () {
@@ -2110,7 +2121,14 @@
       html += '<div><label>Supervisor Signature</label><input type="text" class="portal-form-input" value="' + escapeHtml(data.manager_sig || '') + '" readonly></div>'
         + '<div><label>Date</label><input type="date" class="portal-form-input portal-ts-date-input" value="' + escapeHtml(data.manager_sig_date || '') + '" readonly></div>';
     }
-    html += '</div></div>';
+    html += '</div></div>'
+      + '<div class="portal-ts-attestation" style="margin-top:10px">'
+      + '<div class="portal-ts-attestation-title">VOLUNTARY MEAL / REST BREAK WAIVER &nbsp;&mdash;&nbsp; complete ONLY if a break was voluntarily skipped</div>'
+      + '<p class="portal-ts-attestation-text">I confirm that I was provided the opportunity to take all required meal and rest breaks but voluntarily chose not to take one or more of them on the dates above. In California, this also documents waiver of the first meal period on a shift of 6 hours or less, or the second meal period on a shift of 12 hours or less. This form is not to be used if a break was not provided by the company.</p>'
+      + '<div class="portal-ts-sig-grid portal-ts-sig-grid--half">'
+      + '<div><label>Employee Signature</label><input type="text" class="portal-form-input" value="' + escapeHtml(data.waiver_sig || '') + '" readonly></div>'
+      + '<div><label>Date</label><input type="date" class="portal-form-input portal-ts-date-input" value="' + escapeHtml(data.waiver_sig_date || '') + '" readonly></div>'
+      + '</div></div>';
 
     // Role-specific action buttons
     if (viewRole === 'manager' && subStatus === 'pending') {

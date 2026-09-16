@@ -1162,6 +1162,15 @@ button { cursor: pointer; font-family: inherit; }
   width: min(1200px, calc(100vw - 32px));
 }
 
+#modal-ts-codes { z-index: 600; }
+
+.portal-ts-sig-grid--half {
+  grid-template-columns: 2fr 1fr;
+}
+@media (max-width: 600px) {
+  .portal-ts-sig-grid--half { grid-template-columns: 1fr; }
+}
+
 .portal-pol-hint {
   margin: 14px 0 0;
   font-size: 13px;
