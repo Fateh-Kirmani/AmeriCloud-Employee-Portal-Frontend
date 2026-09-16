@@ -1362,30 +1362,34 @@
       if (tsStd) tsStd.hidden = false;
     }
 
-    var btnStd  = document.getElementById('btn-open-ts-form-std');
-    var btnCA   = document.getElementById('btn-open-ts-form-ca');
-    var panelStd = document.getElementById('panel-ts-form-std');
-    var panelCA  = document.getElementById('panel-ts-form-ca');
+    var btnStd = document.getElementById('btn-open-ts-form-std');
+    var btnCA  = document.getElementById('btn-open-ts-form-ca');
 
-    function wireForm(btn, panel, tsType) {
-      if (!btn || !panel) return;
+    var tsFormModal  = document.getElementById('modal-ts-form');
+    var tsFormBody   = document.getElementById('body-ts-form-modal');
+    var tsFormTitle  = document.getElementById('modal-ts-form-title');
+    var tsFormClose  = document.getElementById('btn-close-ts-form-modal');
+    var tsFormOverlay = document.getElementById('modal-ts-form-overlay');
+
+    function closeTsFormModal() { if (tsFormModal) tsFormModal.hidden = true; }
+    if (tsFormClose)   tsFormClose.addEventListener('click', closeTsFormModal);
+    if (tsFormOverlay) tsFormOverlay.addEventListener('click', closeTsFormModal);
+
+    function wireForm(btn, tsType) {
+      if (!btn || !tsFormModal || !tsFormBody) return;
       btn.addEventListener('click', function () {
-        if (panel.hidden) {
-          panel.hidden = false;
-          btn.textContent = 'Close Form';
-          if (!panel.dataset.built) {
-            buildTimesheetForm(panel, tsType, userEmail, userDisplayName, staffEntry);
-            panel.dataset.built = '1';
-          }
-        } else {
-          panel.hidden = true;
-          btn.textContent = 'Fill Out Form';
+        var label = tsType === 'ca' ? 'California' : 'Standard';
+        if (tsFormTitle) tsFormTitle.textContent = 'Weekly Timesheet — ' + label;
+        if (tsFormBody.dataset.builtType !== tsType) {
+          buildTimesheetForm(tsFormBody, tsType, userEmail, userDisplayName, staffEntry);
+          tsFormBody.dataset.builtType = tsType;
         }
+        tsFormModal.hidden = false;
       });
     }
 
-    wireForm(btnStd, panelStd, 'standard');
-    wireForm(btnCA,  panelCA,  'ca');
+    wireForm(btnStd, 'standard');
+    wireForm(btnCA,  'ca');
   }
 
 
@@ -1403,11 +1407,7 @@
     var staffId      = (staffEntry && staffEntry.employeeId)  ? staffEntry.employeeId : '';
     var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    var html = '<div class="portal-ts-panel__head">'
-      + '<span class="portal-ts-panel__label">Weekly Timesheet — ' + (isCA ? 'California' : 'Standard') + '</span>'
-      + '</div>'
-      + '<div class="portal-ts-panel__body">'
-      + '<div class="portal-ts-form-header">'
+    var html = '<div class="portal-ts-form-header">'
       + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Week Starting (Sunday)</label>'
       + '<input type="date" id="tsf-week-start" class="portal-form-input portal-ts-date-input" value="' + lastSunday() + '"></div>'
       + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Employee ID</label>'
@@ -1471,10 +1471,10 @@
     }
 
     html += '<div class="portal-ts-form-submit-row">'
+      + '<button type="button" id="tsf-clear-' + tsType + '" class="portal-ts-form-clear-btn">Clear Form</button>'
       + '<button type="button" id="tsf-submit-' + tsType + '" class="portal-ts-form-submit-btn">Submit Timesheet</button>'
       + '</div>'
-      + '<div id="tsf-status-' + tsType + '" class="portal-ts-status" hidden></div>'
-      + '</div>';
+      + '<div id="tsf-status-' + tsType + '" class="portal-ts-status" hidden></div>';
 
     panelEl.innerHTML = html;
 
@@ -1612,6 +1612,22 @@
     if (submitBtn) {
       submitBtn.addEventListener('click', function () {
         submitTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry, isCA);
+      });
+    }
+
+    var clearBtn = panelEl.querySelector('#tsf-clear-' + tsType);
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        var wsEl2 = panelEl.querySelector('#tsf-week-start');
+        if (wsEl2) { wsEl2.value = lastSunday(); updateDateLabels(); }
+        panelEl.querySelectorAll('.tsf-time').forEach(function (el) { el.value = ''; });
+        panelEl.querySelectorAll('.tsf-proj, .tsf-notes').forEach(function (el) { el.value = ''; });
+        panelEl.querySelectorAll('.tsf-meal-waiver').forEach(function (el) { el.value = ''; });
+        var ptoEl2 = panelEl.querySelector('#tsf-pto');
+        if (ptoEl2) ptoEl2.value = '0';
+        var cb7El2 = panelEl.querySelector('#tsf-7th-day');
+        if (cb7El2) cb7El2.checked = false;
+        recalcAll();
       });
     }
   }
@@ -1820,31 +1836,36 @@
         + '<td class="portal-ts-col-date">' + formatDate(row.submitted_at) + '</td>'
         + '<td id="tsf-status-row-' + row.id + '">' + badge + '</td>'
         + '<td>' + actionCell + '</td>'
-        + '</tr>'
-        + '<tr id="tsf-detail-row-' + row.id + '" hidden>'
-        + '<td colspan="6" class="portal-pol-ack-cell" id="tsf-detail-cell-' + row.id + '"><p class="portal-ts-loading">Loading…</p></td>'
         + '</tr>';
     });
 
     html += '</tbody></table></div>';
     bodyEl.innerHTML = html;
 
+    var tsDetailModal   = document.getElementById('modal-ts-detail');
+    var tsDetailBody    = document.getElementById('body-ts-detail-modal');
+    var tsDetailTitle   = document.getElementById('modal-ts-detail-title');
+    var tsDetailClose   = document.getElementById('btn-close-ts-detail-modal');
+    var tsDetailOverlay = document.getElementById('modal-ts-detail-overlay');
+    if (!tsDetailModal._wired) {
+      tsDetailModal._wired = true;
+      if (tsDetailClose)   tsDetailClose.addEventListener('click',   function () { tsDetailModal.hidden = true; });
+      if (tsDetailOverlay) tsDetailOverlay.addEventListener('click', function () { tsDetailModal.hidden = true; });
+    }
+
     bodyEl.querySelectorAll('.portal-tsf-detail-link').forEach(function (a) {
       a.addEventListener('click', function (e) {
         e.preventDefault();
-        var id  = a.dataset.tsfId;
-        var row = document.getElementById('tsf-detail-row-'  + id);
-        var cel = document.getElementById('tsf-detail-cell-' + id);
-        if (!row) return;
-        row.hidden = !row.hidden;
-        if (!row.hidden && !cel.dataset.loaded) {
-          apiCall('/timesheets/form/' + id).then(function (data) {
-            cel.innerHTML = renderFormTsDetail(data);
-            cel.dataset.loaded = '1';
-          }).catch(function () {
-            cel.innerHTML = '<p class="portal-ts-empty portal-ts-empty--error">Could not load detail.</p>';
-          });
-        }
+        var id = a.dataset.tsfId;
+        var weekLabel = a.textContent;
+        if (tsDetailTitle) tsDetailTitle.textContent = weekLabel;
+        if (tsDetailBody)  tsDetailBody.innerHTML = '<p class="portal-ts-loading">Loading…</p>';
+        if (tsDetailModal) tsDetailModal.hidden = false;
+        apiCall('/timesheets/form/' + id).then(function (data) {
+          if (tsDetailBody) tsDetailBody.innerHTML = renderFormTsDetail(data);
+        }).catch(function () {
+          if (tsDetailBody) tsDetailBody.innerHTML = '<p class="portal-ts-empty portal-ts-empty--error">Could not load detail.</p>';
+        });
       });
     });
 
@@ -1873,10 +1894,24 @@
       btn.addEventListener('click', function () {
         var id = btn.dataset.tsfId;
         btn.disabled = true; btn.textContent = 'Preparing…';
-        apiCall('/timesheets/form/' + id + '/excel')
-          .then(function (data) { window.open(data.url, '_blank', 'noopener'); })
-          .catch(function () { alert('Could not generate Excel. Try again.'); })
-          .then(function () { btn.disabled = false; btn.textContent = 'Download Excel'; });
+        getApiToken().then(function (token) {
+          return fetch(API_BASE + '/timesheets/form/' + id + '/excel', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+        }).then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.blob();
+        }).then(function (blob) {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url; a.download = 'timesheet-' + id + '.xlsx';
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+          setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        }).catch(function () {
+          alert('Could not generate Excel. Please try again.');
+        }).then(function () {
+          btn.disabled = false; btn.textContent = 'Download Excel';
+        });
       });
     });
   }
@@ -1936,6 +1971,43 @@
     html += '<tr class="tsf-ot-total"><td colspan="' + (isCA ? '9' : '8') + '" style="text-align:right;padding-right:8px"><strong>Total Hours</strong></td>'
       + '<td class="tsf-hours-cell"><strong>' + totalH.toFixed(2) + '</strong></td><td></td></tr>';
     html += '</tbody></table></div>';
+
+    if (isCA) {
+      function toM(t) { if (!t) return null; var p = t.split(':'); return parseInt(p[0],10)*60+parseInt(p[1],10); }
+      function rOk(rs, re) { if (!rs||!re) return false; var a=toM(rs),b=toM(re); if(b<a)b+=1440; return (b-a)>=10; }
+      function fv(n) { return n > 0 ? n.toFixed(2) : '—'; }
+      var tH=0,tReg=0,t15=0,t20=0,tMM=0,tMR=0,tPr=0;
+      var otRows = '';
+      days.forEach(function (d) {
+        var h = d.hoursWorked || 0;
+        if (h === 0) { otRows += '<tr><td>' + escapeHtml(d.day||'') + '</td>' + '<td>—</td>'.repeat(7) + '</tr>'; return; }
+        var is7 = d.is7thDay || false;
+        var reg=0, ot15=0, ot20=0;
+        if (is7) { ot15=Math.min(h,8); ot20=Math.max(0,h-8); }
+        else { reg=Math.min(h,8); ot15=Math.max(0,Math.min(h-8,4)); ot20=Math.max(0,h-12); }
+        var mm=0, mr=0;
+        if (h>5 && d.mealWaiver!=='Y') {
+          if (!d.mealStart||!d.mealEnd) { mm=1; }
+          else { var ms2=toM(d.mealStart),me2=toM(d.mealEnd); if(me2<ms2)me2+=1440; if((me2-ms2)<30)mm=1; }
+        }
+        if (h>=3.5 && !rOk(d.rest1Start,d.rest1End)) mr++;
+        if (h>=7   && !rOk(d.rest2Start,d.rest2End)) mr++;
+        var pr=mm+mr;
+        tH+=h; tReg+=reg; t15+=ot15; t20+=ot20; tMM+=mm; tMR+=mr; tPr+=pr;
+        otRows += '<tr><td>' + escapeHtml(d.day||'') + '</td><td>' + h.toFixed(2) + '</td>'
+          + '<td>' + fv(reg) + '</td><td>' + fv(ot15) + '</td><td>' + fv(ot20) + '</td>'
+          + '<td>' + (mm||'—') + '</td><td>' + (mr||'—') + '</td><td>' + (pr||'—') + '</td></tr>';
+      });
+      html += '<div class="portal-ts-form-ot-summary" style="margin-top:16px">'
+        + '<table class="portal-ts-form-ot-table"><thead><tr>'
+        + '<th>Day</th><th>Hours</th><th>Regular</th><th>OT 1.5\xd7</th><th>OT 2.0\xd7</th><th>Missed Meal</th><th>Missed Rest</th><th>Premium Hrs</th>'
+        + '</tr></thead><tbody>' + otRows + '</tbody>'
+        + '<tfoot><tr class="tsf-ot-total">'
+        + '<td><strong>Total</strong></td><td><strong>' + tH.toFixed(2) + '</strong></td>'
+        + '<td><strong>' + tReg.toFixed(2) + '</strong></td><td><strong>' + t15.toFixed(2) + '</strong></td><td><strong>' + t20.toFixed(2) + '</strong></td>'
+        + '<td><strong>' + (tMM||'—') + '</strong></td><td><strong>' + (tMR||'—') + '</strong></td><td><strong>' + (tPr||'—') + '</strong></td>'
+        + '</tr></tfoot></table></div>';
+    }
 
     if (data.pto_hours > 0) {
       html += '<p style="margin:8px 0;font-size:.83rem;color:var(--slate)">PTO Hours: <strong>' + data.pto_hours + '</strong></p>';

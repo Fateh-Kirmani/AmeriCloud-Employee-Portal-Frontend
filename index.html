@@ -674,6 +674,30 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
+<!-- Timesheet Form Modal -->
+<div id="modal-ts-form" class="portal-modal" hidden>
+  <div class="portal-modal__overlay" id="modal-ts-form-overlay"></div>
+  <div class="portal-modal__box portal-modal__box--wide" role="dialog" aria-modal="true">
+    <div class="portal-modal__head">
+      <h2 class="portal-modal__title" id="modal-ts-form-title">Weekly Timesheet</h2>
+      <button class="portal-modal__close" id="btn-close-ts-form-modal" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div id="body-ts-form-modal" class="portal-modal__body"></div>
+  </div>
+</div>
+
+<!-- Timesheet Detail Modal (manager / HR view) -->
+<div id="modal-ts-detail" class="portal-modal" hidden>
+  <div class="portal-modal__overlay" id="modal-ts-detail-overlay"></div>
+  <div class="portal-modal__box portal-modal__box--wide" role="dialog" aria-modal="true">
+    <div class="portal-modal__head">
+      <h2 class="portal-modal__title" id="modal-ts-detail-title">Timesheet Detail</h2>
+      <button class="portal-modal__close" id="btn-close-ts-detail-modal" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div id="body-ts-detail-modal" class="portal-modal__body"></div>
+  </div>
+</div>
+
 <script src="portal-config.js"></script>
 <script src="portal.js"></script>
 </body>

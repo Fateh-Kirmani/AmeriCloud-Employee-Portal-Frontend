@@ -1158,6 +1158,10 @@ button { cursor: pointer; font-family: inherit; }
   flex: 1;
 }
 
+.portal-modal__box--wide {
+  width: min(1200px, calc(100vw - 32px));
+}
+
 .portal-pol-hint {
   margin: 14px 0 0;
   font-size: 13px;
@@ -2153,6 +2157,8 @@ button { cursor: pointer; font-family: inherit; }
   margin-top: 20px;
   padding-top: 16px;
   border-top: 2px solid var(--line);
+  display: flex;
+  gap: 12px;
 }
 .portal-ts-form-submit-btn {
   font-family: 'Archivo', sans-serif;
@@ -2165,11 +2171,26 @@ button { cursor: pointer; font-family: inherit; }
   padding: 12px 32px;
   cursor: pointer;
   transition: background .15s;
-  width: 100%;
+  flex: 1;
   letter-spacing: .01em;
 }
 .portal-ts-form-submit-btn:hover:not(:disabled) { background: var(--navy-2); }
 .portal-ts-form-submit-btn:disabled { opacity: .55; cursor: wait; }
+
+.portal-ts-form-clear-btn {
+  font-family: 'Archivo', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--slate);
+  background: var(--mist);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+.portal-ts-form-clear-btn:hover { background: #e8eaf0; color: var(--navy); }
 
 /* Form submission detail (manager/HR read view) */
 .portal-tsf-detail { padding: 12px 0 4px; }
