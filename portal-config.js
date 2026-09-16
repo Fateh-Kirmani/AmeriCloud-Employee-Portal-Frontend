@@ -30,19 +30,19 @@ var PORTAL_CONFIG = {
       date:     '2026-09-15',
       category: 'Portal',
       title:    'Company Directory Now Organized by Country',
-      body:     'The Company Directory has been updated and is now grouped by United States, India, and Pakistan, making it easier to find colleagues across all regions. Open it from the Forms & Resources section.',
+      body:     'The Company Directory has been updated and is now grouped by United States, India, and Pakistan, making it easier to find colleagues across all regions. Open it from the Resources tab.',
     },
     {
       date:     '2026-09-15',
       category: 'Portal',
       title:    'Company Calendar Available',
-      body:     'View the 2026 and 2027 holiday schedule and upcoming paydays in the new Company Calendar. Find it under Forms & Resources.',
+      body:     'View the 2026 and 2027 holiday schedule and upcoming paydays in the new Company Calendar. Find it under the Resources tab.',
     },
     {
       date:     '2026-09-15',
       category: 'Portal',
       title:    'Policies Now Viewable In-Browser',
-      body:     'Issued policies can now be opened and read directly in the portal without downloading. Look for underlined policy names in the Time & Policies section.',
+      body:     'Issued policies can now be opened and read directly in the portal without downloading. Look for underlined policy names in the Forms & Policies tab.',
     },
     {
       date:     '2026-09-17',
