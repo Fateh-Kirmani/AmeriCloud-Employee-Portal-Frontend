@@ -44,6 +44,12 @@ var PORTAL_CONFIG = {
       title:    'Policies Now Viewable In-Browser',
       body:     'Issued policies can now be opened and read directly in the portal without downloading. Look for underlined policy names in the Time & Policies section.',
     },
+    {
+      date:     '2026-09-16',
+      category: 'Portal',
+      title:    'Weekly Timesheets Now Submitted Through the Portal',
+      body:     'You can now fill out and submit your weekly timesheet directly from the portal. Go to the Timesheets section, choose your form type (Standard or California), enter your hours for each day, sign the Employee Attestation, and hit Submit. Managers will see pending submissions in their Manager Approval tab and can approve or reject from there. HR has full visibility into all submissions.',
+    },
   ],
 
   // ── Company Directory (A–Z by first name) ─────────────────────────────────
