@@ -272,7 +272,7 @@
     setupNews();
 
     // Available to all roles — company directory
-    setupDirectory();
+    setupDirectory(team);
 
     // Available to all roles — company calendar
     setupCalendar();
@@ -2432,33 +2432,56 @@
   // ══════════════════════════════════════════════════════════════════════════
   // Company Directory — searchable employee list with Teams chat links
   // ══════════════════════════════════════════════════════════════════════════
-  function setupDirectory() {
+  function setupDirectory(teamEmails) {
     var btn     = document.getElementById('btn-open-directory');
     var btn2    = document.getElementById('btn-open-team-directory');
     var panel   = document.getElementById('panel-directory');
     var search  = document.getElementById('dir-search');
     var grid    = document.getElementById('dir-grid');
     var count   = document.getElementById('dir-count');
+    var panelLabel = panel ? panel.querySelector('.portal-ts-panel__label') : null;
     if (!panel || !grid) return;
 
-    var roster = [];
+    var fullRoster = [];
+    var roster     = [];  // active roster (full or team-filtered)
     var rosterLoaded = false;
     var COLORS = ['#0f1e42','#1e3a5f','#1e40af','#065f46','#9f1239','#854d0e','#5b21b6','#48566f'];
 
-    function togglePanel() {
-      var opening = panel.hidden;
-      panel.hidden = !opening;
-      var label = opening ? 'Close' : 'Browse';
-      if (btn)  btn.textContent  = label;
-      if (btn2) btn2.textContent = label;
-      if (opening) {
-        if (search) { search.value = ''; search.focus(); }
-        if (!rosterLoaded) loadDirectory();
+    function openPanel(isTeamView) {
+      if (!rosterLoaded) {
+        fullRoster = (PORTAL_CONFIG.directory || []).slice();
+        rosterLoaded = true;
       }
+      if (isTeamView && teamEmails && teamEmails.length) {
+        roster = fullRoster.filter(function (e) { return teamEmails.indexOf((e.email || '').toLowerCase()) !== -1; });
+        if (panelLabel) panelLabel.textContent = 'Team Directory';
+      } else {
+        roster = fullRoster;
+        if (panelLabel) panelLabel.textContent = 'Company Directory';
+      }
+      if (search) { search.value = ''; search.focus(); }
+      renderGrid(roster);
+      panel.hidden = false;
+      if (btn)  btn.textContent  = 'Close';
+      if (btn2) btn2.textContent = 'Close';
     }
 
-    if (btn)  btn.addEventListener('click',  togglePanel);
-    if (btn2) btn2.addEventListener('click', togglePanel);
+    function closePanel() {
+      panel.hidden = true;
+      if (btn)  btn.textContent  = 'Browse';
+      if (btn2) btn2.textContent = 'Browse';
+    }
+
+    if (btn) {
+      btn.addEventListener('click', function () {
+        panel.hidden ? openPanel(false) : closePanel();
+      });
+    }
+    if (btn2) {
+      btn2.addEventListener('click', function () {
+        panel.hidden ? openPanel(true) : closePanel();
+      });
+    }
 
     if (search) {
       search.addEventListener('input', function () {
@@ -2467,12 +2490,6 @@
           return e.name.toLowerCase().indexOf(q) !== -1 || (e.email || '').toLowerCase().indexOf(q) !== -1;
         }) : roster);
       });
-    }
-
-    function loadDirectory() {
-      roster = (PORTAL_CONFIG.directory || []).slice();
-      rosterLoaded = true;
-      renderGrid(roster);
     }
 
     function renderCard(emp) {
@@ -2496,7 +2513,7 @@
     var COUNTRY_LABELS = { US: 'United States', India: 'India', Pakistan: 'Pakistan' };
 
     function renderGrid(entries) {
-      if (count) count.textContent = entries.length + ' of ' + roster.length + ' people';
+      if (count) count.textContent = entries.length + ' of ' + roster.length + (roster.length === 1 ? ' person' : ' people');
       if (!entries.length) {
         grid.innerHTML = '<p class="portal-dir-empty">No results match your search.</p>';
         return;
