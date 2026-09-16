@@ -45,6 +45,12 @@ var PORTAL_CONFIG = {
       body:     'Issued policies can now be opened and read directly in the portal without downloading. Look for underlined policy names in the Time & Policies section.',
     },
     {
+      date:     '2026-09-17',
+      category: 'Portal',
+      title:    'Ramp and AssetTiger Now Linked in the Portal',
+      body:     'Quick links to your Ramp and AssetTiger accounts are now available under the Resources tab. Use Ramp to view your company card and transactions, and AssetTiger to track company assets assigned to you.',
+    },
+    {
       date:     '2026-09-16',
       category: 'Portal',
       title:    'Weekly Timesheets Now Submitted Through the Portal',
