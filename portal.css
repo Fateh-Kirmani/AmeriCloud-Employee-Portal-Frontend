@@ -1569,9 +1569,10 @@ button { cursor: pointer; font-family: inherit; }
   margin: 0 0 12px;
 }
 
-/* Full-width panel — sits outside the 820px container */
-.portal-dir-panel {
-  margin: 0 clamp(20px, 4vw, 48px) 40px;
+/* Directory panel — extra wide when open as modal */
+.portal-dir-panel.portal-ts-panel--open {
+  width: min(1280px, 97vw);
+  max-height: 90vh;
 }
 
 .portal-dir-grid {
