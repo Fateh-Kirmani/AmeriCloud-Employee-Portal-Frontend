@@ -1569,11 +1569,7 @@ button { cursor: pointer; font-family: inherit; }
   margin: 0 0 12px;
 }
 
-/* Directory panel — extra wide when open as modal */
-.portal-dir-panel.portal-ts-panel--open {
-  width: min(1280px, 97vw);
-  max-height: 90vh;
-}
+/* Directory panel — placeholder, overridden below after panel-modal rules */
 
 .portal-dir-grid {
   display: block;
@@ -1740,6 +1736,12 @@ button { cursor: pointer; font-family: inherit; }
   flex-shrink: 0;
 }
 .portal-ts-panel__close:hover { color: var(--red); }
+
+/* Directory panel — declared last so it beats the generic --open width */
+.portal-dir-panel.portal-ts-panel--open {
+  width: min(1400px, 96vw);
+  max-height: 88vh;
+}
 
 .portal-form-select {
   appearance: none;
