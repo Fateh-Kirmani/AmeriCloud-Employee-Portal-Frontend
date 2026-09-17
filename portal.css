@@ -1000,6 +1000,17 @@ button { cursor: pointer; font-family: inherit; }
 .portal-ts-table tbody tr:hover td { background: var(--mist); }
 .portal-training-link { color: var(--navy); text-decoration: underline; cursor: pointer; }
 .portal-training-link:hover { color: var(--red); }
+.portal-training-edit-btn, .portal-training-save-btn {
+  font-size: 0.75rem; padding: 2px 10px; border-radius: 4px; cursor: pointer;
+  border: 1px solid var(--navy); background: transparent; color: var(--navy);
+  white-space: nowrap;
+}
+.portal-training-save-btn { background: var(--navy); color: #fff; border-color: var(--navy); }
+.portal-training-edit-btn:hover { background: var(--navy); color: #fff; }
+.portal-date-input {
+  width: 110px; padding: 2px 6px; border: 1px solid var(--slate-2);
+  border-radius: 4px; font-size: 0.8rem; font-family: inherit;
+}
 
 .portal-ts-col-name { font-weight: 600; white-space: nowrap; }
 .portal-ts-col-date { color: var(--slate); white-space: nowrap; }

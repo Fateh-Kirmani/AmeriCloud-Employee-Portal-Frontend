@@ -373,21 +373,79 @@
           + '<th>Document</th>'
           + '<th>Issuance Date</th>'
           + '<th>Renewal Date</th>'
+          + '<th></th>'
           + '</tr></thead><tbody>';
         docs.forEach(function(doc) {
-          html += '<tr>'
+          html += '<tr data-doc-id="' + doc.id + '">'
             + (showEmp ? '<td>' + esc(doc.employee_name) + '</td>' : '')
             + '<td><a href="#" class="portal-training-link" data-doc-id="' + doc.id + '">' + esc(doc.filename) + '</a></td>'
-            + '<td>' + (doc.issuance_date ? esc(doc.issuance_date) : '<span style="color:var(--slate-2)">—</span>') + '</td>'
-            + '<td>' + (doc.renewal_date  ? esc(doc.renewal_date)  : '<span style="color:var(--slate-2)">—</span>') + '</td>'
+            + '<td class="td-iss">' + (doc.issuance_date ? esc(doc.issuance_date) : '<span style="color:var(--slate-2)">—</span>') + '</td>'
+            + '<td class="td-ren">' + (doc.renewal_date  ? esc(doc.renewal_date)  : '<span style="color:var(--slate-2)">—</span>') + '</td>'
+            + '<td><button class="portal-training-edit-btn" data-doc-id="' + doc.id
+              + '" data-iss="' + esc(doc.issuance_date) + '" data-ren="' + esc(doc.renewal_date) + '">Edit</button></td>'
             + '</tr>';
         });
         html += '</tbody></table>';
         bodyView.innerHTML = html;
+
         bodyView.querySelectorAll('.portal-training-link').forEach(function(a) {
           a.addEventListener('click', function(e) {
             e.preventDefault();
             openTrainingFile(parseInt(a.dataset.docId, 10));
+          });
+        });
+
+        bodyView.querySelectorAll('.portal-training-edit-btn').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var docId = parseInt(btn.dataset.docId, 10);
+            var row   = bodyView.querySelector('tr[data-doc-id="' + docId + '"]');
+            var tdIss = row.querySelector('.td-iss');
+            var tdRen = row.querySelector('.td-ren');
+            var curIss = btn.dataset.iss;
+            var curRen = btn.dataset.ren;
+
+            // Switch row to edit mode
+            tdIss.innerHTML = '<input class="portal-date-input" placeholder="MM/DD/YYYY" value="' + esc(curIss) + '">';
+            tdRen.innerHTML = '<input class="portal-date-input" placeholder="MM/DD/YYYY (optional)" value="' + esc(curRen) + '">';
+            btn.textContent = 'Save';
+            btn.classList.add('portal-training-save-btn');
+            btn.classList.remove('portal-training-edit-btn');
+
+            btn.addEventListener('click', function onSave() {
+              btn.removeEventListener('click', onSave);
+              var newIss = tdIss.querySelector('input').value.trim();
+              var newRen = tdRen.querySelector('input').value.trim();
+              btn.disabled = true;
+              btn.textContent = '…';
+
+              var fd = new FormData();
+              fd.append('issuance_date', newIss);
+              fd.append('renewal_date',  newRen);
+
+              getApiToken().then(function(token) {
+                return fetch(API_BASE + '/trainings/' + docId, {
+                  method: 'PATCH',
+                  headers: { 'Authorization': 'Bearer ' + token },
+                  body: fd,
+                });
+              }).then(function(r) {
+                if (!r.ok) throw new Error('Save failed (' + r.status + ')');
+                return r.json();
+              }).then(function(updated) {
+                tdIss.innerHTML = updated.issuance_date ? esc(updated.issuance_date) : '<span style="color:var(--slate-2)">—</span>';
+                tdRen.innerHTML = updated.renewal_date  ? esc(updated.renewal_date)  : '<span style="color:var(--slate-2)">—</span>';
+                btn.dataset.iss = updated.issuance_date;
+                btn.dataset.ren = updated.renewal_date;
+                btn.textContent = 'Edit';
+                btn.disabled = false;
+                btn.classList.add('portal-training-edit-btn');
+                btn.classList.remove('portal-training-save-btn');
+              }).catch(function(err) {
+                alert('Could not save dates: ' + err.message);
+                btn.textContent = 'Save';
+                btn.disabled = false;
+              });
+            }, { once: true });
           });
         });
       }).catch(function(err) {
