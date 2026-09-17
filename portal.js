@@ -434,18 +434,9 @@
             var row   = bodyView.querySelector('tr[data-doc-id="' + docId + '"]');
             var tdIss = row.querySelector('.td-iss');
             var tdRen = row.querySelector('.td-ren');
-            var curIss = btn.dataset.iss;
-            var curRen = btn.dataset.ren;
 
-            // Switch row to edit mode
-            tdIss.innerHTML = '<input class="portal-date-input" placeholder="MM/DD/YYYY" value="' + esc(curIss) + '">';
-            tdRen.innerHTML = '<input class="portal-date-input" placeholder="MM/DD/YYYY (optional)" value="' + esc(curRen) + '">';
-            btn.textContent = 'Save';
-            btn.classList.add('portal-training-save-btn');
-            btn.classList.remove('portal-training-edit-btn');
-
-            btn.addEventListener('click', function onSave() {
-              btn.removeEventListener('click', onSave);
+            if (btn.classList.contains('portal-training-save-btn')) {
+              // ── Save mode: send PATCH ──────────────────────────────────────
               var newIss = tdIss.querySelector('input').value.trim();
               var newRen = tdRen.querySelector('input').value.trim();
               btn.disabled = true;
@@ -478,7 +469,14 @@
                 btn.textContent = 'Save';
                 btn.disabled = false;
               });
-            }, { once: true });
+            } else {
+              // ── Edit mode: swap cells to inputs ───────────────────────────
+              tdIss.innerHTML = '<input class="portal-date-input" placeholder="MM/DD/YYYY" value="' + esc(btn.dataset.iss) + '">';
+              tdRen.innerHTML = '<input class="portal-date-input" placeholder="MM/DD/YYYY (optional)" value="' + esc(btn.dataset.ren) + '">';
+              btn.textContent = 'Save';
+              btn.classList.add('portal-training-save-btn');
+              btn.classList.remove('portal-training-edit-btn');
+            }
           });
         });
       }).catch(function(err) {
