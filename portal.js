@@ -7,6 +7,27 @@
   var msalInstance;           // set after MSAL init (not in demo mode)
   var currentAccount;         // set after successful sign-in
 
+  // ── Panel-as-modal system (module-level so all setup functions can use it) ─
+  var _activePanelEl = null;
+
+  function openPanelModal(panel) {
+    if (_activePanelEl && _activePanelEl !== panel) closePanelModal();
+    _activePanelEl = panel;
+    var bd = document.getElementById('portal-panel-backdrop');
+    if (bd) bd.hidden = false;
+    panel.classList.add('portal-ts-panel--open');
+    panel.hidden = false;
+  }
+
+  function closePanelModal() {
+    if (!_activePanelEl) return;
+    _activePanelEl.classList.remove('portal-ts-panel--open');
+    _activePanelEl.hidden = true;
+    _activePanelEl = null;
+    var bd = document.getElementById('portal-panel-backdrop');
+    if (bd) bd.hidden = true;
+  }
+
   // ── Demo mock handbook sign-offs ─────────────────────────────────────────
   var DEMO_SIGNOFFS = [
     { email: 'alex.rivera@americloudtelecom.com',    name: 'Alex Rivera',    status: 'Signed',  signedDate: '2026-07-08T14:22:00Z' },
@@ -181,27 +202,6 @@
       isHR      = true;
       document.getElementById('nav-manager').hidden = false;
       document.getElementById('nav-hr').hidden      = false;
-    }
-
-    // ── Panel-as-modal system ─────────────────────────────────────────────
-    var _activePanelEl = null;
-
-    function openPanelModal(panel) {
-      if (_activePanelEl && _activePanelEl !== panel) closePanelModal();
-      _activePanelEl = panel;
-      var bd = document.getElementById('portal-panel-backdrop');
-      if (bd) bd.hidden = false;
-      panel.classList.add('portal-ts-panel--open');
-      panel.hidden = false;
-    }
-
-    function closePanelModal() {
-      if (!_activePanelEl) return;
-      _activePanelEl.classList.remove('portal-ts-panel--open');
-      _activePanelEl.hidden = true;
-      _activePanelEl = null;
-      var bd = document.getElementById('portal-panel-backdrop');
-      if (bd) bd.hidden = true;
     }
 
     // Wire backdrop click and all panel close buttons once
