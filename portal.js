@@ -276,6 +276,9 @@
 
     // Available to all roles — company calendar
     setupCalendar();
+
+    // Available to all roles — trainings & certifications
+    setupTrainings(userEmail, userDisplayName);
   }
 
 
@@ -299,6 +302,190 @@
       }
     });
   }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Trainings & Certifications
+  // ══════════════════════════════════════════════════════════════════════════
+  var TRAININGS_ADMIN = 'fkirmani@americloudtelecom.com';
+
+  function setupTrainings(userEmail, userDisplayName) {
+    var modalView        = document.getElementById('modal-trainings-view');
+    var modalViewOverlay = document.getElementById('modal-trainings-view-overlay');
+    var bodyView         = document.getElementById('body-trainings-view');
+    var closeView        = document.getElementById('btn-close-trainings-view');
+    var btnView          = document.getElementById('btn-view-my-trainings');
+
+    var modalUpload        = document.getElementById('modal-trainings-upload');
+    var modalUploadOverlay = document.getElementById('modal-trainings-upload-overlay');
+    var closeUpload        = document.getElementById('btn-close-trainings-upload');
+    var btnUpload          = document.getElementById('btn-upload-training');
+    var formUpload         = document.getElementById('form-training-upload');
+    var uploadStatus       = document.getElementById('training-upload-status');
+    var adminRow           = document.getElementById('training-upload-admin-row');
+    var adminSelect        = document.getElementById('training-upload-emp-email');
+
+    function closeViewModal()   { if (modalView)   modalView.hidden   = true; }
+    function closeUploadModal() { if (modalUpload) modalUpload.hidden = true; }
+
+    if (closeView)        closeView.addEventListener('click', closeViewModal);
+    if (modalViewOverlay) modalViewOverlay.addEventListener('click', closeViewModal);
+    if (closeUpload)        closeUpload.addEventListener('click', closeUploadModal);
+    if (modalUploadOverlay) modalUploadOverlay.addEventListener('click', closeUploadModal);
+
+    // Admin: show employee selector and populate from directory
+    var isAdmin = userEmail && userEmail.toLowerCase() === TRAININGS_ADMIN;
+    if (isAdmin && adminRow) {
+      adminRow.hidden = false;
+      if (adminSelect && window.PORTAL_CONFIG && window.PORTAL_CONFIG.directory) {
+        PORTAL_CONFIG.directory.forEach(function(emp) {
+          var opt = document.createElement('option');
+          opt.value = emp.email;
+          opt.textContent = emp.name + ' (' + emp.email + ')';
+          adminSelect.appendChild(opt);
+        });
+      }
+    }
+
+    // ── View modal ──────────────────────────────────────────────────────────
+    if (btnView) {
+      btnView.addEventListener('click', function() {
+        if (modalView) modalView.hidden = false;
+        loadTrainingDocs();
+      });
+    }
+
+    function loadTrainingDocs() {
+      if (!bodyView) return;
+      bodyView.innerHTML = '<p class="portal-ts-empty">Loading…</p>';
+      getApiToken().then(function(token) {
+        return fetch(API_BASE + '/trainings', { headers: { 'Authorization': 'Bearer ' + token } });
+      }).then(function(r) {
+        return r.json();
+      }).then(function(docs) {
+        if (!docs || !docs.length) {
+          bodyView.innerHTML = '<p class="portal-ts-empty">No documents on file.</p>';
+          return;
+        }
+        var showEmp = isAdmin;
+        var html = '<table class="portal-ts-table">'
+          + '<thead><tr>'
+          + (showEmp ? '<th>Employee</th>' : '')
+          + '<th>Document</th>'
+          + '<th>Issuance Date</th>'
+          + '<th>Renewal Date</th>'
+          + '</tr></thead><tbody>';
+        docs.forEach(function(doc) {
+          html += '<tr>'
+            + (showEmp ? '<td>' + esc(doc.employee_name) + '</td>' : '')
+            + '<td><a href="#" class="portal-training-link" data-doc-id="' + doc.id + '">' + esc(doc.filename) + '</a></td>'
+            + '<td>' + (doc.issuance_date ? esc(doc.issuance_date) : '<span style="color:var(--slate-2)">—</span>') + '</td>'
+            + '<td>' + (doc.renewal_date  ? esc(doc.renewal_date)  : '<span style="color:var(--slate-2)">—</span>') + '</td>'
+            + '</tr>';
+        });
+        html += '</tbody></table>';
+        bodyView.innerHTML = html;
+        bodyView.querySelectorAll('.portal-training-link').forEach(function(a) {
+          a.addEventListener('click', function(e) {
+            e.preventDefault();
+            openTrainingFile(parseInt(a.dataset.docId, 10));
+          });
+        });
+      }).catch(function(err) {
+        bodyView.innerHTML = '<p class="portal-ts-empty">Error loading documents.</p>';
+        console.error('Training docs load error:', err);
+      });
+    }
+
+    function openTrainingFile(docId) {
+      getApiToken().then(function(token) {
+        return fetch(API_BASE + '/trainings/' + docId + '/file', { headers: { 'Authorization': 'Bearer ' + token } });
+      }).then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        var ct = r.headers.get('Content-Type') || '';
+        return r.blob().then(function(blob) {
+          var blobUrl = URL.createObjectURL(new Blob([blob], { type: ct }));
+          window.open(blobUrl, '_blank');
+        });
+      }).catch(function(err) {
+        alert('Could not open document. Please try again.');
+        console.error('Training file open error:', err);
+      });
+    }
+
+    // ── Upload modal ─────────────────────────────────────────────────────────
+    if (btnUpload) {
+      btnUpload.addEventListener('click', function() {
+        if (formUpload) formUpload.reset();
+        if (uploadStatus) { uploadStatus.hidden = true; uploadStatus.textContent = ''; }
+        if (modalUpload) modalUpload.hidden = false;
+      });
+    }
+
+    if (formUpload) {
+      formUpload.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var fileInput    = document.getElementById('training-upload-file');
+        var issuedInput  = document.getElementById('training-upload-issued');
+        var renewalInput = document.getElementById('training-upload-renewal');
+        var submitBtn    = document.getElementById('btn-training-upload-submit');
+
+        if (!fileInput || !fileInput.files.length) {
+          showUploadStatus('error', 'Please select a file to upload.');
+          return;
+        }
+        var issuedVal = (issuedInput ? issuedInput.value.trim() : '');
+        if (!issuedVal) {
+          showUploadStatus('error', 'Date of issuance is required.');
+          return;
+        }
+
+        if (submitBtn) submitBtn.disabled = true;
+        showUploadStatus('info', 'Uploading…');
+
+        var fd = new FormData();
+        fd.append('file',          fileInput.files[0]);
+        fd.append('issuance_date', issuedVal);
+        fd.append('renewal_date',  renewalInput ? renewalInput.value.trim() : '');
+        if (isAdmin && adminSelect && adminSelect.value) {
+          fd.append('employee_email', adminSelect.value);
+          var selOpt = adminSelect.options[adminSelect.selectedIndex];
+          var empName = selOpt ? selOpt.textContent.replace(/\s*\(.*\)$/, '').trim() : '';
+          fd.append('employee_name', empName);
+        }
+
+        getApiToken().then(function(token) {
+          return fetch(API_BASE + '/trainings/upload', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: fd,
+          });
+        }).then(function(r) {
+          if (!r.ok) return r.json().then(function(d) { throw new Error(d.detail || 'Upload failed'); });
+          return r.json();
+        }).then(function() {
+          showUploadStatus('ok', 'Document uploaded successfully.');
+          if (formUpload) formUpload.reset();
+          if (submitBtn) submitBtn.disabled = false;
+        }).catch(function(err) {
+          showUploadStatus('error', 'Upload failed: ' + err.message);
+          if (submitBtn) submitBtn.disabled = false;
+          console.error('Training upload error:', err);
+        });
+      });
+    }
+
+    function showUploadStatus(type, msg) {
+      if (!uploadStatus) return;
+      uploadStatus.hidden = false;
+      uploadStatus.className = 'portal-ts-status portal-ts-status--' + (type === 'ok' ? 'success' : type === 'error' ? 'error' : 'uploading');
+      uploadStatus.textContent = msg;
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  }
+
 
   function renderCalendar(bodyEl) {
     var today = new Date(); today.setHours(0, 0, 0, 0);

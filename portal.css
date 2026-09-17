@@ -998,6 +998,8 @@ button { cursor: pointer; font-family: inherit; }
 }
 .portal-ts-table tbody tr:last-child td { border-bottom: none; }
 .portal-ts-table tbody tr:hover td { background: var(--mist); }
+.portal-training-link { color: var(--navy); text-decoration: underline; cursor: pointer; }
+.portal-training-link:hover { color: var(--red); }
 
 .portal-ts-col-name { font-weight: 600; white-space: nowrap; }
 .portal-ts-col-date { color: var(--slate); white-space: nowrap; }

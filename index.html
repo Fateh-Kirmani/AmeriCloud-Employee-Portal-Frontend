@@ -67,6 +67,10 @@
         <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
         Resources
       </a>
+      <a href="#" class="portal-nav__link" data-section="trainings">
+        <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg>
+        Trainings &amp; Certs
+      </a>
       <!-- Role-gated nav items — shown by portal.js based on Azure AD group -->
       <a href="#" class="portal-nav__link portal-nav__link--role" data-section="manager" id="nav-manager" hidden>
         <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -399,6 +403,84 @@
         </div>
       </div>
     </section>
+
+    <!-- ── SECTION: Trainings & Certifications ── -->
+    <section id="section-trainings" class="portal-section" hidden>
+      <div class="portal-section__header">
+        <p class="portal-section__eyebrow">Trainings &amp; Certifications</p>
+        <h2 class="portal-section__title">Trainings &amp; Certifications</h2>
+        <p class="portal-section__desc">View and manage your training certificates and professional certifications.</p>
+      </div>
+      <div class="portal-container">
+        <ul class="portal-linklist">
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">My Training Documents</span>
+              <span class="portal-linkitem__desc">View all training certificates and certifications on file for you.</span>
+            </div>
+            <button class="portal-linkitem__action" id="btn-view-my-trainings" type="button">View Documents</button>
+          </li>
+          <li class="portal-linkitem">
+            <div class="portal-linkitem__body">
+              <span class="portal-linkitem__title">Upload a Document</span>
+              <span class="portal-linkitem__desc">Add a new certification or training certificate to your records.</span>
+            </div>
+            <button class="portal-linkitem__action portal-linkitem__action--primary" id="btn-upload-training" type="button">Upload</button>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── MODAL: Training Documents View ── -->
+    <div id="modal-trainings-view" class="portal-modal" hidden>
+      <div class="portal-modal__overlay" id="modal-trainings-view-overlay"></div>
+      <div class="portal-modal__box portal-modal__box--wide" role="dialog" aria-modal="true" aria-labelledby="modal-trainings-view-title">
+        <div class="portal-modal__head">
+          <h2 class="portal-modal__title" id="modal-trainings-view-title">My Training Documents</h2>
+          <button class="portal-modal__close" id="btn-close-trainings-view" type="button" aria-label="Close">&times;</button>
+        </div>
+        <div class="portal-modal__body" id="body-trainings-view">
+          <p class="portal-ts-empty">Loading…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MODAL: Upload Training Document ── -->
+    <div id="modal-trainings-upload" class="portal-modal" hidden>
+      <div class="portal-modal__overlay" id="modal-trainings-upload-overlay"></div>
+      <div class="portal-modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-trainings-upload-title">
+        <div class="portal-modal__head">
+          <h2 class="portal-modal__title" id="modal-trainings-upload-title">Upload a Training Document</h2>
+          <button class="portal-modal__close" id="btn-close-trainings-upload" type="button" aria-label="Close">&times;</button>
+        </div>
+        <div class="portal-modal__body">
+          <form id="form-training-upload" class="portal-policy-form" novalidate>
+            <div id="training-upload-admin-row" class="portal-form-row" hidden>
+              <label class="portal-form-label" for="training-upload-emp-email">Employee <span class="portal-form-hint">(admin only — leave blank to upload for yourself)</span></label>
+              <select id="training-upload-emp-email" class="portal-form-input portal-form-select">
+                <option value="">— Upload for myself —</option>
+              </select>
+            </div>
+            <div class="portal-form-row">
+              <label class="portal-form-label" for="training-upload-file">Document <span class="portal-form-hint">(PDF, JPEG, PNG — required)</span></label>
+              <input type="file" id="training-upload-file" class="portal-form-input" accept=".pdf,.jpg,.jpeg,.png" required>
+            </div>
+            <div class="portal-form-row">
+              <label class="portal-form-label" for="training-upload-issued">Date of Issuance <span class="portal-form-hint">(MM/DD/YYYY — required)</span></label>
+              <input type="text" id="training-upload-issued" class="portal-form-input" placeholder="MM/DD/YYYY" maxlength="10" required>
+            </div>
+            <div class="portal-form-row">
+              <label class="portal-form-label" for="training-upload-renewal">Date of Renewal <span class="portal-form-hint">(MM/DD/YYYY — optional, leave blank if none)</span></label>
+              <input type="text" id="training-upload-renewal" class="portal-form-input" placeholder="MM/DD/YYYY" maxlength="10">
+            </div>
+            <div class="portal-form-actions">
+              <button type="submit" id="btn-training-upload-submit" class="portal-linkitem__action portal-linkitem__action--primary">Upload Document</button>
+            </div>
+            <div id="training-upload-status" class="portal-ts-status" hidden></div>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <!-- ── SECTION: Manager Approvals (role-gated) ── -->
     <section id="section-manager" class="portal-section" hidden>
