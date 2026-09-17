@@ -286,6 +286,7 @@
         <div id="panel-incident-report" class="portal-ts-panel portal-ts-panel--urgent" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">Safety &amp; Incident Report</span>
+            <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
           </div>
           <div class="portal-ts-panel__body">
             <p class="portal-pol-hint">Fill out this form as soon as possible after the incident. All submissions are received by HR.</p>
@@ -324,6 +325,7 @@
         <div id="panel-pto-request" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">PTO Request Form</span>
+            <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
           </div>
           <div class="portal-ts-panel__body">
             <form id="form-pto-request" class="portal-policy-form" novalidate>
@@ -351,6 +353,7 @@
         <div id="panel-my-pto" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">My PTO Requests</span>
+            <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
           </div>
           <div id="body-my-pto" class="portal-ts-panel__body"></div>
         </div>
@@ -398,6 +401,7 @@
         <div id="panel-calendar" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">Company Calendar</span>
+            <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
           </div>
           <div class="portal-ts-panel__body" id="body-calendar"></div>
         </div>
@@ -525,14 +529,20 @@
         <div id="panel-manager-ts-form" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">Team Timesheets</span>
-            <button class="portal-ts-panel__refresh" id="btn-refresh-manager-ts-form" type="button">&#8635; Refresh</button>
+            <div class="portal-ts-panel__head-right">
+              <button class="portal-ts-panel__refresh" id="btn-refresh-manager-ts-form" type="button">&#8635; Refresh</button>
+              <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
+            </div>
           </div>
           <div id="body-manager-ts-form" class="portal-ts-panel__body"></div>
         </div>
         <div id="panel-pto-approvals" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">PTO Requests — Your Team</span>
-            <button class="portal-ts-panel__refresh" id="btn-refresh-pto-approvals" type="button">&#8635; Refresh</button>
+            <div class="portal-ts-panel__head-right">
+              <button class="portal-ts-panel__refresh" id="btn-refresh-pto-approvals" type="button">&#8635; Refresh</button>
+              <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
+            </div>
           </div>
           <div id="body-pto-approvals" class="portal-ts-panel__body"></div>
         </div>
@@ -600,14 +610,20 @@
         <div id="panel-hr-pto" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">PTO Requests — All Employees</span>
-            <button class="portal-ts-panel__refresh" id="btn-refresh-hr-pto" type="button">&#8635; Refresh</button>
+            <div class="portal-ts-panel__head-right">
+              <button class="portal-ts-panel__refresh" id="btn-refresh-hr-pto" type="button">&#8635; Refresh</button>
+              <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
+            </div>
           </div>
           <div id="body-hr-pto" class="portal-ts-panel__body"></div>
         </div>
         <div id="panel-handbook-signoffs" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">Handbook Sign-offs</span>
-            <button class="portal-ts-panel__refresh" id="btn-refresh-handbook-signoffs" type="button">&#8635; Refresh</button>
+            <div class="portal-ts-panel__head-right">
+              <button class="portal-ts-panel__refresh" id="btn-refresh-handbook-signoffs" type="button">&#8635; Refresh</button>
+              <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
+            </div>
           </div>
           <div id="body-handbook-signoffs" class="portal-ts-panel__body"></div>
         </div>
@@ -615,6 +631,7 @@
         <div id="panel-issue-policy" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">Issue a Policy Document</span>
+            <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
           </div>
           <div class="portal-ts-panel__body">
             <form id="form-issue-policy" class="portal-policy-form" novalidate>
@@ -648,21 +665,30 @@
         <div id="panel-view-policies" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">Issued Policies</span>
-            <button class="portal-ts-panel__refresh" id="btn-refresh-issued-policies" type="button">&#8635; Refresh</button>
+            <div class="portal-ts-panel__head-right">
+              <button class="portal-ts-panel__refresh" id="btn-refresh-issued-policies" type="button">&#8635; Refresh</button>
+              <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
+            </div>
           </div>
           <div id="body-issued-policies" class="portal-ts-panel__body"></div>
         </div>
         <div id="panel-hr-ts-form" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">All Employee Timesheets</span>
-            <button class="portal-ts-panel__refresh" id="btn-refresh-hr-ts-form" type="button">&#8635; Refresh</button>
+            <div class="portal-ts-panel__head-right">
+              <button class="portal-ts-panel__refresh" id="btn-refresh-hr-ts-form" type="button">&#8635; Refresh</button>
+              <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
+            </div>
           </div>
           <div id="body-hr-ts-form" class="portal-ts-panel__body"></div>
         </div>
         <div id="panel-incident-reports-hr" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">Incident Reports</span>
-            <button class="portal-ts-panel__refresh" id="btn-refresh-incident-reports" type="button">&#8635; Refresh</button>
+            <div class="portal-ts-panel__head-right">
+              <button class="portal-ts-panel__refresh" id="btn-refresh-incident-reports" type="button">&#8635; Refresh</button>
+              <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
+            </div>
           </div>
           <div id="body-incident-reports-hr" class="portal-ts-panel__body"></div>
         </div>
@@ -671,6 +697,7 @@
         <div id="panel-issue-efs" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">Issue Essential Functions Statement</span>
+            <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
           </div>
           <div class="portal-ts-panel__body">
             <form id="form-issue-efs" class="portal-policy-form" novalidate>
@@ -701,7 +728,10 @@
         <div id="panel-view-efs" class="portal-ts-panel" hidden>
           <div class="portal-ts-panel__head">
             <span class="portal-ts-panel__label">EFS Records</span>
-            <button class="portal-ts-panel__refresh" id="btn-refresh-efs" type="button">&#8635; Refresh</button>
+            <div class="portal-ts-panel__head-right">
+              <button class="portal-ts-panel__refresh" id="btn-refresh-efs" type="button">&#8635; Refresh</button>
+              <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
+            </div>
           </div>
           <div id="body-efs-records" class="portal-ts-panel__body"></div>
         </div>
@@ -713,6 +743,7 @@
     <div id="panel-directory" class="portal-ts-panel portal-dir-panel" hidden>
       <div class="portal-ts-panel__head">
         <span class="portal-ts-panel__label">Company Directory</span>
+        <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
       </div>
       <div class="portal-ts-panel__body">
         <input type="search" id="dir-search" class="portal-dir-search" placeholder="Search by name or email…" autocomplete="off" spellcheck="false">
@@ -720,6 +751,9 @@
         <div id="dir-grid" class="portal-dir-grid"></div>
       </div>
     </div>
+
+    <!-- Global backdrop for panel-as-modal -->
+    <div id="portal-panel-backdrop" hidden></div>
 
     <!-- ── Footer (always visible, contact info lives here) ── -->
     <footer class="portal-foot">

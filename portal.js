@@ -183,11 +183,42 @@
       document.getElementById('nav-hr').hidden      = false;
     }
 
+    // ── Panel-as-modal system ─────────────────────────────────────────────
+    var _activePanelEl = null;
+
+    function openPanelModal(panel) {
+      if (_activePanelEl && _activePanelEl !== panel) closePanelModal();
+      _activePanelEl = panel;
+      var bd = document.getElementById('portal-panel-backdrop');
+      if (bd) bd.hidden = false;
+      panel.classList.add('portal-ts-panel--open');
+      panel.hidden = false;
+    }
+
+    function closePanelModal() {
+      if (!_activePanelEl) return;
+      _activePanelEl.classList.remove('portal-ts-panel--open');
+      _activePanelEl.hidden = true;
+      _activePanelEl = null;
+      var bd = document.getElementById('portal-panel-backdrop');
+      if (bd) bd.hidden = true;
+    }
+
+    // Wire backdrop click and all panel close buttons once
+    (function () {
+      var bd = document.getElementById('portal-panel-backdrop');
+      if (bd) bd.addEventListener('click', closePanelModal);
+      document.querySelectorAll('.portal-ts-panel__close').forEach(function (btn) {
+        btn.addEventListener('click', closePanelModal);
+      });
+    })();
+
     // ── Section switching ─────────────────────────────────────────────────
     var navLinks    = document.querySelectorAll('.portal-nav__link[data-section]');
     var allSections = document.querySelectorAll('.portal-section[id^="section-"]');
 
     function activateSection(id) {
+      closePanelModal();
       allSections.forEach(function (s) { s.hidden = s.id !== 'section-' + id; });
       navLinks.forEach(function (l) { l.classList.toggle('is-active', l.dataset.section === id); });
       document.querySelector('.portal-content').scrollTo(0, 0);
@@ -292,14 +323,9 @@
     if (!btn || !panel || !bodyEl) return;
 
     btn.addEventListener('click', function () {
-      if (panel.hidden) {
-        panel.hidden = false;
-        btn.textContent = 'Close ×';
-        if (!bodyEl.dataset.rendered) { renderCalendar(bodyEl); bodyEl.dataset.rendered = '1'; }
-      } else {
-        panel.hidden = true;
-        btn.textContent = 'View →';
-      }
+      if (_activePanelEl === panel) { closePanelModal(); return; }
+      if (!bodyEl.dataset.rendered) { renderCalendar(bodyEl); bodyEl.dataset.rendered = '1'; }
+      openPanelModal(panel);
     });
   }
 
@@ -732,14 +758,9 @@
     var loaded = false;
 
     btn.addEventListener('click', function () {
-      if (panel.hidden) {
-        panel.hidden = false;
-        btn.textContent = 'Hide Sign-offs';
-        if (!loaded) { loadAndRender(); loaded = true; }
-      } else {
-        panel.hidden = true;
-        btn.textContent = 'View Sign-offs';
-      }
+      if (_activePanelEl === panel) { closePanelModal(); return; }
+      if (!loaded) { loadAndRender(); loaded = true; }
+      openPanelModal(panel);
     });
 
     if (refresh) {
@@ -897,28 +918,18 @@
     var _efsPickerSelected = [];
 
     issueBtn.addEventListener('click', function () {
-      if (issuePanel.hidden) {
-        issuePanel.hidden = false;
-        viewPanel.hidden  = true;
-        viewBtn.textContent = 'View Acknowledgements';
-        _efsPickerSelected = [];
-        var efsSearch = document.getElementById('efs-emp-search');
-        if (efsSearch) efsSearch.value = '';
-        buildEfsPicker('');
-      } else {
-        issuePanel.hidden = true;
-      }
+      if (_activePanelEl === issuePanel) { closePanelModal(); return; }
+      _efsPickerSelected = [];
+      var efsSearch = document.getElementById('efs-emp-search');
+      if (efsSearch) efsSearch.value = '';
+      buildEfsPicker('');
+      openPanelModal(issuePanel);
     });
 
     viewBtn.addEventListener('click', function () {
-      if (viewPanel.hidden) {
-        viewPanel.hidden  = false;
-        issuePanel.hidden = true;
-        issueBtn.textContent = 'Issue EFS';
-        if (!viewLoaded) { loadEfsRecords(); viewLoaded = true; }
-      } else {
-        viewPanel.hidden = true;
-      }
+      if (_activePanelEl === viewPanel) { closePanelModal(); return; }
+      if (!viewLoaded) { loadEfsRecords(); viewLoaded = true; }
+      openPanelModal(viewPanel);
     });
 
     var refreshEfsBtn = document.getElementById('btn-refresh-efs');
@@ -1283,28 +1294,17 @@
     }
 
     issueBtn.addEventListener('click', function () {
-      if (issuePanel.hidden) {
-        issuePanel.hidden = false;
-        viewPanel.hidden  = true;
-        viewBtn.textContent = 'View Issued Policies';
-        // Reset picker state when opening
-        _pickerSelected = [];
-        if (searchInput) searchInput.value = '';
-        buildEmployeePicker('');
-      } else {
-        issuePanel.hidden = true;
-      }
+      if (_activePanelEl === issuePanel) { closePanelModal(); return; }
+      _pickerSelected = [];
+      if (searchInput) searchInput.value = '';
+      buildEmployeePicker('');
+      openPanelModal(issuePanel);
     });
 
     viewBtn.addEventListener('click', function () {
-      if (viewPanel.hidden) {
-        viewPanel.hidden  = false;
-        issuePanel.hidden = true;
-        issueBtn.textContent = 'Issue a Policy';
-        if (!viewLoaded) { loadAndRenderIssuedPolicies(); viewLoaded = true; }
-      } else {
-        viewPanel.hidden = true;
-      }
+      if (_activePanelEl === viewPanel) { closePanelModal(); return; }
+      if (!viewLoaded) { loadAndRenderIssuedPolicies(); viewLoaded = true; }
+      openPanelModal(viewPanel);
     });
 
     var refreshBtn = document.getElementById('btn-refresh-issued-policies');
@@ -2048,14 +2048,9 @@
     var loaded = false;
 
     btn.addEventListener('click', function () {
-      if (panel.hidden) {
-        panel.hidden = false;
-        btn.textContent = 'Hide Timesheets';
-        if (!loaded) { doLoad(); loaded = true; }
-      } else {
-        panel.hidden = true;
-        btn.textContent = 'View Timesheets';
-      }
+      if (_activePanelEl === panel) { closePanelModal(); return; }
+      if (!loaded) { doLoad(); loaded = true; }
+      openPanelModal(panel);
     });
 
     if (refresh) refresh.addEventListener('click', function () { loaded = false; doLoad(); loaded = true; });
@@ -2473,14 +2468,9 @@
     var loaded = false;
 
     btn.addEventListener('click', function () {
-      if (panel.hidden) {
-        panel.hidden = false;
-        btn.textContent = 'Hide Timesheets';
-        if (!loaded) { loadAndRender(); loaded = true; }
-      } else {
-        panel.hidden = true;
-        btn.textContent = 'View Timesheets';
-      }
+      if (_activePanelEl === panel) { closePanelModal(); return; }
+      if (!loaded) { loadAndRender(); loaded = true; }
+      openPanelModal(panel);
     });
 
     if (refresh) {
@@ -2898,7 +2888,7 @@
     var rosterLoaded = false;
     var COLORS = ['#0f1e42','#1e3a5f','#1e40af','#065f46','#9f1239','#854d0e','#5b21b6','#48566f'];
 
-    function openPanel(isTeamView) {
+    function openDirPanel(isTeamView) {
       if (!rosterLoaded) {
         fullRoster = (PORTAL_CONFIG.directory || []).slice();
         rosterLoaded = true;
@@ -2912,25 +2902,17 @@
       }
       if (search) { search.value = ''; search.focus(); }
       renderGrid(roster);
-      panel.hidden = false;
-      if (btn)  btn.textContent  = 'Close';
-      if (btn2) btn2.textContent = 'Close';
-    }
-
-    function closePanel() {
-      panel.hidden = true;
-      if (btn)  btn.textContent  = 'Browse';
-      if (btn2) btn2.textContent = 'Browse';
+      openPanelModal(panel);
     }
 
     if (btn) {
       btn.addEventListener('click', function () {
-        panel.hidden ? openPanel(false) : closePanel();
+        _activePanelEl === panel ? closePanelModal() : openDirPanel(false);
       });
     }
     if (btn2) {
       btn2.addEventListener('click', function () {
-        panel.hidden ? openPanel(true) : closePanel();
+        _activePanelEl === panel ? closePanelModal() : openDirPanel(true);
       });
     }
 
@@ -3014,14 +2996,11 @@
     dateEl.max = new Date().toISOString().slice(0, 10); // can't report a future incident
 
     openBtn.addEventListener('click', function () {
-      var opening = panel.hidden;
-      panel.hidden = !opening;
-      openBtn.textContent = opening ? 'Close Form' : 'Report Incident';
-      if (opening) {
-        form.reset();
-        dateEl.max = new Date().toISOString().slice(0, 10);
-        if (statusEl) statusEl.hidden = true;
-      }
+      if (_activePanelEl === panel) { closePanelModal(); return; }
+      form.reset();
+      dateEl.max = new Date().toISOString().slice(0, 10);
+      if (statusEl) statusEl.hidden = true;
+      openPanelModal(panel);
     });
 
     form.addEventListener('submit', function (e) {
@@ -3086,14 +3065,9 @@
     var loaded = false;
 
     btn.addEventListener('click', function () {
-      if (panel.hidden) {
-        panel.hidden = false;
-        btn.textContent = 'Hide Reports';
-        if (!loaded) { loadAndRender(); loaded = true; }
-      } else {
-        panel.hidden = true;
-        btn.textContent = 'View Reports';
-      }
+      if (_activePanelEl === panel) { closePanelModal(); return; }
+      if (!loaded) { loadAndRender(); loaded = true; }
+      openPanelModal(panel);
     });
 
     if (refresh) {
@@ -3188,17 +3162,14 @@
     if (!openBtn || !panel || !form || !startEl || !endEl || !reasonEl) return;
 
     openBtn.addEventListener('click', function () {
-      var opening = panel.hidden;
-      panel.hidden = !opening;
-      openBtn.textContent = opening ? 'Close Form' : 'Submit Request';
-      if (opening) {
-        form.reset();
-        var todayStr = new Date().toISOString().slice(0, 10);
-        startEl.min = todayStr;
-        endEl.min   = '';
-        endEl.max   = '';
-        statusEl.hidden = true;
-      }
+      if (_activePanelEl === panel) { closePanelModal(); return; }
+      form.reset();
+      var todayStr = new Date().toISOString().slice(0, 10);
+      startEl.min = todayStr;
+      endEl.min   = '';
+      endEl.max   = '';
+      statusEl.hidden = true;
+      openPanelModal(panel);
     });
 
     startEl.addEventListener('change', function () {
@@ -3267,14 +3238,9 @@
     var loaded = false;
 
     btn.addEventListener('click', function () {
-      if (panel.hidden) {
-        panel.hidden = false;
-        btn.textContent = 'Hide Requests';
-        if (!loaded) { loadAndRender(); loaded = true; }
-      } else {
-        panel.hidden = true;
-        btn.textContent = 'View Requests';
-      }
+      if (_activePanelEl === panel) { closePanelModal(); return; }
+      if (!loaded) { loadAndRender(); loaded = true; }
+      openPanelModal(panel);
     });
 
     if (refresh) {
@@ -3406,14 +3372,9 @@
     var loaded = false;
 
     btn.addEventListener('click', function () {
-      if (panel.hidden) {
-        panel.hidden = false;
-        btn.textContent = 'Hide My Requests';
-        if (!loaded) { loadAndRender(); loaded = true; }
-      } else {
-        panel.hidden = true;
-        btn.textContent = 'View My Requests';
-      }
+      if (_activePanelEl === panel) { closePanelModal(); return; }
+      if (!loaded) { loadAndRender(); loaded = true; }
+      openPanelModal(panel);
     });
 
     function loadAndRender() {
