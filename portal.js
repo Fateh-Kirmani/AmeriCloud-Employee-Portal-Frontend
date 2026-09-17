@@ -134,20 +134,27 @@
   // ── View helpers ──────────────────────────────────────────────────────────
   function showDashboard(account) {
     currentAccount = account;
+    document.getElementById('loading-view').hidden   = true;
     document.getElementById('signin-view').hidden    = true;
     document.getElementById('dashboard-view').hidden = false;
     initDashboard(account);
   }
 
   function showSignIn() {
+    document.getElementById('loading-view').hidden   = true;
     document.getElementById('signin-view').hidden    = false;
     document.getElementById('dashboard-view').hidden = true;
   }
 
-  // ── Boot: MSAL v3 requires initialize() before any other call ─────────────
+  // ── Boot: show loading screen immediately, then let MSAL resolve the view ──
+  document.getElementById('loading-view').hidden = false;
+
   msalInstance.initialize().then(function () {
     // Auth buttons (wired after initialize so loginRedirect works)
     document.getElementById('btn-signin').addEventListener('click', function () {
+      // Keep loading screen up while Microsoft's auth page loads
+      document.getElementById('loading-view').hidden = false;
+      document.getElementById('signin-view').hidden  = true;
       msalInstance.loginRedirect(loginRequest);
     });
 
