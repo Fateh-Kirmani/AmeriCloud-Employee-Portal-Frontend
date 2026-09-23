@@ -1045,6 +1045,14 @@ button { cursor: pointer; font-family: inherit; }
 }
 .portal-training-save-btn { background: var(--navy); color: #fff; border-color: var(--navy); }
 .portal-training-edit-btn:hover { background: var(--navy); color: #fff; }
+.td-actions { white-space: nowrap; display: flex; gap: 6px; align-items: center; }
+.portal-training-delete-btn {
+  font-size: 0.75rem; padding: 2px 10px; border-radius: 4px; cursor: pointer;
+  border: 1px solid var(--red); background: transparent; color: var(--red);
+  white-space: nowrap;
+}
+.portal-training-delete-btn:hover { background: var(--red); color: #fff; }
+.portal-training-delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .portal-date-input {
   width: 110px; padding: 2px 6px; border: 1px solid var(--slate-2);
   border-radius: 4px; font-size: 0.8rem; font-family: inherit;

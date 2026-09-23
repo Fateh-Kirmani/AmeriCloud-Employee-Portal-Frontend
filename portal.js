@@ -414,8 +414,11 @@
             + '<td><a href="#" class="portal-training-link" data-doc-id="' + doc.id + '">' + esc(doc.filename) + '</a></td>'
             + '<td class="td-iss">' + (doc.issuance_date ? esc(doc.issuance_date) : '<span style="color:var(--slate-2)">—</span>') + '</td>'
             + '<td class="td-ren">' + (doc.renewal_date  ? esc(doc.renewal_date)  : '<span style="color:var(--slate-2)">—</span>') + '</td>'
-            + '<td><button class="portal-training-edit-btn" data-doc-id="' + doc.id
-              + '" data-iss="' + esc(doc.issuance_date) + '" data-ren="' + esc(doc.renewal_date) + '">Edit</button></td>'
+            + '<td class="td-actions"><button class="portal-training-edit-btn" data-doc-id="' + doc.id
+              + '" data-iss="' + esc(doc.issuance_date) + '" data-ren="' + esc(doc.renewal_date) + '">Edit</button>'
+              + (isAdmin ? '<button class="portal-training-delete-btn" data-doc-id="' + doc.id
+              + '" data-name="' + esc(doc.filename) + '">Delete</button>' : '')
+              + '</td>'
             + '</tr>';
         });
         html += '</tbody></table>';
@@ -477,6 +480,30 @@
               btn.classList.add('portal-training-save-btn');
               btn.classList.remove('portal-training-edit-btn');
             }
+          });
+        });
+
+        bodyView.querySelectorAll('.portal-training-delete-btn').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var docId = parseInt(btn.dataset.docId, 10);
+            var name  = btn.dataset.name || 'this document';
+            if (!confirm('Delete "' + name + '"? This cannot be undone.')) return;
+            btn.disabled = true;
+            btn.textContent = '…';
+            getApiToken().then(function(token) {
+              return fetch(API_BASE + '/trainings/' + docId, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token },
+              });
+            }).then(function(r) {
+              if (!r.ok) throw new Error('Delete failed (' + r.status + ')');
+              var row = bodyView.querySelector('tr[data-doc-id="' + docId + '"]');
+              if (row) row.remove();
+            }).catch(function(err) {
+              alert('Could not delete: ' + err.message);
+              btn.disabled = false;
+              btn.textContent = 'Delete';
+            });
           });
         });
       }).catch(function(err) {
