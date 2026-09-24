@@ -56,6 +56,12 @@ var PORTAL_CONFIG = {
       title:    'Weekly Timesheets Now Submitted Through the Portal',
       body:     'You can now fill out and submit your weekly timesheet directly from the portal. Go to the Timesheets section, choose your form type (Standard or California), enter your hours for each day, sign the Employee Attestation, and hit Submit. Managers will see pending submissions in their Manager Approval tab and can approve or reject from there. HR has full visibility into all submissions.',
     },
+    {
+      date:     '2026-09-24',
+      category: 'Portal',
+      title:    'Certifications & Training Documents Now in the Portal',
+      body:     'You can now view your training certificates and compliance documents directly from the portal. Find them under the Certifications & Training section in the Time & Policies tab.',
+    },
   ],
 
   // ── Company Directory (A–Z by first name) ─────────────────────────────────
