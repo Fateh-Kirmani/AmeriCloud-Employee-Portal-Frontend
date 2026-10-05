@@ -843,7 +843,7 @@
 <!-- Timesheet Guide Modal -->
 <div id="modal-ts-guide" class="portal-modal" hidden>
   <div class="portal-modal__overlay" id="modal-ts-guide-overlay"></div>
-  <div class="portal-modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-ts-guide-title">
+  <div class="portal-modal__box portal-modal__box--wide" role="dialog" aria-modal="true" aria-labelledby="modal-ts-guide-title">
     <div class="portal-modal__head">
       <h2 class="portal-modal__title" id="modal-ts-guide-title">How to Fill Out Your Timesheet</h2>
       <button class="portal-modal__close" id="btn-close-ts-guide" type="button" aria-label="Close">&times;</button>
@@ -851,46 +851,203 @@
     <div class="portal-modal__body">
       <p class="portal-ts-guide-intro">Review these four points before submitting — they cover the most common mistakes.</p>
 
+      <!-- Step 1: Project Code -->
       <div class="portal-ts-guide-step">
         <div class="portal-ts-guide-step__num">1</div>
         <div class="portal-ts-guide-step__content">
           <h3 class="portal-ts-guide-step__title">Project Code — must be exact</h3>
-          <p>Every row needs a project code from the project tracker. The format is <strong>3 capital letters followed by 9 digits</strong> — for example <code>ERI202607135</code>. Do not guess or abbreviate it.</p>
-          <p>If a day is non-billable (training, admin, travel, etc.), use the correct <strong>LBR code</strong> instead. You can find the full codes list by clicking the <em>"Non-Billable Codes"</em> link at the top of the timesheet form.</p>
+          <p>Every row needs a project code from the project tracker. The format is <strong>3 capital letters + 9 digits</strong>. If a day is non-billable use the LBR code instead (click <em>"Non-Billable Codes"</em> at the top of the form).</p>
+
+          <!-- Mockup -->
+          <div class="portal-ts-guide-mockup">
+            <div class="tsm-label">Project Code column in the timesheet table</div>
+            <div class="tsm-table-wrap">
+              <table class="tsm-table">
+                <thead>
+                  <tr>
+                    <th>Day</th>
+                    <th>Date</th>
+                    <th class="tsm-col--highlight">Project Code</th>
+                    <th>Shift Start</th>
+                    <th>Shift End</th>
+                    <th class="tsm-col--calc">Hours</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Mon</td><td>Oct 6</td>
+                    <td class="tsm-col--highlight"><div class="tsm-input tsm-input--ok">ERI202607135</div></td>
+                    <td><div class="tsm-input">0900</div></td>
+                    <td><div class="tsm-input">1730</div></td>
+                    <td class="tsm-col--calc tsm-calc">8.00</td>
+                  </tr>
+                  <tr>
+                    <td>Tue</td><td>Oct 7</td>
+                    <td class="tsm-col--highlight"><div class="tsm-input tsm-input--err" title="Wrong format">ERI2026</div><span class="tsm-err-tag">&#9888; wrong format</span></td>
+                    <td><div class="tsm-input">0900</div></td>
+                    <td><div class="tsm-input">1730</div></td>
+                    <td class="tsm-col--calc tsm-calc">8.00</td>
+                  </tr>
+                  <tr>
+                    <td>Wed</td><td>Oct 8</td>
+                    <td class="tsm-col--highlight"><div class="tsm-input tsm-input--err tsm-input--empty"></div><span class="tsm-err-tag">&#9888; missing</span></td>
+                    <td><div class="tsm-input">0900</div></td>
+                    <td><div class="tsm-input">1730</div></td>
+                    <td class="tsm-col--calc tsm-calc">8.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tsm-legend">
+              <span class="tsm-legend__ok">&#10003; Correct</span>
+              <span class="tsm-legend__err">&#9888; Will be rejected</span>
+            </div>
+          </div>
+
           <div class="portal-ts-guide-warn">A missing or wrong project code means your hours cannot be allocated — your submission will be flagged and returned.</div>
         </div>
       </div>
 
+      <!-- Step 2: Week Start Date -->
       <div class="portal-ts-guide-step">
         <div class="portal-ts-guide-step__num">2</div>
         <div class="portal-ts-guide-step__content">
           <h3 class="portal-ts-guide-step__title">Week Start Date — must be the Sunday that begins your work week</h3>
-          <p>The <strong>Week Starting</strong> field at the top of the form must be set to the <strong>Sunday</strong> of the week you are reporting. The individual day dates in the table are filled in automatically based on that Sunday — check them before submitting.</p>
+          <p>Set the <strong>Week Starting</strong> field to the <strong>Sunday</strong> of the week you are reporting. The daily dates in the table fill in automatically from that Sunday.</p>
+
+          <!-- Mockup -->
+          <div class="portal-ts-guide-mockup">
+            <div class="tsm-label">Top of the timesheet form</div>
+            <div class="tsm-header-row">
+              <div class="tsm-header-field tsm-header-field--highlight">
+                <span class="tsm-field-label">Week Starting (Sunday)</span>
+                <div class="tsm-input tsm-input--ok tsm-input--date">2026-10-05</div>
+                <span class="tsm-field-note tsm-field-note--ok">&#10003; Sunday Oct 5 — correct</span>
+              </div>
+              <div class="tsm-header-field">
+                <span class="tsm-field-label">Employee ID</span>
+                <div class="tsm-input">EMP-042</div>
+              </div>
+              <div class="tsm-header-field">
+                <span class="tsm-field-label">Manager Name</span>
+                <div class="tsm-input">Nishant Jawale</div>
+              </div>
+            </div>
+            <div class="tsm-header-row tsm-header-row--bad">
+              <div class="tsm-header-field tsm-header-field--err">
+                <span class="tsm-field-label">Week Starting (Sunday)</span>
+                <div class="tsm-input tsm-input--err tsm-input--date">2026-10-06</div>
+                <span class="tsm-field-note tsm-field-note--err">&#9888; Monday — not a Sunday</span>
+              </div>
+              <div class="tsm-header-field">
+                <span class="tsm-field-label">Employee ID</span>
+                <div class="tsm-input">EMP-042</div>
+              </div>
+              <div class="tsm-header-field">
+                <span class="tsm-field-label">Manager Name</span>
+                <div class="tsm-input">Nishant Jawale</div>
+              </div>
+            </div>
+          </div>
+
           <div class="portal-ts-guide-warn">Submitting with the wrong week date puts your hours on the wrong pay period. Double-check this field every time.</div>
         </div>
       </div>
 
+      <!-- Step 3: Don't touch calculated columns -->
       <div class="portal-ts-guide-step">
         <div class="portal-ts-guide-step__num">3</div>
         <div class="portal-ts-guide-step__content">
-          <h3 class="portal-ts-guide-step__title">Only fill in the white input fields — do not touch the calculated totals</h3>
-          <p>The timesheet calculates your total hours, overtime, and premiums automatically from what you enter. The columns you should fill in are:</p>
-          <ul class="portal-ts-guide-list">
-            <li>Project Code</li>
-            <li>Shift Start and Shift End (24-hour format — e.g. <code>0900</code>, <code>1730</code>)</li>
-            <li>Rest break start and end times</li>
-            <li>Meal break start and end times</li>
-          </ul>
-          <p>Do <strong>not</strong> type directly into the Hours, Regular, OT, or Total rows — those are calculated for you and overwriting them will break the calculation.</p>
+          <h3 class="portal-ts-guide-step__title">Only fill in your times — do not type in the calculated columns</h3>
+          <p>Hours and overtime are calculated automatically. Only fill in the <span class="tsm-badge tsm-badge--fill">blue</span> columns. Never type in the <span class="tsm-badge tsm-badge--calc">grey</span> columns.</p>
+
+          <!-- Mockup -->
+          <div class="portal-ts-guide-mockup">
+            <div class="tsm-label">Column key — what you fill vs. what the form calculates</div>
+            <div class="tsm-table-wrap">
+              <table class="tsm-table">
+                <thead>
+                  <tr>
+                    <th class="tsm-col--fill">Project Code</th>
+                    <th class="tsm-col--fill">Shift Start</th>
+                    <th class="tsm-col--fill">Shift End</th>
+                    <th class="tsm-col--fill">Rest Start</th>
+                    <th class="tsm-col--fill">Rest End</th>
+                    <th class="tsm-col--fill">Meal Start</th>
+                    <th class="tsm-col--fill">Meal End</th>
+                    <th class="tsm-col--calc">Hours</th>
+                    <th class="tsm-col--calc">Regular</th>
+                    <th class="tsm-col--calc">OT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="tsm-col--fill"><div class="tsm-input">ERI202607135</div></td>
+                    <td class="tsm-col--fill"><div class="tsm-input">0900</div></td>
+                    <td class="tsm-col--fill"><div class="tsm-input">1730</div></td>
+                    <td class="tsm-col--fill"><div class="tsm-input">1030</div></td>
+                    <td class="tsm-col--fill"><div class="tsm-input">1040</div></td>
+                    <td class="tsm-col--fill"><div class="tsm-input">1230</div></td>
+                    <td class="tsm-col--fill"><div class="tsm-input">1300</div></td>
+                    <td class="tsm-col--calc tsm-calc">8.00</td>
+                    <td class="tsm-col--calc tsm-calc">8.00</td>
+                    <td class="tsm-col--calc tsm-calc">0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tsm-legend">
+              <span class="tsm-legend__fill">&#9632; You type here</span>
+              <span class="tsm-legend__calc">&#9632; Auto-calculated — do not touch</span>
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- Step 4: Break Waiver -->
       <div class="portal-ts-guide-step">
         <div class="portal-ts-guide-step__num">4</div>
         <div class="portal-ts-guide-step__content">
-          <h3 class="portal-ts-guide-step__title">Break Waiver — required if you skipped a meal or rest break</h3>
-          <p>At the bottom of the form there are two signature sections. The first (<strong>Employee Attestation</strong>) is required for everyone — always sign it.</p>
-          <p>The second (<strong>Voluntary Meal / Rest Break Waiver</strong>) must be signed <strong>only if you voluntarily skipped a meal or rest break on any day that week</strong>. If you took all your breaks, leave the waiver blank.</p>
+          <h3 class="portal-ts-guide-step__title">Break Waiver — sign it only if you skipped a break</h3>
+          <p>At the bottom of the form are two signature sections. The <strong>Employee Attestation</strong> is required for everyone. The <strong>Voluntary Meal / Rest Break Waiver</strong> is only required if you skipped a meal or rest break that week.</p>
+
+          <!-- Mockup -->
+          <div class="portal-ts-guide-mockup">
+            <div class="tsm-label">Bottom of the timesheet form — two signature boxes</div>
+            <div class="tsm-sigs">
+              <div class="tsm-sig-box">
+                <div class="tsm-sig-title">EMPLOYEE ATTESTATION</div>
+                <p class="tsm-sig-body">I certify that this timesheet accurately reflects all hours I worked and all meal and rest periods I took, waived, or missed&hellip;</p>
+                <div class="tsm-sig-fields">
+                  <div>
+                    <span class="tsm-field-label">Employee Signature</span>
+                    <div class="tsm-input tsm-input--ok">Jane Smith</div>
+                  </div>
+                  <div>
+                    <span class="tsm-field-label">Date</span>
+                    <div class="tsm-input tsm-input--ok">2026-10-10</div>
+                  </div>
+                </div>
+                <div class="tsm-sig-tag tsm-sig-tag--required">Required — always sign</div>
+              </div>
+              <div class="tsm-sig-box tsm-sig-box--highlight">
+                <div class="tsm-sig-title">VOLUNTARY MEAL / REST BREAK WAIVER</div>
+                <p class="tsm-sig-body">I confirm I was provided the opportunity to take all required breaks but voluntarily chose not to take one or more of them&hellip;</p>
+                <div class="tsm-sig-fields">
+                  <div>
+                    <span class="tsm-field-label">Employee Signature <em>(leave blank if no waiver applies)</em></span>
+                    <div class="tsm-input tsm-input--warn tsm-input--empty tsm-input--placeholder">Type your full name if applicable</div>
+                  </div>
+                  <div>
+                    <span class="tsm-field-label">Date</span>
+                    <div class="tsm-input"></div>
+                  </div>
+                </div>
+                <div class="tsm-sig-tag tsm-sig-tag--conditional">Required only if you skipped a break</div>
+              </div>
+            </div>
+          </div>
+
           <div class="portal-ts-guide-warn">Submitting without the waiver signature when a break was skipped is a compliance issue. If you worked through lunch or skipped a rest break, the waiver must be signed.</div>
         </div>
       </div>
