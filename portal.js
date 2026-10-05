@@ -3085,24 +3085,20 @@
     ];
     var COUNTRY_COLORS = { US: '#0f1e42', India: '#b84e00', Pakistan: '#166534' };
 
-    function getBubbleInitials(name) {
-      var parts = name.trim().split(/\s+/);
-      if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-    }
-
-    function renderBubble(emp) {
+    function renderCard(emp) {
       var color    = COUNTRY_COLORS[emp.country] || '#48566f';
-      var initials = getBubbleInitials(emp.name);
+      var initial  = emp.name.charAt(0).toUpperCase();
       var teamsUrl = 'https://teams.microsoft.com/l/chat/0/0?users=' + encodeURIComponent(emp.email);
-      return '<a href="' + teamsUrl + '" target="_blank" rel="noopener"'
-        + ' class="portal-dir-bubble portal-dir-bubble--' + (emp.country || 'us').toLowerCase() + '"'
-        + ' style="background:' + color + '"'
-        + ' data-name="' + escapeHtml(emp.name) + '"'
-        + ' data-email="' + escapeHtml(emp.email) + '"'
-        + ' title="' + escapeHtml(emp.name) + ' · ' + escapeHtml(emp.email) + '">'
-        + escapeHtml(initials)
-        + '</a>';
+      return '<div class="portal-dir-card">'
+        + '<div class="portal-dir-avatar" style="background:' + color + '">' + escapeHtml(initial) + '</div>'
+        + '<div class="portal-dir-info">'
+        + '<span class="portal-dir-name">' + escapeHtml(emp.name) + '</span>'
+        + '<span class="portal-dir-email">' + escapeHtml(emp.email) + '</span>'
+        + '</div>'
+        + '<a href="' + teamsUrl + '" target="_blank" rel="noopener" class="portal-dir-teams" title="Message ' + escapeHtml(emp.name) + ' on Teams">'
+        + '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>'
+        + ' Chat</a>'
+        + '</div>';
     }
 
     function getFilteredEntries() {
@@ -3148,8 +3144,8 @@
           + '<span class="portal-dir-dept-name">' + escapeHtml(dept) + '</span>'
           + '<span class="portal-dir-dept-count">' + grp.length + '</span>'
           + '</div>'
-          + '<div class="portal-dir-bubble-grid">'
-          + grp.map(renderBubble).join('')
+          + '<div class="portal-dir-country-grid">'
+          + grp.map(renderCard).join('')
           + '</div>'
           + '</div>';
       });
