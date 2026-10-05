@@ -840,6 +840,23 @@
   </div>
 </div>
 
+<!-- Timesheet Interactive Tour Overlay -->
+<div id="ts-tour-overlay" hidden>
+  <div id="ts-tour-spotlight"></div>
+  <div id="ts-tour-tooltip">
+    <div class="ts-tour-counter">Step <span id="ts-tour-cur">1</span> of <span id="ts-tour-total">6</span></div>
+    <h4 class="ts-tour-title" id="ts-tour-title"></h4>
+    <p class="ts-tour-body" id="ts-tour-body"></p>
+    <div class="ts-tour-btns">
+      <button class="ts-tour-skip" id="ts-tour-end" type="button">End tour</button>
+      <div class="ts-tour-nav">
+        <button class="ts-tour-prev" id="ts-tour-prev" type="button">&#8592; Back</button>
+        <button class="ts-tour-next" id="ts-tour-next" type="button">Next &#8594;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Timesheet Guide Modal -->
 <div id="modal-ts-guide" class="portal-modal" hidden>
   <div class="portal-modal__overlay" id="modal-ts-guide-overlay"></div>

@@ -337,6 +337,121 @@
   }
 
   // ══════════════════════════════════════════════════════════════════════════
+  // Timesheet Interactive Tour
+  // ══════════════════════════════════════════════════════════════════════════
+  var _TOUR_STEPS = [
+    {
+      sel:   '#tsf-week-start',
+      title: 'Week Starting Date',
+      body:  'Set this to the Sunday that begins your work week. The daily dates in the table fill in automatically — double-check them before submitting.',
+    },
+    {
+      sel:   '.tsf-proj',
+      title: 'Project Code',
+      body:  'Every row needs a project code from the tracker: 3 capital letters + 9 digits (e.g. ERI202607135). For non-billable days use the LBR code — click "Non-Billable Codes" to see the list.',
+    },
+    {
+      sel:   '.tsf-shift-start',
+      title: 'Time Entry Columns',
+      body:  'Enter times in 24-hour format: 0900 = 9 AM, 1730 = 5:30 PM. Fill in Shift Start/End, Rest, and Meal times. These are the only columns you should type in.',
+    },
+    {
+      sel:   '.portal-ts-form-summary,.portal-ts-form-ot-summary',
+      title: 'Calculated Totals — do not type here',
+      body:  'Hours, Regular, and OT figures are calculated automatically. Do not type directly into these fields — it will break the totals.',
+    },
+    {
+      sel:   '#tsf-emp-sig',
+      title: 'Employee Attestation',
+      body:  'Type your full legal name here to sign. This is required on every timesheet — never leave it blank.',
+    },
+    {
+      sel:   '#tsf-waiver-sig',
+      title: 'Voluntary Meal / Rest Break Waiver',
+      body:  'Sign here ONLY if you voluntarily skipped a meal or rest break that week. If you took all your breaks, leave this blank.',
+    },
+  ];
+
+  var _tourStep   = 0;
+  var _tourInited = false;
+
+  function _initTour() {
+    if (_tourInited) return;
+    _tourInited = true;
+    var nextBtn = document.getElementById('ts-tour-next');
+    var prevBtn = document.getElementById('ts-tour-prev');
+    var endBtn  = document.getElementById('ts-tour-end');
+    var overlay = document.getElementById('ts-tour-overlay');
+    if (nextBtn) nextBtn.addEventListener('click', function () {
+      if (_tourStep < _TOUR_STEPS.length - 1) { _tourStep++; _showTourStep(); }
+      else _endTour();
+    });
+    if (prevBtn) prevBtn.addEventListener('click', function () {
+      if (_tourStep > 0) { _tourStep--; _showTourStep(); }
+    });
+    if (endBtn)  endBtn.addEventListener('click',  _endTour);
+    if (overlay) overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) _endTour();
+    });
+  }
+
+  function startTsTour() {
+    _initTour();
+    _tourStep = 0;
+    var overlay = document.getElementById('ts-tour-overlay');
+    if (overlay) overlay.hidden = false;
+    _showTourStep();
+  }
+
+  function _endTour() {
+    var overlay  = document.getElementById('ts-tour-overlay');
+    var spotlight = document.getElementById('ts-tour-spotlight');
+    if (overlay)   overlay.hidden = true;
+    if (spotlight) spotlight.removeAttribute('style');
+  }
+
+  function _showTourStep() {
+    var step = _TOUR_STEPS[_tourStep];
+    var el = null;
+    step.sel.split(',').forEach(function (s) { if (!el) el = document.querySelector(s.trim()); });
+    if (!el) {
+      if (_tourStep < _TOUR_STEPS.length - 1) { _tourStep++; _showTourStep(); } else _endTour();
+      return;
+    }
+    document.getElementById('ts-tour-cur').textContent   = _tourStep + 1;
+    document.getElementById('ts-tour-total').textContent = _TOUR_STEPS.length;
+    document.getElementById('ts-tour-title').textContent = step.title;
+    document.getElementById('ts-tour-body').textContent  = step.body;
+    var prevBtn = document.getElementById('ts-tour-prev');
+    var nextBtn = document.getElementById('ts-tour-next');
+    if (prevBtn) prevBtn.disabled    = (_tourStep === 0);
+    if (nextBtn) nextBtn.textContent = (_tourStep === _TOUR_STEPS.length - 1) ? 'Finish' : 'Next →';
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    setTimeout(function () { _positionTour(el); }, 380);
+  }
+
+  function _positionTour(el) {
+    var spotlight = document.getElementById('ts-tour-spotlight');
+    var tooltip   = document.getElementById('ts-tour-tooltip');
+    if (!spotlight || !tooltip) return;
+    var rect = el.getBoundingClientRect();
+    var pad  = 7;
+    spotlight.style.top    = (rect.top    - pad) + 'px';
+    spotlight.style.left   = (rect.left   - pad) + 'px';
+    spotlight.style.width  = (rect.width  + pad * 2) + 'px';
+    spotlight.style.height = (rect.height + pad * 2) + 'px';
+    var ttW  = 310;
+    var ttH  = tooltip.offsetHeight || 170;
+    var mg   = 16;
+    var top  = (rect.bottom + mg + ttH < window.innerHeight) ? rect.bottom + mg
+             : (rect.top - mg - ttH > 0)                    ? rect.top - mg - ttH
+             : Math.max(mg, window.innerHeight / 2 - ttH / 2);
+    var left = Math.max(mg, Math.min(rect.left, window.innerWidth - ttW - mg));
+    tooltip.style.top  = top  + 'px';
+    tooltip.style.left = left + 'px';
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
   // Trainings & Certifications
   // ══════════════════════════════════════════════════════════════════════════
   var TRAININGS_ADMIN = 'fkirmani@americloudtelecom.com';
@@ -1721,6 +1836,7 @@
       + 'Enter times in 24-hour format: <strong>0900 = 9:00 AM, 1300 = 1:00 PM, 1730 = 5:30 PM, 2200 = 10:00 PM.</strong> '
       + 'Meal time is unpaid; rest breaks are paid up to 10 minutes each and any extra is deducted. Submit by <strong>Monday 12:00 PM</strong> for the prior week.</p>'
       + '<button type="button" class="portal-ts-codes-btn" id="btn-ts-codes-' + tsType + '">Non-Billable Codes</button>'
+      + '<button type="button" class="portal-ts-tour-btn" id="btn-ts-tour-' + tsType + '">&#9654; Quick tour</button>'
       + '</div>';
 
     html += '<div class="portal-ts-form-table-wrap"><table class="portal-ts-form-table" id="tsf-table">'
@@ -1799,6 +1915,10 @@
       + '<div id="tsf-status-' + tsType + '" class="portal-ts-status" hidden></div>';
 
     panelEl.innerHTML = html;
+
+    // Wire tour button
+    var tourBtnEl = panelEl.querySelector('#btn-ts-tour-' + tsType);
+    if (tourBtnEl) tourBtnEl.addEventListener('click', startTsTour);
 
     // Date label wiring
     function updateDateLabels() {

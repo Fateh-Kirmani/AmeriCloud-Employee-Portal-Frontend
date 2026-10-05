@@ -2330,6 +2330,61 @@ button { cursor: pointer; font-family: inherit; }
 .portal-ts-guide-footer p { margin: 0; font-size: 0.85rem; color: var(--slate); }
 .portal-ts-guide-footer a { color: var(--navy); }
 
+/* ── Timesheet Interactive Tour ─────────────────────────────────────────── */
+#ts-tour-overlay {
+  position: fixed; inset: 0; z-index: 9500;
+  pointer-events: all;
+}
+#ts-tour-spotlight {
+  position: fixed; z-index: 9501; border-radius: 6px; pointer-events: none;
+  box-shadow: 0 0 0 5px #f59e0b, 0 0 0 9999px rgba(10, 21, 48, 0.72);
+  transition: top 0.3s ease, left 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+#ts-tour-tooltip {
+  position: fixed; z-index: 9502;
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 8px 40px rgba(10, 21, 48, 0.28);
+  padding: 18px 20px; width: 310px;
+  transition: top 0.3s ease, left 0.3s ease;
+}
+.ts-tour-counter {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--slate); margin-bottom: 6px;
+}
+.ts-tour-title {
+  font-family: 'Archivo', sans-serif; font-size: 0.95rem; font-weight: 700;
+  color: var(--navy); margin: 0 0 8px;
+}
+.ts-tour-body {
+  font-size: 0.85rem; line-height: 1.55; color: var(--ink); margin: 0 0 14px;
+}
+.ts-tour-btns {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.ts-tour-nav { display: flex; gap: 6px; }
+.ts-tour-prev, .ts-tour-next {
+  font-family: 'Archivo', sans-serif; font-size: 0.8rem; font-weight: 700;
+  padding: 6px 14px; border-radius: 6px; cursor: pointer;
+  border: 1.5px solid var(--navy); background: var(--navy); color: #fff;
+}
+.ts-tour-prev { background: transparent; color: var(--navy); }
+.ts-tour-prev:disabled { opacity: 0.35; cursor: default; }
+.ts-tour-prev:not(:disabled):hover { background: var(--navy); color: #fff; }
+.ts-tour-next:hover { background: var(--navy-2); }
+.ts-tour-skip {
+  font-size: 0.78rem; color: var(--slate); background: none;
+  border: none; cursor: pointer; padding: 0; text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ts-tour-skip:hover { color: var(--navy); }
+.portal-ts-tour-btn {
+  font-family: 'Manrope', sans-serif; font-size: 0.78rem; font-weight: 600;
+  padding: 4px 12px; border-radius: 5px; cursor: pointer;
+  border: 1.5px solid var(--navy); background: transparent; color: var(--navy);
+  margin-left: 8px; vertical-align: middle;
+}
+.portal-ts-tour-btn:hover { background: var(--navy); color: #fff; }
+
 /* ── Timesheet Guide Mockups ─────────────────────────────────────────────── */
 .portal-ts-guide-mockup {
   margin: 14px 0 12px;
