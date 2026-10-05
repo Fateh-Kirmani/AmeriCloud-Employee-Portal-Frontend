@@ -1786,6 +1786,16 @@
     if (guideDone)    guideDone.addEventListener('click',    closeGuide);
     if (guideOverlay) guideOverlay.addEventListener('click', closeGuide);
 
+    // "Show Me How" — open the Standard form then launch the tour
+    var showMeBtn = document.getElementById('btn-ts-show-me');
+    if (showMeBtn) {
+      showMeBtn.addEventListener('click', function () {
+        var stdBtn = document.getElementById('btn-open-ts-form-std');
+        if (stdBtn) stdBtn.click();
+        setTimeout(startTsTour, 600);
+      });
+    }
+
     function wireForm(btn, tsType) {
       if (!btn || !tsFormModal || !tsFormBody) return;
       btn.addEventListener('click', function () {
