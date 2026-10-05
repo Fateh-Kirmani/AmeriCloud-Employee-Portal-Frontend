@@ -1659,6 +1659,18 @@
     if (codesClose)   codesClose.addEventListener('click',   function () { if (codesModal) codesModal.hidden = true; });
     if (codesOverlay) codesOverlay.addEventListener('click', function () { if (codesModal) codesModal.hidden = true; });
 
+    // Wire Timesheet Guide modal
+    var guideModal   = document.getElementById('modal-ts-guide');
+    var guideBtn     = document.getElementById('btn-ts-guide');
+    var guideClose   = document.getElementById('btn-close-ts-guide');
+    var guideDone    = document.getElementById('btn-ts-guide-done');
+    var guideOverlay = document.getElementById('modal-ts-guide-overlay');
+    function closeGuide() { if (guideModal) guideModal.hidden = true; }
+    if (guideBtn)     guideBtn.addEventListener('click',     function () { if (guideModal) guideModal.hidden = false; });
+    if (guideClose)   guideClose.addEventListener('click',   closeGuide);
+    if (guideDone)    guideDone.addEventListener('click',    closeGuide);
+    if (guideOverlay) guideOverlay.addEventListener('click', closeGuide);
+
     function wireForm(btn, tsType) {
       if (!btn || !tsFormModal || !tsFormBody) return;
       btn.addEventListener('click', function () {

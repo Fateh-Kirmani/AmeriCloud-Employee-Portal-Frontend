@@ -210,7 +210,7 @@
       <div class="portal-section__header">
         <p class="portal-section__eyebrow">Timesheets</p>
         <h2 class="portal-section__title">Timesheets</h2>
-        <p class="portal-section__desc">Fill out and submit your weekly timesheet directly in the portal. Deadline: <strong>Friday at 5:00 PM CST</strong>.</p>
+        <p class="portal-section__desc">Fill out and submit your weekly timesheet directly in the portal. Deadline: <strong>Friday at 5:00 PM CST</strong>. &nbsp;<button id="btn-ts-guide" class="portal-ts-guide-link" type="button">How to fill out your timesheet &rarr;</button></p>
       </div>
       <div class="portal-container">
         <ul class="portal-linklist">
@@ -836,6 +836,69 @@
           <tr><td><strong>LBR1090</strong></td><td>Safety / Stand-Down</td><td>Safety stand-downs, toolbox talks</td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- Timesheet Guide Modal -->
+<div id="modal-ts-guide" class="portal-modal" hidden>
+  <div class="portal-modal__overlay" id="modal-ts-guide-overlay"></div>
+  <div class="portal-modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-ts-guide-title">
+    <div class="portal-modal__head">
+      <h2 class="portal-modal__title" id="modal-ts-guide-title">How to Fill Out Your Timesheet</h2>
+      <button class="portal-modal__close" id="btn-close-ts-guide" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div class="portal-modal__body">
+      <p class="portal-ts-guide-intro">Review these four points before submitting — they cover the most common mistakes.</p>
+
+      <div class="portal-ts-guide-step">
+        <div class="portal-ts-guide-step__num">1</div>
+        <div class="portal-ts-guide-step__content">
+          <h3 class="portal-ts-guide-step__title">Project Code — must be exact</h3>
+          <p>Every row needs a project code from the project tracker. The format is <strong>3 capital letters followed by 9 digits</strong> — for example <code>ERI202607135</code>. Do not guess or abbreviate it.</p>
+          <p>If a day is non-billable (training, admin, travel, etc.), use the correct <strong>LBR code</strong> instead. You can find the full codes list by clicking the <em>"Non-Billable Codes"</em> link at the top of the timesheet form.</p>
+          <div class="portal-ts-guide-warn">A missing or wrong project code means your hours cannot be allocated — your submission will be flagged and returned.</div>
+        </div>
+      </div>
+
+      <div class="portal-ts-guide-step">
+        <div class="portal-ts-guide-step__num">2</div>
+        <div class="portal-ts-guide-step__content">
+          <h3 class="portal-ts-guide-step__title">Week Start Date — must be the Sunday that begins your work week</h3>
+          <p>The <strong>Week Starting</strong> field at the top of the form must be set to the <strong>Sunday</strong> of the week you are reporting. The individual day dates in the table are filled in automatically based on that Sunday — check them before submitting.</p>
+          <div class="portal-ts-guide-warn">Submitting with the wrong week date puts your hours on the wrong pay period. Double-check this field every time.</div>
+        </div>
+      </div>
+
+      <div class="portal-ts-guide-step">
+        <div class="portal-ts-guide-step__num">3</div>
+        <div class="portal-ts-guide-step__content">
+          <h3 class="portal-ts-guide-step__title">Only fill in the white input fields — do not touch the calculated totals</h3>
+          <p>The timesheet calculates your total hours, overtime, and premiums automatically from what you enter. The columns you should fill in are:</p>
+          <ul class="portal-ts-guide-list">
+            <li>Project Code</li>
+            <li>Shift Start and Shift End (24-hour format — e.g. <code>0900</code>, <code>1730</code>)</li>
+            <li>Rest break start and end times</li>
+            <li>Meal break start and end times</li>
+          </ul>
+          <p>Do <strong>not</strong> type directly into the Hours, Regular, OT, or Total rows — those are calculated for you and overwriting them will break the calculation.</p>
+        </div>
+      </div>
+
+      <div class="portal-ts-guide-step">
+        <div class="portal-ts-guide-step__num">4</div>
+        <div class="portal-ts-guide-step__content">
+          <h3 class="portal-ts-guide-step__title">Break Waiver — required if you skipped a meal or rest break</h3>
+          <p>At the bottom of the form there are two signature sections. The first (<strong>Employee Attestation</strong>) is required for everyone — always sign it.</p>
+          <p>The second (<strong>Voluntary Meal / Rest Break Waiver</strong>) must be signed <strong>only if you voluntarily skipped a meal or rest break on any day that week</strong>. If you took all your breaks, leave the waiver blank.</p>
+          <div class="portal-ts-guide-warn">Submitting without the waiver signature when a break was skipped is a compliance issue. If you worked through lunch or skipped a rest break, the waiver must be signed.</div>
+        </div>
+      </div>
+
+      <div class="portal-ts-guide-footer">
+        <p>Questions? Contact <a href="mailto:Timesheet@americloudtelecom.com">Timesheet@americloudtelecom.com</a>.</p>
+        <button id="btn-ts-guide-done" class="portal-ts-form-submit-btn" type="button">Got it</button>
+      </div>
     </div>
   </div>
 </div>
