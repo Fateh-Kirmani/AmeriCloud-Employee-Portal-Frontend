@@ -312,6 +312,22 @@
     // Available to all roles — company directory
     setupDirectory(team);
 
+    // Resources & Tools tab switching
+    (function () {
+      var tabs   = document.querySelectorAll('.portal-res-tab');
+      var panels = document.querySelectorAll('.portal-res-tab-panel');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          tabs.forEach(function (t) { t.classList.remove('portal-res-tab--active'); t.setAttribute('aria-selected', 'false'); });
+          panels.forEach(function (p) { p.hidden = true; });
+          tab.classList.add('portal-res-tab--active');
+          tab.setAttribute('aria-selected', 'true');
+          var target = document.getElementById(tab.getAttribute('aria-controls'));
+          if (target) target.hidden = false;
+        });
+      });
+    })();
+
     // Available to all roles — company calendar
     setupCalendar();
 

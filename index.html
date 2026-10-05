@@ -76,7 +76,7 @@
       </a>
       <a href="#" class="portal-nav__link" data-section="resources">
         <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-        Resources
+        Resources &amp; Tools
       </a>
       <a href="#" class="portal-nav__link" data-section="trainings">
         <svg class="portal-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg>
@@ -381,51 +381,68 @@
       </div>
     </section>
 
-    <!-- ── SECTION: Resources ── -->
+    <!-- ── SECTION: Resources & Tools ── -->
     <section id="section-resources" class="portal-section" hidden>
       <div class="portal-section__header">
-        <p class="portal-section__eyebrow">Resources</p>
-        <h2 class="portal-section__title">Resources</h2>
+        <p class="portal-section__eyebrow">Resources &amp; Tools</p>
+        <h2 class="portal-section__title">Resources &amp; Tools</h2>
         <p class="portal-section__desc">Company directory, calendar, and your business tool accounts.</p>
       </div>
       <div class="portal-container">
-        <ul class="portal-linklist">
-          <li class="portal-linkitem">
-            <div class="portal-linkitem__body">
-              <span class="portal-linkitem__title">Company Directory</span>
-              <span class="portal-linkitem__desc">Search all employees by name or email and message them on Teams.</span>
-            </div>
-            <button class="portal-linkitem__action" id="btn-open-directory" type="button">Browse</button>
-          </li>
-          <li class="portal-linkitem">
-            <div class="portal-linkitem__body">
-              <span class="portal-linkitem__title">Company Calendar</span>
-              <span class="portal-linkitem__desc">Holidays, paydays, and key company dates.</span>
-            </div>
-            <button class="portal-linkitem__action" id="btn-open-calendar" type="button">View &rarr;</button>
-          </li>
-          <li class="portal-linkitem">
-            <div class="portal-linkitem__body">
-              <span class="portal-linkitem__title">My Ramp</span>
-              <span class="portal-linkitem__desc">Access your company card, view transactions, and manage spend in Ramp.</span>
-            </div>
-            <a href="https://app.ramp.com/login" target="_blank" rel="noopener" class="portal-linkitem__action">Open Ramp &rarr;</a>
-          </li>
-          <li class="portal-linkitem">
-            <div class="portal-linkitem__body">
-              <span class="portal-linkitem__title">My AssetTiger</span>
-              <span class="portal-linkitem__desc">View and track company assets assigned to you.</span>
-            </div>
-            <a href="https://www.assettiger.com/login" target="_blank" rel="noopener" class="portal-linkitem__action">Open AssetTiger &rarr;</a>
-          </li>
-        </ul>
-        <div id="panel-calendar" class="portal-ts-panel" hidden>
-          <div class="portal-ts-panel__head">
-            <span class="portal-ts-panel__label">Company Calendar</span>
-            <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
-          </div>
-          <div class="portal-ts-panel__body" id="body-calendar"></div>
+
+        <!-- Tab bar -->
+        <div class="portal-res-tabs" role="tablist">
+          <button class="portal-res-tab portal-res-tab--active" id="res-tab-resources" role="tab" aria-selected="true"  aria-controls="res-panel-resources" type="button">Resources</button>
+          <button class="portal-res-tab"                         id="res-tab-tools"     role="tab" aria-selected="false" aria-controls="res-panel-tools"     type="button">Tools</button>
         </div>
+
+        <!-- Resources tab panel -->
+        <div id="res-panel-resources" class="portal-res-tab-panel" role="tabpanel">
+          <ul class="portal-linklist">
+            <li class="portal-linkitem">
+              <div class="portal-linkitem__body">
+                <span class="portal-linkitem__title">Company Directory</span>
+                <span class="portal-linkitem__desc">Search all employees by name or email and message them on Teams.</span>
+              </div>
+              <button class="portal-linkitem__action" id="btn-open-directory" type="button">Browse</button>
+            </li>
+            <li class="portal-linkitem">
+              <div class="portal-linkitem__body">
+                <span class="portal-linkitem__title">Company Calendar</span>
+                <span class="portal-linkitem__desc">Holidays, paydays, and key company dates.</span>
+              </div>
+              <button class="portal-linkitem__action" id="btn-open-calendar" type="button">View &rarr;</button>
+            </li>
+            <li class="portal-linkitem">
+              <div class="portal-linkitem__body">
+                <span class="portal-linkitem__title">My Ramp</span>
+                <span class="portal-linkitem__desc">Access your company card, view transactions, and manage spend in Ramp.</span>
+              </div>
+              <a href="https://app.ramp.com/login" target="_blank" rel="noopener" class="portal-linkitem__action">Open Ramp &rarr;</a>
+            </li>
+          </ul>
+          <div id="panel-calendar" class="portal-ts-panel" hidden>
+            <div class="portal-ts-panel__head">
+              <span class="portal-ts-panel__label">Company Calendar</span>
+              <button class="portal-ts-panel__close" type="button" aria-label="Close">&times;</button>
+            </div>
+            <div class="portal-ts-panel__body" id="body-calendar"></div>
+          </div>
+        </div>
+
+        <!-- Tools tab panel -->
+        <div id="res-panel-tools" class="portal-res-tab-panel" hidden role="tabpanel">
+          <ul class="portal-linklist">
+            <li class="portal-linkitem">
+              <div class="portal-linkitem__body">
+                <span class="portal-linkitem__title">My AssetTiger</span>
+                <span class="portal-linkitem__desc">View and track company assets assigned to you.</span>
+              </div>
+              <a href="https://www.assettiger.com/login" target="_blank" rel="noopener" class="portal-linkitem__action">Open AssetTiger &rarr;</a>
+            </li>
+          </ul>
+        </div>
+
       </div>
     </section>
 

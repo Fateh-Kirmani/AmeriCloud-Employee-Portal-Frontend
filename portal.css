@@ -669,6 +669,21 @@ button { cursor: pointer; font-family: inherit; }
 /* ══════════════════════════════════════════════════════════════════════
    LINK LIST (used in Pay, Time, Forms, Manager, HR sections)
 ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Resources & Tools tabs ──────────────────────────────────────────────── */
+.portal-res-tabs {
+  display: flex; gap: 0; border-bottom: 2px solid var(--line);
+  margin-bottom: 24px;
+}
+.portal-res-tab {
+  font-family: 'Archivo', sans-serif; font-size: 0.88rem; font-weight: 700;
+  padding: 10px 22px; border: none; background: none; cursor: pointer;
+  color: var(--slate); border-bottom: 2px solid transparent;
+  margin-bottom: -2px; transition: color 0.15s, border-color 0.15s;
+}
+.portal-res-tab:hover { color: var(--navy); }
+.portal-res-tab--active { color: var(--navy); border-bottom-color: var(--navy); }
+
 .portal-linklist {
   display: flex;
   flex-direction: column;
