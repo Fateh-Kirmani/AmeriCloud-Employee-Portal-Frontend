@@ -1864,21 +1864,31 @@ button { cursor: pointer; font-family: inherit; }
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 2px solid var(--line);
+  padding: 6px 12px;
+  border-radius: 5px;
+  background: #48566f;
 }
+.portal-dir-dept-head--bbu          { background: #1d4ed8; }
+.portal-dir-dept-head--construction { background: #b45309; }
+.portal-dir-dept-head--design       { background: #7c3aed; }
+.portal-dir-dept-head--integration  { background: #0f766e; }
+.portal-dir-dept-head--managed      { background: #be185d; }
+.portal-dir-dept-head--optimization { background: #15803d; }
+.portal-dir-dept-head--overhead     { background: #0f1e42; }
+.portal-dir-dept-head--rf           { background: #c2410c; }
+.portal-dir-dept-head--other        { background: #475569; }
 .portal-dir-dept-name {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--navy);
+  color: #fff;
 }
 .portal-dir-dept-count {
   font-size: 11px;
   font-weight: 600;
-  background: #e8ebf3;
-  color: #48566f;
+  background: rgba(255,255,255,0.22);
+  color: #fff;
   padding: 1px 7px;
   border-radius: 10px;
 }

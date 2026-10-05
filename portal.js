@@ -3083,6 +3083,17 @@
       'BBU Swaps', 'Construction', 'Design', 'Integration',
       'Managed Services', 'Optimization', 'Overhead', 'RF Data Collection', 'Other'
     ];
+    var DEPT_SLUG = {
+      'BBU Swaps':          'bbu',
+      'Construction':       'construction',
+      'Design':             'design',
+      'Integration':        'integration',
+      'Managed Services':   'managed',
+      'Optimization':       'optimization',
+      'Overhead':           'overhead',
+      'RF Data Collection': 'rf',
+      'Other':              'other'
+    };
     var COUNTRY_COLORS = { US: '#0f1e42', India: '#b84e00', Pakistan: '#166534' };
 
     function renderCard(emp) {
@@ -3139,8 +3150,9 @@
       DEPT_ORDER.forEach(function (dept) {
         var grp = groups[dept];
         if (!grp || !grp.length) return;
+        var slug = DEPT_SLUG[dept] || 'other';
         html += '<div class="portal-dir-dept">'
-          + '<div class="portal-dir-dept-head">'
+          + '<div class="portal-dir-dept-head portal-dir-dept-head--' + slug + '">'
           + '<span class="portal-dir-dept-name">' + escapeHtml(dept) + '</span>'
           + '<span class="portal-dir-dept-count">' + grp.length + '</span>'
           + '</div>'
