@@ -1804,6 +1804,149 @@ button { cursor: pointer; font-family: inherit; }
   max-height: 88vh;
 }
 
+/* ── Directory filters ─────────────────────────────────────────────────────── */
+.portal-dir-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0 14px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 10px;
+}
+.portal-dir-filter-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.portal-dir-filter-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  width: 84px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+.portal-dir-chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.portal-dir-chip {
+  padding: 3px 11px;
+  border-radius: 20px;
+  border: 1.5px solid var(--line);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--body);
+  transition: all 0.13s;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.portal-dir-chip:hover { border-color: #b0b8cc; background: #f5f6fa; }
+.portal-dir-chip--active { background: var(--navy); color: #fff; border-color: var(--navy); }
+.portal-dir-chip--us     { border-color: #0f1e42; color: #0f1e42; }
+.portal-dir-chip--us.portal-dir-chip--active     { background: #0f1e42; color: #fff; }
+.portal-dir-chip--india  { border-color: #b84e00; color: #b84e00; }
+.portal-dir-chip--india.portal-dir-chip--active  { background: #b84e00; color: #fff; }
+.portal-dir-chip--pakistan { border-color: #166534; color: #166534; }
+.portal-dir-chip--pakistan.portal-dir-chip--active { background: #166534; color: #fff; }
+
+/* ── Department bubble groups ──────────────────────────────────────────────── */
+.portal-dir-dept {
+  margin-bottom: 22px;
+}
+.portal-dir-dept-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--line);
+}
+.portal-dir-dept-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--navy);
+}
+.portal-dir-dept-count {
+  font-size: 11px;
+  font-weight: 600;
+  background: #e8ebf3;
+  color: #48566f;
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+/* ── Employee bubbles ──────────────────────────────────────────────────────── */
+.portal-dir-bubble-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.portal-dir-bubble {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.12s, box-shadow 0.12s;
+  letter-spacing: 0.04em;
+  font-family: inherit;
+}
+.portal-dir-bubble:hover {
+  transform: scale(1.18);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.28);
+  z-index: 10;
+}
+.portal-dir-bubble::after {
+  content: attr(data-name);
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0a1530;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 50;
+  letter-spacing: 0;
+}
+.portal-dir-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #0a1530;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 50;
+}
+.portal-dir-bubble:hover::after,
+.portal-dir-bubble:hover::before { opacity: 1; }
+
 .portal-form-select {
   appearance: none;
   -webkit-appearance: none;

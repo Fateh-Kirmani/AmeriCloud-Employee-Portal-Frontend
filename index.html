@@ -785,6 +785,32 @@
       </div>
       <div class="portal-ts-panel__body">
         <input type="search" id="dir-search" class="portal-dir-search" placeholder="Search by name or email…" autocomplete="off" spellcheck="false">
+        <div class="portal-dir-filters">
+          <div class="portal-dir-filter-row">
+            <span class="portal-dir-filter-label">Country</span>
+            <div class="portal-dir-chips" id="dir-filter-country" role="group" aria-label="Filter by country">
+              <button class="portal-dir-chip portal-dir-chip--active" data-filter="country" data-value="" type="button">All</button>
+              <button class="portal-dir-chip portal-dir-chip--us"       data-filter="country" data-value="US"       type="button">US</button>
+              <button class="portal-dir-chip portal-dir-chip--india"    data-filter="country" data-value="India"    type="button">India</button>
+              <button class="portal-dir-chip portal-dir-chip--pakistan" data-filter="country" data-value="Pakistan" type="button">Pakistan</button>
+            </div>
+          </div>
+          <div class="portal-dir-filter-row">
+            <span class="portal-dir-filter-label">Department</span>
+            <div class="portal-dir-chips" id="dir-filter-dept" role="group" aria-label="Filter by department">
+              <button class="portal-dir-chip portal-dir-chip--active" data-filter="dept" data-value=""                   type="button">All</button>
+              <button class="portal-dir-chip" data-filter="dept" data-value="BBU Swaps"          type="button">BBU Swaps</button>
+              <button class="portal-dir-chip" data-filter="dept" data-value="Construction"       type="button">Construction</button>
+              <button class="portal-dir-chip" data-filter="dept" data-value="Design"             type="button">Design</button>
+              <button class="portal-dir-chip" data-filter="dept" data-value="Integration"        type="button">Integration</button>
+              <button class="portal-dir-chip" data-filter="dept" data-value="Managed Services"   type="button">Managed Services</button>
+              <button class="portal-dir-chip" data-filter="dept" data-value="Optimization"       type="button">Optimization</button>
+              <button class="portal-dir-chip" data-filter="dept" data-value="Overhead"           type="button">Overhead</button>
+              <button class="portal-dir-chip" data-filter="dept" data-value="RF Data Collection" type="button">RF&nbsp;Data</button>
+              <button class="portal-dir-chip" data-filter="dept" data-value="Other"              type="button">Other</button>
+            </div>
+          </div>
+        </div>
         <p id="dir-count" class="portal-dir-count"></p>
         <div id="dir-grid" class="portal-dir-grid"></div>
       </div>

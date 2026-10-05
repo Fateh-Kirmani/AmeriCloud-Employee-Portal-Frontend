@@ -3064,19 +3064,121 @@
   // Company Directory — searchable employee list with Teams chat links
   // ══════════════════════════════════════════════════════════════════════════
   function setupDirectory(teamEmails) {
-    var btn     = document.getElementById('btn-open-directory');
-    var btn2    = document.getElementById('btn-open-team-directory');
-    var panel   = document.getElementById('panel-directory');
-    var search  = document.getElementById('dir-search');
-    var grid    = document.getElementById('dir-grid');
-    var count   = document.getElementById('dir-count');
+    var btn        = document.getElementById('btn-open-directory');
+    var btn2       = document.getElementById('btn-open-team-directory');
+    var panel      = document.getElementById('panel-directory');
+    var search     = document.getElementById('dir-search');
+    var grid       = document.getElementById('dir-grid');
+    var count      = document.getElementById('dir-count');
     var panelLabel = panel ? panel.querySelector('.portal-ts-panel__label') : null;
     if (!panel || !grid) return;
 
-    var fullRoster = [];
-    var roster     = [];  // active roster (full or team-filtered)
+    var fullRoster   = [];
+    var roster       = [];
     var rosterLoaded = false;
-    var COLORS = ['#0f1e42','#1e3a5f','#1e40af','#065f46','#9f1239','#854d0e','#5b21b6','#48566f'];
+    var _filterCountry = '';
+    var _filterDept    = '';
+
+    var DEPT_ORDER = [
+      'BBU Swaps', 'Construction', 'Design', 'Integration',
+      'Managed Services', 'Optimization', 'Overhead', 'RF Data Collection', 'Other'
+    ];
+    var COUNTRY_COLORS = { US: '#0f1e42', India: '#b84e00', Pakistan: '#166534' };
+
+    function getBubbleInitials(name) {
+      var parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    }
+
+    function renderBubble(emp) {
+      var color    = COUNTRY_COLORS[emp.country] || '#48566f';
+      var initials = getBubbleInitials(emp.name);
+      var teamsUrl = 'https://teams.microsoft.com/l/chat/0/0?users=' + encodeURIComponent(emp.email);
+      return '<a href="' + teamsUrl + '" target="_blank" rel="noopener"'
+        + ' class="portal-dir-bubble portal-dir-bubble--' + (emp.country || 'us').toLowerCase() + '"'
+        + ' style="background:' + color + '"'
+        + ' data-name="' + escapeHtml(emp.name) + '"'
+        + ' data-email="' + escapeHtml(emp.email) + '"'
+        + ' title="' + escapeHtml(emp.name) + ' · ' + escapeHtml(emp.email) + '">'
+        + escapeHtml(initials)
+        + '</a>';
+    }
+
+    function getFilteredEntries() {
+      return roster.filter(function (e) {
+        if (_filterCountry && (e.country || 'US') !== _filterCountry) return false;
+        if (_filterDept    && (e.department || 'Other') !== _filterDept)  return false;
+        return true;
+      });
+    }
+
+    function applyFiltersAndSearch() {
+      var q       = search ? search.value.toLowerCase().trim() : '';
+      var entries = getFilteredEntries();
+      if (q) entries = entries.filter(function (e) {
+        return e.name.toLowerCase().indexOf(q) !== -1
+            || (e.email || '').toLowerCase().indexOf(q) !== -1;
+      });
+      renderGrid(entries);
+    }
+
+    function renderGrid(entries) {
+      var total = roster.length;
+      if (count) count.textContent = entries.length + ' of ' + total + (total === 1 ? ' person' : ' people');
+      if (!entries.length) {
+        grid.innerHTML = '<p class="portal-dir-empty">No results match your filters.</p>';
+        return;
+      }
+
+      var groups = {};
+      DEPT_ORDER.forEach(function (d) { groups[d] = []; });
+      entries.forEach(function (emp) {
+        var d = emp.department || 'Other';
+        if (!groups[d]) groups[d] = [];
+        groups[d].push(emp);
+      });
+
+      var html = '';
+      DEPT_ORDER.forEach(function (dept) {
+        var grp = groups[dept];
+        if (!grp || !grp.length) return;
+        html += '<div class="portal-dir-dept">'
+          + '<div class="portal-dir-dept-head">'
+          + '<span class="portal-dir-dept-name">' + escapeHtml(dept) + '</span>'
+          + '<span class="portal-dir-dept-count">' + grp.length + '</span>'
+          + '</div>'
+          + '<div class="portal-dir-bubble-grid">'
+          + grp.map(renderBubble).join('')
+          + '</div>'
+          + '</div>';
+      });
+      grid.innerHTML = html || '<p class="portal-dir-empty">No results match your filters.</p>';
+    }
+
+    function resetFilters() {
+      _filterCountry = '';
+      _filterDept    = '';
+      panel.querySelectorAll('.portal-dir-chip').forEach(function (c) {
+        c.classList.toggle('portal-dir-chip--active', c.getAttribute('data-value') === '');
+      });
+    }
+
+    // Wire filter chips
+    panel.addEventListener('click', function (e) {
+      var chip = e.target.closest('.portal-dir-chip');
+      if (!chip) return;
+      var filterType = chip.getAttribute('data-filter');
+      var value      = chip.getAttribute('data-value');
+      var groupId    = filterType === 'country' ? 'dir-filter-country' : 'dir-filter-dept';
+      var group      = document.getElementById(groupId);
+      if (group) group.querySelectorAll('.portal-dir-chip').forEach(function (c) {
+        c.classList.toggle('portal-dir-chip--active', c === chip);
+      });
+      if (filterType === 'country') _filterCountry = value;
+      else _filterDept = value;
+      applyFiltersAndSearch();
+    });
 
     function openDirPanel(isTeamView) {
       if (!rosterLoaded) {
@@ -3084,87 +3186,23 @@
         rosterLoaded = true;
       }
       if (isTeamView && teamEmails && teamEmails.length) {
-        roster = fullRoster.filter(function (e) { return teamEmails.indexOf((e.email || '').toLowerCase()) !== -1; });
+        roster = fullRoster.filter(function (e) {
+          return teamEmails.indexOf((e.email || '').toLowerCase()) !== -1;
+        });
         if (panelLabel) panelLabel.textContent = 'Team Directory';
       } else {
         roster = fullRoster;
         if (panelLabel) panelLabel.textContent = 'Company Directory';
       }
+      resetFilters();
       if (search) { search.value = ''; search.focus(); }
       renderGrid(roster);
       openPanelModal(panel);
     }
 
-    if (btn) {
-      btn.addEventListener('click', function () {
-        _activePanelEl === panel ? closePanelModal() : openDirPanel(false);
-      });
-    }
-    if (btn2) {
-      btn2.addEventListener('click', function () {
-        _activePanelEl === panel ? closePanelModal() : openDirPanel(true);
-      });
-    }
-
-    if (search) {
-      search.addEventListener('input', function () {
-        var q = search.value.toLowerCase().trim();
-        renderGrid(q ? roster.filter(function (e) {
-          return e.name.toLowerCase().indexOf(q) !== -1 || (e.email || '').toLowerCase().indexOf(q) !== -1;
-        }) : roster);
-      });
-    }
-
-    function renderCard(emp) {
-      var initial  = emp.name.charAt(0).toUpperCase();
-      var color    = COLORS[emp.name.charCodeAt(0) % COLORS.length];
-      var teamsUrl = 'https://teams.microsoft.com/l/chat/0/0?users=' + encodeURIComponent(emp.email);
-      return '<div class="portal-dir-card">'
-        + '<div class="portal-dir-avatar" style="background:' + color + '">' + escapeHtml(initial) + '</div>'
-        + '<div class="portal-dir-info">'
-        + '<span class="portal-dir-name">' + escapeHtml(emp.name) + '</span>'
-        + '<span class="portal-dir-email">' + escapeHtml(emp.email) + '</span>'
-        + (emp.title ? '<span class="portal-dir-title">' + escapeHtml(emp.title) + (emp.dept ? ' — ' + escapeHtml(emp.dept) : '') + '</span>' : '')
-        + '</div>'
-        + '<a href="' + teamsUrl + '" target="_blank" rel="noopener" class="portal-dir-teams" title="Message ' + escapeHtml(emp.name) + ' on Teams">'
-        + '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>'
-        + ' Chat</a>'
-        + '</div>';
-    }
-
-    var COUNTRY_ORDER  = ['US', 'India', 'Pakistan'];
-    var COUNTRY_LABELS = { US: 'United States', India: 'India', Pakistan: 'Pakistan' };
-
-    function renderGrid(entries) {
-      if (count) count.textContent = entries.length + ' of ' + roster.length + (roster.length === 1 ? ' person' : ' people');
-      if (!entries.length) {
-        grid.innerHTML = '<p class="portal-dir-empty">No results match your search.</p>';
-        return;
-      }
-
-      // Group by country
-      var groups = {};
-      COUNTRY_ORDER.forEach(function (c) { groups[c] = []; });
-      entries.forEach(function (emp) {
-        var c = emp.country || 'US';
-        if (!groups[c]) groups[c] = [];
-        groups[c].push(emp);
-      });
-
-      var html = '';
-      COUNTRY_ORDER.forEach(function (c) {
-        var grp = groups[c];
-        if (!grp || !grp.length) return;
-        html += '<div class="portal-dir-country">'
-          + '<div class="portal-dir-country-head portal-dir-country-head--' + c.toLowerCase() + '">'
-          + escapeHtml(COUNTRY_LABELS[c])
-          + ' <span class="portal-dir-country-count">(' + grp.length + ')</span>'
-          + '</div>'
-          + '<div class="portal-dir-country-grid">' + grp.map(renderCard).join('') + '</div>'
-          + '</div>';
-      });
-      grid.innerHTML = html;
-    }
+    if (btn)  btn.addEventListener('click',  function () { _activePanelEl === panel ? closePanelModal() : openDirPanel(false); });
+    if (btn2) btn2.addEventListener('click', function () { _activePanelEl === panel ? closePanelModal() : openDirPanel(true);  });
+    if (search) search.addEventListener('input', applyFiltersAndSearch);
   }
 
 
