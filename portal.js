@@ -98,17 +98,6 @@
     { id: '3', email: 'chris.nguyen@americloudtelecom.com',   name: 'Chris Nguyen',   startDate: '2026-08-11', endDate: '2026-08-14', reason: 'Medical appointment and recovery', status: 'Approved', submittedDate: '2026-07-20T09:00:00Z' },
   ];
 
-  // ── Dev bypass — visit index.html#demo to preview without real auth ───────
-  // REMOVE this entire block before announcing the portal to employees.
-  if (window.location.hash === '#demo') {
-    IS_DEMO = true;
-    document.getElementById('signin-view').hidden    = true;
-    document.getElementById('dashboard-view').hidden = false;
-    initDashboard(null);
-    return;
-  }
-  // ── End dev bypass ────────────────────────────────────────────────────────
-
   // ── MSAL config ───────────────────────────────────────────────────────────
   var MSAL_CLIENT_ID = '64cfff00-2deb-4a7a-91fc-74431baac966';
   var MSAL_TENANT_ID = 'f8e7955f-b183-4786-b8ca-7a51ecf001e8';
