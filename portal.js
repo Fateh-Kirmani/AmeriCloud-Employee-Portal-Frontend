@@ -182,13 +182,16 @@
     var isManager = false;
     var isHR      = false;
 
+    var FULL_ACCESS_EMAILS = ['fkirmani@americloudtelecom.com', 'developer@americloudtelecom.com'];
+    var hasFullAccess = FULL_ACCESS_EMAILS.indexOf(userEmail) !== -1;
+
     if (account) {
       var groups = (account.idTokenClaims && account.idTokenClaims.groups) || [];
-      if (groups.indexOf(GROUP_HR) !== -1) {
+      if (hasFullAccess || groups.indexOf(GROUP_HR) !== -1) {
         isHR = true;
         document.getElementById('nav-hr').hidden = false;
       }
-      if (groups.indexOf(GROUP_MANAGERS) !== -1) {
+      if (hasFullAccess || groups.indexOf(GROUP_MANAGERS) !== -1) {
         isManager = true;
         document.getElementById('nav-manager').hidden = false;
       }
