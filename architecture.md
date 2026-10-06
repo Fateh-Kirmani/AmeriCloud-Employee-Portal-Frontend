@@ -4,7 +4,7 @@
 
 A single-page web application (SPA) for AmeriCloud Telecom employees to submit timesheets, manage PTO, sign documents, and access HR tools. No build step, no framework — served as static files from RunCloud with a FastAPI backend on Vercel and Supabase as the database.
 
-**Live URL:** `https://portal.americloudtelecom.com`
+**Live URL:** `https://americloud-employee-portal.vercel.app`
 
 ---
 
@@ -18,7 +18,7 @@ A single-page web application (SPA) for AmeriCloud Telecom employees to submit t
 | Backend | FastAPI on Vercel (`https://americloud-employee-portal-backend.vercel.app`) |
 | Database | Supabase (PostgreSQL + file storage) |
 | Auth provider | Microsoft Entra ID (Azure AD) |
-| Hosting | RunCloud (Nginx) — auto-deploys from `main` branch |
+| Hosting | Vercel — auto-deploys from `master` branch |
 | Repo | `Fateh-Kirmani/AmeriCloud-Employee-Portal-Frontend` (GitHub) |
 
 ---
@@ -467,9 +467,9 @@ Used for: policy/EFS employee pickers, manager team lookups, timesheet routing, 
 ## Deployment
 
 ### Frontend
-- **Host:** RunCloud (Nginx)
-- **Config:** `deploy/nginx-runcloud.conf` — apply manually in RunCloud → Web App → Nginx Config
-- **Auto-deploy:** Every push to `main` branch triggers deployment
+- **Host:** Vercel
+- **URL:** `https://americloud-employee-portal.vercel.app`
+- **Auto-deploy:** Every push to `master` branch triggers deployment
 - **Build:** None — static files served directly
 
 ### Backend
