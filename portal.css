@@ -2428,8 +2428,24 @@ button { cursor: pointer; font-family: inherit; }
 .portal-ts-pto-row  { margin: 8px 0 4px; align-items: center; gap: 10px; display: flex; }
 .portal-ts-pto-row .portal-form-label { margin: 0; white-space: nowrap; font-size: .8rem; }
 .portal-ts-pto-row input { width: 80px; }
+
+/* Inline PTO row inside summary section */
+.tsf-summary-row.portal-ts-pto-inline { flex-direction: row; align-items: center; gap: 10px; }
+.tsf-summary-row.portal-ts-pto-inline span:first-child { flex: 1; }
+.tsf-summary-row.portal-ts-pto-inline input { width: 80px; font-weight: 800; font-size: 1rem; text-align: right; }
+
+/* Sub-total divider row in CA summary */
+.tsf-summary-row--subtotal { border-top: 1px solid var(--line); padding-top: 6px; margin-top: 2px; }
+.tsf-summary-row--subtotal span:last-child { color: var(--brand-red); }
+
 .portal-ts-7thday-row { margin: 4px 0 8px; font-size: .82rem; }
 .portal-ts-7thday-row input[type="checkbox"] { margin-right: 6px; }
+
+/* Offshore table — narrower inputs */
+.portal-ts-form-table--offshore th,
+.portal-ts-form-table--offshore td { padding: 4px 3px; font-size: .75rem; }
+.portal-ts-form-table--offshore input[type="number"] { width: 54px; }
+.portal-ts-form-table--offshore input[type="text"]   { width: 70px; }
 
 .portal-ts-form-submit-row {
   margin-top: 20px;

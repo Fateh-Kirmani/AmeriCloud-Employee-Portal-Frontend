@@ -1757,26 +1757,43 @@
   // Timesheet Form — employee inline form (Standard + CA)
   // ══════════════════════════════════════════════════════════════════════════
   function setupTimesheetForm(userEmail, userDisplayName, staffEntry) {
-    var tsCA  = document.getElementById('ts-item-ca');
-    var tsStd = document.getElementById('ts-item-std');
+    var tsCA       = document.getElementById('ts-item-ca');
+    var tsStd      = document.getElementById('ts-item-std');
+    var tsOffshore = document.getElementById('ts-item-offshore');
 
-    var workState = (staffEntry && staffEntry.state) ? staffEntry.state.toUpperCase() : '';
-    if (workState === 'CA') {
+    // Determine user country from directory for offshore routing
+    var dirEntry = (PORTAL_CONFIG.directory || []).find(function (e) {
+      return (e.email || '').toLowerCase() === (userEmail || '').toLowerCase();
+    });
+    var userCountry = (dirEntry && dirEntry.country) ? dirEntry.country : '';
+    var workState   = (staffEntry && staffEntry.state) ? staffEntry.state.toUpperCase() : '';
+
+    var ADMIN_EMAILS = ['fkirmani@americloudtelecom.com'];
+    var isAdmin = ADMIN_EMAILS.indexOf((userEmail || '').toLowerCase()) !== -1;
+
+    if (isAdmin) {
+      if (tsCA)       tsCA.hidden       = false;
+      if (tsStd)      tsStd.hidden      = false;
+      if (tsOffshore) tsOffshore.hidden = false;
+    } else if (userCountry === 'India' || userCountry === 'Pakistan') {
+      if (tsOffshore) tsOffshore.hidden = false;
+    } else if (workState === 'CA') {
       if (tsCA) tsCA.hidden = false;
     } else if (workState) {
       if (tsStd) tsStd.hidden = false;
     } else {
-      if (tsCA) tsCA.hidden = false;
-      if (tsStd) tsStd.hidden = false;
+      if (tsCA)       tsCA.hidden       = false;
+      if (tsStd)      tsStd.hidden      = false;
     }
 
-    var btnStd = document.getElementById('btn-open-ts-form-std');
-    var btnCA  = document.getElementById('btn-open-ts-form-ca');
+    var btnStd      = document.getElementById('btn-open-ts-form-std');
+    var btnCA       = document.getElementById('btn-open-ts-form-ca');
+    var btnOffshore = document.getElementById('btn-open-ts-form-offshore');
 
-    var tsFormModal  = document.getElementById('modal-ts-form');
-    var tsFormBody   = document.getElementById('body-ts-form-modal');
-    var tsFormTitle  = document.getElementById('modal-ts-form-title');
-    var tsFormClose  = document.getElementById('btn-close-ts-form-modal');
+    var tsFormModal   = document.getElementById('modal-ts-form');
+    var tsFormBody    = document.getElementById('body-ts-form-modal');
+    var tsFormTitle   = document.getElementById('modal-ts-form-title');
+    var tsFormClose   = document.getElementById('btn-close-ts-form-modal');
     var tsFormOverlay = document.getElementById('modal-ts-form-overlay');
 
     function closeTsFormModal() { if (tsFormModal) tsFormModal.hidden = true; }
@@ -1802,12 +1819,14 @@
     if (guideDone)    guideDone.addEventListener('click',    closeGuide);
     if (guideOverlay) guideOverlay.addEventListener('click', closeGuide);
 
-    // "Show Me How" — open the Standard form then launch the tour
+    // "Show Me How" — open whichever form is visible then launch the tour
     var showMeBtn = document.getElementById('btn-ts-show-me');
     if (showMeBtn) {
       showMeBtn.addEventListener('click', function () {
-        var stdBtn = document.getElementById('btn-open-ts-form-std');
-        if (stdBtn) stdBtn.click();
+        var targetBtn = document.getElementById('btn-open-ts-form-std')
+                     || document.getElementById('btn-open-ts-form-ca')
+                     || document.getElementById('btn-open-ts-form-offshore');
+        if (targetBtn) targetBtn.click();
         setTimeout(startTsTour, 600);
       });
     }
@@ -1815,7 +1834,7 @@
     function wireForm(btn, tsType) {
       if (!btn || !tsFormModal || !tsFormBody) return;
       btn.addEventListener('click', function () {
-        var label = tsType === 'ca' ? 'California' : 'Standard';
+        var label = tsType === 'ca' ? 'California' : tsType === 'offshore' ? 'Offshore' : 'Standard';
         if (tsFormTitle) tsFormTitle.textContent = 'Weekly Timesheet — ' + label;
         if (tsFormBody.dataset.builtType !== tsType) {
           buildTimesheetForm(tsFormBody, tsType, userEmail, userDisplayName, staffEntry);
@@ -1825,13 +1844,15 @@
       });
     }
 
-    wireForm(btnStd, 'standard');
-    wireForm(btnCA,  'ca');
+    wireForm(btnStd,      'standard');
+    wireForm(btnCA,       'ca');
+    wireForm(btnOffshore, 'offshore');
   }
 
 
   function buildTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry) {
-    var isCA = tsType === 'ca';
+    var isCA       = tsType === 'ca';
+    var isOffshore = tsType === 'offshore';
 
     function lastSunday() {
       var d = new Date();
@@ -1839,77 +1860,139 @@
       return d.toISOString().slice(0, 10);
     }
 
-    var staffState   = (staffEntry && staffEntry.state)      ? staffEntry.state      : (isCA ? 'CA' : '');
-    var staffManager = (staffEntry && staffEntry.manager)     ? staffEntry.manager    : '';
-    var staffId      = (staffEntry && staffEntry.employeeId)  ? staffEntry.employeeId : '';
-    var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
+    var staffManager = (staffEntry && staffEntry.manager)    ? staffEntry.manager    : '';
+    var staffId      = (staffEntry && staffEntry.employeeId) ? staffEntry.employeeId : '';
+    var DAYS    = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     var todayIso = new Date().toISOString().slice(0, 10);
 
+    // Look up department from directory
+    var dirEntry = (PORTAL_CONFIG.directory || []).find(function (e) {
+      return (e.email || '').toLowerCase() === (userEmail || '').toLowerCase();
+    });
+    var staffDept = (dirEntry && dirEntry.department) ? dirEntry.department : '';
+
+    // ── Header ───────────────────────────────────────────────────────────────
     var html = '<div class="portal-ts-form-header">'
-      + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Week Starting (Sunday)</label>'
-      + '<input type="date" id="tsf-week-start" class="portal-form-input portal-ts-date-input" value="' + lastSunday() + '"></div>'
+      + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Employee Name</label>'
+      + '<input type="text" id="tsf-emp-name" class="portal-form-input" value="' + escapeHtml(userDisplayName || '') + '" placeholder="Your full name" maxlength="100"></div>'
       + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Employee ID</label>'
       + '<input type="text" id="tsf-emp-id" class="portal-form-input portal-ts-short-input" value="' + escapeHtml(staffId) + '" placeholder="ID" maxlength="20"></div>'
-      + (isCA ? '' : '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Work State</label>'
-        + '<input type="text" id="tsf-state" class="portal-form-input portal-ts-short-input" value="' + escapeHtml(staffState) + '" placeholder="e.g. TX" maxlength="2"></div>')
-      + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Manager Name</label>'
+      + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Department</label>'
+      + '<input type="text" id="tsf-dept" class="portal-form-input" value="' + escapeHtml(staffDept) + '" placeholder="Department" maxlength="60"></div>'
+      + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Week Start (Sun)</label>'
+      + '<input type="date" id="tsf-week-start" class="portal-form-input portal-ts-date-input" value="' + lastSunday() + '"></div>'
+      + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Week End (Sat)</label>'
+      + '<input type="date" id="tsf-week-end" class="portal-form-input portal-ts-date-input" readonly tabindex="-1" style="opacity:0.6"></div>'
+      + '<div class="portal-ts-form-row-inline"><label class="portal-form-label">Manager</label>'
       + '<input type="text" id="tsf-manager" class="portal-form-input" value="' + escapeHtml(staffManager) + '" placeholder="Manager full name" maxlength="100"></div>'
       + '</div>';
 
-    html += '<div class="portal-ts-form-note">'
-      + '<p>ONE LINE PER DAY. In <strong>Project Code</strong> put the code from the tracker — three capital letters then nine digits, e.g. <strong>ERI202607135</strong>. For a non-billable day put the LBR code instead (see Codes List). '
-      + 'Enter times in 24-hour format: <strong>0900 = 9:00 AM, 1300 = 1:00 PM, 1730 = 5:30 PM, 2200 = 10:00 PM.</strong> '
-      + 'Meal time is unpaid; rest breaks are paid up to 10 minutes each and any extra is deducted. Submit by <strong>Monday 12:00 PM</strong> for the prior week.</p>'
-      + '<button type="button" class="portal-ts-codes-btn" id="btn-ts-codes-' + tsType + '">Non-Billable Codes</button>'
-      + '<button type="button" class="portal-ts-tour-btn" id="btn-ts-tour-' + tsType + '">&#9654; Quick tour</button>'
-      + '</div>';
+    // ── Instructions note ────────────────────────────────────────────────────
+    if (isOffshore) {
+      html += '<div class="portal-ts-form-note">'
+        + '<p>Enter up to three project or LBR codes per day with their hours. <strong>Hours are in half-hour increments</strong> (e.g. 3.5 = 3 hrs 30 min). Start and End times are for reference only and do not drive calculations.</p>'
+        + '<button type="button" class="portal-ts-codes-btn" id="btn-ts-codes-' + tsType + '">Non-Billable Codes</button>'
+        + '</div>';
+    } else {
+      html += '<div class="portal-ts-form-note">'
+        + '<p>ONE LINE PER DAY. In <strong>Project Code</strong> put the code from the tracker — three capital letters then nine digits, e.g. <strong>ERI202607135</strong>. For a non-billable day put the LBR code instead. '
+        + 'Times in 24-hour format: <strong>0900 = 9:00 AM, 1730 = 5:30 PM.</strong> '
+        + 'Meal time is unpaid; rest breaks are paid up to 10 minutes each.</p>'
+        + '<button type="button" class="portal-ts-codes-btn" id="btn-ts-codes-' + tsType + '">Non-Billable Codes</button>'
+        + '<button type="button" class="portal-ts-tour-btn" id="btn-ts-tour-' + tsType + '">&#9654; Quick tour</button>'
+        + '</div>';
+    }
 
-    html += '<div class="portal-ts-form-table-wrap"><table class="portal-ts-form-table" id="tsf-table">'
-      + '<thead><tr><th>Day</th><th>Date</th><th>Project Code</th>'
-      + '<th>Shift Start</th><th>Rest 1 Start</th><th>Rest 1 End</th>'
-      + '<th>Meal Start</th><th>Meal End</th>'
-      + (isCA ? '<th>Meal Waiver</th>' : '')
-      + '<th>Rest 2 Start</th><th>Rest 2 End</th><th>Shift End</th>'
-      + '<th>Hours</th><th>Notes</th>'
-      + '</tr></thead><tbody>';
+    // ── Daily table ──────────────────────────────────────────────────────────
+    if (isOffshore) {
+      html += '<div class="portal-ts-form-table-wrap"><table class="portal-ts-form-table portal-ts-form-table--offshore" id="tsf-table">'
+        + '<thead><tr><th>Day</th><th>Date</th>'
+        + '<th>Code 1</th><th>Hrs 1</th>'
+        + '<th>Code 2</th><th>Hrs 2</th>'
+        + '<th>Code 3</th><th>Hrs 3</th>'
+        + '<th>Start</th><th>End</th>'
+        + '<th>Day Total</th>'
+        + '</tr></thead><tbody>';
 
-    for (var i = 0; i < 7; i++) {
-      html += '<tr class="tsf-day-row" data-day-index="' + i + '">'
-        + '<td class="tsf-day-label">' + DAYS[i] + '</td>'
-        + '<td class="tsf-date-cell" id="tsf-date-' + i + '">—</td>'
-        + '<td><input type="text" class="portal-form-input tsf-proj" data-day="' + i + '" placeholder="Code" maxlength="30"></td>'
-        + '<td><input type="text" class="tsf-time tsf-shift-start portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
-        + '<td><input type="text" class="tsf-time tsf-rest1s      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
-        + '<td><input type="text" class="tsf-time tsf-rest1e      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
-        + '<td><input type="text" class="tsf-time tsf-meals       portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
-        + '<td><input type="text" class="tsf-time tsf-meale       portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
-        + (isCA ? '<td><select class="tsf-meal-waiver" data-day="' + i + '"><option value=""></option><option value="Y">Y</option><option value="N">N</option></select></td>' : '')
-        + '<td><input type="text" class="tsf-time tsf-rest2s      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
-        + '<td><input type="text" class="tsf-time tsf-rest2e      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
-        + '<td><input type="text" class="tsf-time tsf-shift-end   portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
-        + '<td class="tsf-hours-cell" id="tsf-hours-' + i + '">—</td>'
-        + '<td><input type="text" class="portal-form-input tsf-notes" data-day="' + i + '" placeholder="Notes" maxlength="200"></td>'
-        + '</tr>';
+      for (var i = 0; i < 7; i++) {
+        html += '<tr class="tsf-day-row" data-day-index="' + i + '">'
+          + '<td class="tsf-day-label">' + DAYS[i] + '</td>'
+          + '<td class="tsf-date-cell" id="tsf-date-' + i + '">—</td>'
+          + '<td><input type="text"   class="portal-form-input tsf-proj tsf-code1" data-day="' + i + '" placeholder="Code" maxlength="20"></td>'
+          + '<td><input type="number" class="portal-form-input tsf-hrs1" data-day="' + i + '" placeholder="0" min="0" max="24" step="0.5"></td>'
+          + '<td><input type="text"   class="portal-form-input tsf-code2" data-day="' + i + '" placeholder="Code" maxlength="20"></td>'
+          + '<td><input type="number" class="portal-form-input tsf-hrs2" data-day="' + i + '" placeholder="0" min="0" max="24" step="0.5"></td>'
+          + '<td><input type="text"   class="portal-form-input tsf-code3" data-day="' + i + '" placeholder="Code" maxlength="20"></td>'
+          + '<td><input type="number" class="portal-form-input tsf-hrs3" data-day="' + i + '" placeholder="0" min="0" max="24" step="0.5"></td>'
+          + '<td><input type="text"   class="tsf-time tsf-shift-start portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+          + '<td><input type="text"   class="tsf-time tsf-shift-end   portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+          + '<td class="tsf-hours-cell" id="tsf-hours-' + i + '">—</td>'
+          + '</tr>';
+      }
+    } else {
+      html += '<div class="portal-ts-form-table-wrap"><table class="portal-ts-form-table" id="tsf-table">'
+        + '<thead><tr><th>Day</th><th>Date</th><th>Project Code</th>'
+        + '<th>Shift Start</th><th>Rest 1 Start</th><th>Rest 1 End</th>'
+        + '<th>Meal Start</th><th>Meal End</th>'
+        + (isCA ? '<th>Meal Waiver</th>' : '')
+        + '<th>Rest 2 Start</th><th>Rest 2 End</th><th>Shift End</th>'
+        + '<th>Hours</th>'
+        + '</tr></thead><tbody>';
+
+      for (var i = 0; i < 7; i++) {
+        html += '<tr class="tsf-day-row" data-day-index="' + i + '">'
+          + '<td class="tsf-day-label">' + DAYS[i] + '</td>'
+          + '<td class="tsf-date-cell" id="tsf-date-' + i + '">—</td>'
+          + '<td><input type="text" class="portal-form-input tsf-proj" data-day="' + i + '" placeholder="Code" maxlength="30"></td>'
+          + '<td><input type="text" class="tsf-time tsf-shift-start portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+          + '<td><input type="text" class="tsf-time tsf-rest1s      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+          + '<td><input type="text" class="tsf-time tsf-rest1e      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+          + '<td><input type="text" class="tsf-time tsf-meals       portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+          + '<td><input type="text" class="tsf-time tsf-meale       portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+          + (isCA ? '<td><select class="tsf-meal-waiver" data-day="' + i + '"><option value=""></option><option value="Y">Y</option><option value="N">N</option></select></td>' : '')
+          + '<td><input type="text" class="tsf-time tsf-rest2s      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+          + '<td><input type="text" class="tsf-time tsf-rest2e      portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+          + '<td><input type="text" class="tsf-time tsf-shift-end   portal-form-input tsf-time-input" data-day="' + i + '" placeholder="HH:MM" maxlength="5"></td>'
+          + '<td class="tsf-hours-cell" id="tsf-hours-' + i + '">—</td>'
+          + '</tr>';
+      }
     }
     html += '</tbody></table></div>';
 
-    if (isCA) {
+    // ── Weekly Summary ───────────────────────────────────────────────────────
+    if (isOffshore) {
+      html += '<div class="portal-ts-form-summary">'
+        + '<div class="tsf-summary-row"><span>Total Hours Worked</span><span id="tsf-total-hours">0.0</span></div>'
+        + '<div class="tsf-summary-row"><span>Hours on Non-Billable Codes</span><span id="tsf-nb-hours">0.0</span></div>'
+        + '<div class="tsf-summary-row"><span>Hours on Project Codes</span><span id="tsf-proj-hours">0.0</span></div>'
+        + '<div class="tsf-summary-row"><span>Over 40 hours this week</span><span id="tsf-over40">No</span></div>'
+        + '</div>';
+    } else if (isCA) {
       html += '<div class="portal-ts-form-ot-summary">'
         + '<table class="portal-ts-form-ot-table">'
         + '<thead><tr><th>Day</th><th>Hours</th><th>Regular</th><th>OT 1.5×</th><th>OT 2.0×</th><th>Missed Meal</th><th>Missed Rest</th><th>Premium Hrs</th></tr></thead>'
         + '<tbody id="tsf-ot-body"></tbody><tfoot id="tsf-ot-foot"></tfoot>'
-        + '</table></div>';
+        + '</table></div>'
+        + '<div class="portal-ts-form-summary">'
+        + '<div class="tsf-summary-row"><span>Total Hours Worked</span><span id="tsf-total-hours">0.00</span></div>'
+        + '<div class="tsf-summary-row"><span>Regular Hours (max 40/wk)</span><span id="tsf-reg-hours">0.00</span></div>'
+        + '<div class="tsf-summary-row"><span>Overtime 1.5× (daily 8–12 hrs)</span><span id="tsf-ot15-daily">0.00</span></div>'
+        + '<div class="tsf-summary-row"><span>Weekly Overtime 1.5× (reg &gt;40)</span><span id="tsf-ot15-weekly">0.00</span></div>'
+        + '<div class="tsf-summary-row tsf-summary-row--subtotal"><span>Total Overtime 1.5×</span><span id="tsf-ot-hours">0.00</span></div>'
+        + '<div class="tsf-summary-row"><span>Overtime 2.0× (&gt;12/day; 7th-day &gt;8)</span><span id="tsf-ot20-hours">0.00</span></div>'
+        + '<div class="tsf-summary-row portal-ts-pto-inline"><span>PTO / Sick / Holiday Hours</span>'
+        + '<input type="number" id="tsf-pto" class="portal-form-input portal-ts-short-input" min="0" max="40" step="0.5" value="0"></div>'
+        + '<div class="tsf-summary-row"><span>Missed-Break Premium Hours (§226.7)</span><span id="tsf-prem-hours">0.00</span></div>'
+        + '</div>';
     } else {
       html += '<div class="portal-ts-form-summary">'
-        + '<div class="tsf-summary-row"><span>Total Hours</span><span id="tsf-total-hours">0.00</span></div>'
-        + '<div class="tsf-summary-row"><span>Regular (≤40h)</span><span id="tsf-reg-hours">0.00</span></div>'
-        + '<div class="tsf-summary-row"><span>Overtime (&gt;40h)</span><span id="tsf-ot-hours">0.00</span></div>'
+        + '<div class="tsf-summary-row"><span>Total Hours Worked</span><span id="tsf-total-hours">0.00</span></div>'
+        + '<div class="tsf-summary-row"><span>Regular Hours (max 40/wk)</span><span id="tsf-reg-hours">0.00</span></div>'
+        + '<div class="tsf-summary-row"><span>Overtime 1.5× (&gt;40/wk)</span><span id="tsf-ot-hours">0.00</span></div>'
+        + '<div class="tsf-summary-row portal-ts-pto-inline"><span>PTO / Sick / Holiday Hours</span>'
+        + '<input type="number" id="tsf-pto" class="portal-form-input portal-ts-short-input" min="0" max="40" step="0.5" value="0"></div>'
         + '</div>';
     }
-
-    html += '<div class="portal-ts-pto-row"><label class="portal-form-label">PTO Hours this week</label>'
-      + '<input type="number" id="tsf-pto" class="portal-form-input portal-ts-short-input" min="0" max="40" step="0.5" value="0"></div>';
 
     if (isCA) {
       html += '<div class="portal-ts-7thday-row">'
@@ -1917,22 +2000,43 @@
         + '</div>';
     }
 
+    // ── Attestation ──────────────────────────────────────────────────────────
+    var attestText = isOffshore
+      ? 'I certify that this timesheet accurately reflects all hours I worked during the week shown, on the codes shown.'
+      : isCA
+        ? 'I certify that this timesheet accurately reflects all hours I worked and all meal and rest periods I took, waived, or missed. I took every rest and meal break shown, free of duty and uninterrupted. On any day I marked Meal Waiver = Y, my shift was 6 hours or less and I voluntarily chose to waive my meal period. I was not pressured to under-report hours or over-report breaks.'
+        : 'I certify that this timesheet accurately reflects all hours I worked during the week shown, including overtime, and that meal periods recorded were taken as shown.';
+
     html += '<div class="portal-ts-attestation">'
       + '<div class="portal-ts-attestation-title">EMPLOYEE ATTESTATION</div>'
-      + '<p class="portal-ts-attestation-text">I certify that this timesheet accurately reflects all hours I worked and all meal and rest periods I took, waived, or missed. I took every rest and meal break shown, free of duty and uninterrupted; I noted in the Notes column any meal that was interrupted or worked through. On any day I marked Meal Waiver = Y, my shift was 6 hours or less and I voluntarily chose to waive my meal period. I was not pressured to under-report hours or over-report breaks.</p>'
+      + '<p class="portal-ts-attestation-text">' + attestText + '</p>'
       + '<div class="portal-ts-sig-grid">'
       + '<div><label>Employee Signature</label><input type="text" id="tsf-emp-sig" class="portal-form-input" placeholder="Type your full name" maxlength="100"></div>'
-      + '<div><label>Date</label><input type="date" id="tsf-emp-sig-date" class="portal-form-input portal-ts-date-input" value="' + todayIso + '"></div>'
-      + '<div><label>Supervisor Signature <em>(filled by manager when approving)</em></label><input type="text" class="portal-form-input" placeholder="—" disabled></div>'
-      + '<div><label>Date</label><input type="date" class="portal-form-input portal-ts-date-input" disabled></div>'
-      + '</div></div>'
-      + '<div class="portal-ts-attestation" style="margin-top:10px">'
-      + '<div class="portal-ts-attestation-title">VOLUNTARY MEAL / REST BREAK WAIVER &nbsp;&mdash;&nbsp; complete ONLY if a break was voluntarily skipped</div>'
-      + '<p class="portal-ts-attestation-text">I confirm that I was provided the opportunity to take all required meal and rest breaks but voluntarily chose not to take one or more of them on the dates above. In California, this also documents waiver of the first meal period on a shift of 6 hours or less, or the second meal period on a shift of 12 hours or less. This form is not to be used if a break was not provided by the company.</p>'
-      + '<div class="portal-ts-sig-grid portal-ts-sig-grid--half">'
-      + '<div><label>Employee Signature <em>(leave blank if no waiver applies)</em></label><input type="text" id="tsf-waiver-sig" class="portal-form-input" placeholder="Type your full name if applicable" maxlength="100"></div>'
-      + '<div><label>Date</label><input type="date" id="tsf-waiver-sig-date" class="portal-form-input portal-ts-date-input"></div>'
-      + '</div></div>';
+      + '<div><label>Date</label><input type="date" id="tsf-emp-sig-date" class="portal-form-input portal-ts-date-input" value="' + todayIso + '"></div>';
+
+    if (isOffshore) {
+      html += '<div><label>Manager Name <em>(approval — filled by manager)</em></label><input type="text" class="portal-form-input" placeholder="—" disabled></div>'
+        + '<div><label>Date</label><input type="date" class="portal-form-input portal-ts-date-input" disabled></div>';
+    } else {
+      html += '<div><label>Supervisor Signature <em>(filled by manager when approving)</em></label><input type="text" class="portal-form-input" placeholder="—" disabled></div>'
+        + '<div><label>Date</label><input type="date" class="portal-form-input portal-ts-date-input" disabled></div>';
+    }
+
+    html += '</div></div>';
+
+    // ── Waiver (Standard / CA only) ──────────────────────────────────────────
+    if (!isOffshore) {
+      var waiverExtra = isCA
+        ? ' In California, this also documents waiver of the first meal period on a shift of 6 hours or less, or the second meal period on a shift of 12 hours or less.'
+        : '';
+      html += '<div class="portal-ts-attestation" style="margin-top:10px">'
+        + '<div class="portal-ts-attestation-title">VOLUNTARY MEAL / REST BREAK WAIVER &nbsp;&mdash;&nbsp; complete ONLY if a break was voluntarily skipped</div>'
+        + '<p class="portal-ts-attestation-text">I confirm that I was provided the opportunity to take all required meal and rest breaks but voluntarily chose not to take one or more of them on the dates above.' + waiverExtra + ' This form is not to be used if a break was not provided by the company.</p>'
+        + '<div class="portal-ts-sig-grid portal-ts-sig-grid--half">'
+        + '<div><label>Employee Signature <em>(leave blank if no waiver applies)</em></label><input type="text" id="tsf-waiver-sig" class="portal-form-input" placeholder="Type your full name if applicable" maxlength="100"></div>'
+        + '<div><label>Date</label><input type="date" id="tsf-waiver-sig-date" class="portal-form-input portal-ts-date-input"></div>'
+        + '</div></div>';
+    }
 
     html += '<div class="portal-ts-form-submit-row">'
       + '<button type="button" id="tsf-clear-' + tsType + '" class="portal-ts-form-clear-btn">Clear Form</button>'
@@ -1942,22 +2046,27 @@
 
     panelEl.innerHTML = html;
 
-    // Wire tour button
+    // Wire tour button (Standard / CA only)
     var tourBtnEl = panelEl.querySelector('#btn-ts-tour-' + tsType);
     if (tourBtnEl) tourBtnEl.addEventListener('click', startTsTour);
 
-    // Date label wiring
+    // Date label + Week End wiring
     function updateDateLabels() {
       var wsEl = panelEl.querySelector('#tsf-week-start');
       if (!wsEl || !wsEl.value) return;
       var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      var p = wsEl.value.split('-');
+      var p   = wsEl.value.split('-');
       var sun = new Date(+p[0], +p[1] - 1, +p[2]);
       for (var d = 0; d < 7; d++) {
         var el = panelEl.querySelector('#tsf-date-' + d);
         if (!el) continue;
         var curr = new Date(sun); curr.setDate(curr.getDate() + d);
         el.textContent = MONTHS[curr.getMonth()] + ' ' + curr.getDate();
+      }
+      var weEl = panelEl.querySelector('#tsf-week-end');
+      if (weEl) {
+        var sat = new Date(sun); sat.setDate(sat.getDate() + 6);
+        weEl.value = sat.toISOString().slice(0, 10);
       }
     }
     var wsInput = panelEl.querySelector('#tsf-week-start');
@@ -1982,13 +2091,41 @@
     }
 
     function recalcAll() {
-      var rows   = panelEl.querySelectorAll('.tsf-day-row');
+      var rows    = panelEl.querySelectorAll('.tsf-day-row');
       var DLABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      var cb7     = panelEl.querySelector('#tsf-7th-day');
 
-      if (isCA) {
-        var totH = 0, totReg = 0, tot15 = 0, tot20 = 0, totMM = 0, totMR = 0, totPrem = 0;
+      if (isOffshore) {
+        var totalH = 0, nbH = 0, projH = 0;
+        function isNonBillable(code) { return code && (code.startsWith('LBR') || code.startsWith('BDV')); }
+        rows.forEach(function (row, i) {
+          var h1 = parseFloat((row.querySelector('.tsf-hrs1') || {}).value) || 0;
+          var h2 = parseFloat((row.querySelector('.tsf-hrs2') || {}).value) || 0;
+          var h3 = parseFloat((row.querySelector('.tsf-hrs3') || {}).value) || 0;
+          var c1 = ((row.querySelector('.tsf-code1') || {}).value || '').trim().toUpperCase();
+          var c2 = ((row.querySelector('.tsf-code2') || {}).value || '').trim().toUpperCase();
+          var c3 = ((row.querySelector('.tsf-code3') || {}).value || '').trim().toUpperCase();
+          var dayTotal = h1 + h2 + h3;
+          var hoursEl = panelEl.querySelector('#tsf-hours-' + i);
+          if (hoursEl) hoursEl.textContent = dayTotal > 0 ? dayTotal.toFixed(1) : '—';
+          totalH += dayTotal;
+          if (isNonBillable(c1)) nbH += h1;
+          if (isNonBillable(c2)) nbH += h2;
+          if (isNonBillable(c3)) nbH += h3;
+        });
+        projH = totalH - nbH;  // matches Excel: ProjectHours = Total - NonBillable
+        var tEl   = panelEl.querySelector('#tsf-total-hours');
+        var nEl   = panelEl.querySelector('#tsf-nb-hours');
+        var pEl   = panelEl.querySelector('#tsf-proj-hours');
+        var o40El = panelEl.querySelector('#tsf-over40');
+        if (tEl)   tEl.textContent   = totalH.toFixed(1);
+        if (nEl)   nEl.textContent   = nbH.toFixed(1);
+        if (pEl)   pEl.textContent   = projH.toFixed(1);
+        if (o40El) o40El.textContent = totalH > 40 ? 'Yes' : 'No';
+
+      } else if (isCA) {
+        var totH = 0, totReg = 0, tot15daily = 0, tot15weekly = 0, tot20 = 0, totMM = 0, totMR = 0, totPrem = 0;
         var bodyHtml = '';
+        var cb7 = panelEl.querySelector('#tsf-7th-day');
 
         rows.forEach(function (row, i) {
           var h = calcDayHours(row);
@@ -2001,13 +2138,13 @@
           }
 
           var dayIs7th = cb7 && cb7.checked && (i === 6);
-          var reg = 0, ot15 = 0, ot20 = 0;
+          var reg = 0, ot15d = 0, ot20 = 0;
           if (dayIs7th) {
-            ot15 = Math.min(h, 8); ot20 = Math.max(0, h - 8);
+            ot15d = Math.min(h, 8); ot20 = Math.max(0, h - 8);
           } else {
-            reg  = Math.min(h, 8);
-            ot15 = Math.max(0, Math.min(h - 8, 4));
-            ot20 = Math.max(0, h - 12);
+            reg   = Math.min(h, 8);
+            ot15d = Math.max(0, Math.min(h - 8, 4));
+            ot20  = Math.max(0, h - 12);
           }
 
           var waiver = (row.querySelector('.tsf-meal-waiver') || {}).value || '';
@@ -2018,26 +2155,24 @@
           var r2s    = row.querySelector('.tsf-rest2s').value;
           var r2e    = row.querySelector('.tsf-rest2e').value;
 
-          var mm = 0, mr = 0;
-          if (h > 5 && waiver !== 'Y') {
-            if (!mealS || !mealE) { mm = 1; }
-            else { var ms2 = toMins(mealS), me2 = toMins(mealE); if (me2 < ms2) me2 += 1440; if ((me2 - ms2) < 30) mm = 1; }
-          }
-          function restOk(rs, re) {
-            if (!rs || !re) return false;
-            var a = toMins(rs), b = toMins(re); if (b < a) b += 1440; return (b - a) >= 10;
-          }
-          if (h >= 3.5 && !restOk(r1s, r1e)) mr++;
-          if (h >= 7   && !restOk(r2s, r2e)) mr++;
+          // Missed Meal: flag only when meal start or end is empty (Excel col R)
+          var mm = (h > 5 && waiver.toUpperCase() !== 'Y' && (!mealS || !mealE)) ? 1 : 0;
+          // Missed Rest: 1 if rest1 empty when >3.5h OR rest2 empty when >6h (Excel col S)
+          var mr = ((h > 3.5 && (!r1s || !r1e)) || (h > 6 && (!r2s || !r2e))) ? 1 : 0;
 
           var prem = mm + mr;
-          totH += h; totReg += reg; tot15 += ot15; tot20 += ot20; totMM += mm; totMR += mr; totPrem += prem;
+          totH += h; totReg += reg; tot15daily += ot15d; tot20 += ot20; totMM += mm; totMR += mr; totPrem += prem;
 
           function f(n) { return n > 0 ? n.toFixed(2) : '—'; }
           bodyHtml += '<tr><td>' + DLABELS[i] + '</td><td>' + h.toFixed(2) + '</td>'
-            + '<td>' + f(reg) + '</td><td>' + f(ot15) + '</td><td>' + f(ot20) + '</td>'
+            + '<td>' + f(reg) + '</td><td>' + f(ot15d) + '</td><td>' + f(ot20) + '</td>'
             + '<td>' + (mm || '—') + '</td><td>' + (mr || '—') + '</td><td>' + (prem || '—') + '</td></tr>';
         });
+
+        // Weekly OT 1.5× = hours of regular time above 40
+        tot15weekly = Math.max(0, totReg - 40);
+        totReg      = Math.min(totReg, 40);
+        var tot15total = tot15daily + tot15weekly;
 
         var bodyEl2 = panelEl.querySelector('#tsf-ot-body');
         var footEl  = panelEl.querySelector('#tsf-ot-foot');
@@ -2045,11 +2180,26 @@
         if (footEl) footEl.innerHTML = '<tr class="tsf-ot-total"><td><strong>Total</strong></td>'
           + '<td><strong>' + totH.toFixed(2) + '</strong></td>'
           + '<td><strong>' + totReg.toFixed(2) + '</strong></td>'
-          + '<td><strong>' + tot15.toFixed(2) + '</strong></td>'
+          + '<td><strong>' + tot15daily.toFixed(2) + '</strong></td>'
           + '<td><strong>' + tot20.toFixed(2) + '</strong></td>'
           + '<td><strong>' + (totMM || '—') + '</strong></td>'
           + '<td><strong>' + (totMR || '—') + '</strong></td>'
           + '<td><strong>' + (totPrem || '—') + '</strong></td></tr>';
+
+        var tEl2    = panelEl.querySelector('#tsf-total-hours');
+        var rEl2    = panelEl.querySelector('#tsf-reg-hours');
+        var o15dEl  = panelEl.querySelector('#tsf-ot15-daily');
+        var o15wEl  = panelEl.querySelector('#tsf-ot15-weekly');
+        var oEl2    = panelEl.querySelector('#tsf-ot-hours');
+        var o20El   = panelEl.querySelector('#tsf-ot20-hours');
+        var premEl  = panelEl.querySelector('#tsf-prem-hours');
+        if (tEl2)   tEl2.textContent   = totH.toFixed(2);
+        if (rEl2)   rEl2.textContent   = totReg.toFixed(2);
+        if (o15dEl) o15dEl.textContent = tot15daily.toFixed(2);
+        if (o15wEl) o15wEl.textContent = tot15weekly.toFixed(2);
+        if (oEl2)   oEl2.textContent   = tot15total.toFixed(2);
+        if (o20El)  o20El.textContent  = tot20.toFixed(2);
+        if (premEl) premEl.textContent = totPrem.toFixed(2);
 
       } else {
         var totalH = 0;
@@ -2069,7 +2219,12 @@
       }
     }
 
-    panelEl.querySelectorAll('.tsf-time, .tsf-meal-waiver').forEach(function (el) {
+    panelEl.querySelectorAll('.tsf-time, .tsf-meal-waiver, .tsf-hrs1, .tsf-hrs2, .tsf-hrs3').forEach(function (el) {
+      el.addEventListener('change', recalcAll);
+      el.addEventListener('input',  recalcAll);
+    });
+    // Offshore code inputs also trigger non-billable recalc
+    panelEl.querySelectorAll('.tsf-code1, .tsf-code2, .tsf-code3').forEach(function (el) {
       el.addEventListener('change', recalcAll);
       el.addEventListener('input',  recalcAll);
     });
@@ -2088,7 +2243,7 @@
     var submitBtn = panelEl.querySelector('#tsf-submit-' + tsType);
     if (submitBtn) {
       submitBtn.addEventListener('click', function () {
-        submitTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry, isCA);
+        submitTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry, isCA, isOffshore);
       });
     }
 
@@ -2098,7 +2253,8 @@
         var wsEl2 = panelEl.querySelector('#tsf-week-start');
         if (wsEl2) { wsEl2.value = lastSunday(); updateDateLabels(); }
         panelEl.querySelectorAll('.tsf-time').forEach(function (el) { el.value = ''; });
-        panelEl.querySelectorAll('.tsf-proj, .tsf-notes').forEach(function (el) { el.value = ''; });
+        panelEl.querySelectorAll('.tsf-proj, .tsf-code1, .tsf-code2, .tsf-code3').forEach(function (el) { el.value = ''; });
+        panelEl.querySelectorAll('.tsf-hrs1, .tsf-hrs2, .tsf-hrs3').forEach(function (el) { el.value = ''; });
         panelEl.querySelectorAll('.tsf-meal-waiver').forEach(function (el) { el.value = ''; });
         var ptoEl2 = panelEl.querySelector('#tsf-pto');
         if (ptoEl2) ptoEl2.value = '0';
@@ -2110,18 +2266,18 @@
   }
 
 
-  function submitTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry, isCA) {
-    var weekStartEl    = panelEl.querySelector('#tsf-week-start');
-    var empIdEl        = panelEl.querySelector('#tsf-emp-id');
-    var stateEl        = panelEl.querySelector('#tsf-state');
-    var managerEl      = panelEl.querySelector('#tsf-manager');
-    var ptoEl          = panelEl.querySelector('#tsf-pto');
-    var empSigEl       = panelEl.querySelector('#tsf-emp-sig');
-    var empSigDateEl   = panelEl.querySelector('#tsf-emp-sig-date');
-    var waiverSigEl    = panelEl.querySelector('#tsf-waiver-sig');
-    var waiverDateEl   = panelEl.querySelector('#tsf-waiver-sig-date');
-    var statusEl       = panelEl.querySelector('#tsf-status-' + tsType);
-    var submitBtn      = panelEl.querySelector('#tsf-submit-' + tsType);
+  function submitTimesheetForm(panelEl, tsType, userEmail, userDisplayName, staffEntry, isCA, isOffshore) {
+    var weekStartEl  = panelEl.querySelector('#tsf-week-start');
+    var empIdEl      = panelEl.querySelector('#tsf-emp-id');
+    var deptEl       = panelEl.querySelector('#tsf-dept');
+    var managerEl    = panelEl.querySelector('#tsf-manager');
+    var ptoEl        = panelEl.querySelector('#tsf-pto');
+    var empSigEl     = panelEl.querySelector('#tsf-emp-sig');
+    var empSigDateEl = panelEl.querySelector('#tsf-emp-sig-date');
+    var waiverSigEl  = panelEl.querySelector('#tsf-waiver-sig');
+    var waiverDateEl = panelEl.querySelector('#tsf-waiver-sig-date');
+    var statusEl     = panelEl.querySelector('#tsf-status-' + tsType);
+    var submitBtn    = panelEl.querySelector('#tsf-submit-' + tsType);
 
     function showSt(type, msg) {
       if (!statusEl) return;
@@ -2131,58 +2287,86 @@
       if (type === 'success') setTimeout(function () { statusEl.hidden = true; }, 9000);
     }
 
-    if (!weekStartEl || !weekStartEl.value) { showSt('error', 'Please select the week starting date.'); return; }
+    if (!weekStartEl || !weekStartEl.value) { showSt('error', 'Please select the week start date.'); return; }
 
     function toMins(t) {
       if (!t) return null;
       var p = t.split(':'); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
     }
 
-    var cb7 = panelEl.querySelector('#tsf-7th-day');
-    var is7thChecked = cb7 && cb7.checked;
-    var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    var parts = weekStartEl.value.split('-');
+    var DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var parts  = weekStartEl.value.split('-');
     var sunday = new Date(+parts[0], +parts[1] - 1, +parts[2]);
-    var days = [];
+    var days   = [];
 
-    panelEl.querySelectorAll('.tsf-day-row').forEach(function (row, i) {
-      var curr = new Date(sunday); curr.setDate(curr.getDate() + i);
-      var dateStr = curr.getFullYear() + '-' + String(curr.getMonth()+1).padStart(2,'0') + '-' + String(curr.getDate()).padStart(2,'0');
-      var ss = row.querySelector('.tsf-shift-start').value;
-      var se = row.querySelector('.tsf-shift-end').value;
-      var ms = row.querySelector('.tsf-meals').value;
-      var me = row.querySelector('.tsf-meale').value;
-      var h = 0;
-      if (ss && se) {
-        var sv = toMins(ss), ev = toMins(se);
-        if (ev < sv) ev += 1440;
-        var tot = ev - sv;
-        if (ms && me) { var msv = toMins(ms), mev = toMins(me); if (mev < msv) mev += 1440; tot -= (mev - msv); }
-        h = Math.max(0, tot / 60);
-      }
-      var waiverEl = row.querySelector('.tsf-meal-waiver');
-      days.push({
-        date:        dateStr,
-        day:         DAYS[i],
-        projectCode: (row.querySelector('.tsf-proj')   || {}).value || '',
-        shiftStart:  ss,
-        rest1Start:  row.querySelector('.tsf-rest1s').value,
-        rest1End:    row.querySelector('.tsf-rest1e').value,
-        mealStart:   ms,
-        mealEnd:     me,
-        mealWaiver:  waiverEl ? waiverEl.value : '',
-        rest2Start:  row.querySelector('.tsf-rest2s').value,
-        rest2End:    row.querySelector('.tsf-rest2e').value,
-        shiftEnd:    se,
-        hoursWorked: Math.round(h * 100) / 100,
-        is7thDay:    isCA && is7thChecked && (i === 6),
-        notes:       (row.querySelector('.tsf-notes')  || {}).value || ''
+    if (isOffshore) {
+      panelEl.querySelectorAll('.tsf-day-row').forEach(function (row, i) {
+        var curr    = new Date(sunday); curr.setDate(curr.getDate() + i);
+        var dateStr = curr.getFullYear() + '-' + String(curr.getMonth()+1).padStart(2,'0') + '-' + String(curr.getDate()).padStart(2,'0');
+        var h1 = parseFloat((row.querySelector('.tsf-hrs1') || {}).value) || 0;
+        var h2 = parseFloat((row.querySelector('.tsf-hrs2') || {}).value) || 0;
+        var h3 = parseFloat((row.querySelector('.tsf-hrs3') || {}).value) || 0;
+        days.push({
+          date:       dateStr,
+          day:        DAYS[i],
+          code1:      (row.querySelector('.tsf-code1') || {}).value || '',
+          hours1:     h1,
+          code2:      (row.querySelector('.tsf-code2') || {}).value || '',
+          hours2:     h2,
+          code3:      (row.querySelector('.tsf-code3') || {}).value || '',
+          hours3:     h3,
+          startTime:  (row.querySelector('.tsf-shift-start') || {}).value || '',
+          endTime:    (row.querySelector('.tsf-shift-end')   || {}).value || '',
+          dayTotal:   Math.round((h1 + h2 + h3) * 100) / 100
+        });
       });
-    });
 
-    if (!days.some(function (d) { return d.shiftStart || d.shiftEnd; })) {
-      showSt('error', 'Please fill in at least one day\'s shift times.');
-      return;
+      if (!days.some(function (d) { return d.dayTotal > 0; })) {
+        showSt('error', 'Please enter hours for at least one day.');
+        return;
+      }
+    } else {
+      var cb7          = panelEl.querySelector('#tsf-7th-day');
+      var is7thChecked = cb7 && cb7.checked;
+
+      panelEl.querySelectorAll('.tsf-day-row').forEach(function (row, i) {
+        var curr    = new Date(sunday); curr.setDate(curr.getDate() + i);
+        var dateStr = curr.getFullYear() + '-' + String(curr.getMonth()+1).padStart(2,'0') + '-' + String(curr.getDate()).padStart(2,'0');
+        var ss = row.querySelector('.tsf-shift-start').value;
+        var se = row.querySelector('.tsf-shift-end').value;
+        var ms = row.querySelector('.tsf-meals').value;
+        var me = row.querySelector('.tsf-meale').value;
+        var h  = 0;
+        if (ss && se) {
+          var sv = toMins(ss), ev = toMins(se);
+          if (ev < sv) ev += 1440;
+          var tot = ev - sv;
+          if (ms && me) { var msv = toMins(ms), mev = toMins(me); if (mev < msv) mev += 1440; tot -= (mev - msv); }
+          h = Math.max(0, tot / 60);
+        }
+        var waiverEl = row.querySelector('.tsf-meal-waiver');
+        days.push({
+          date:        dateStr,
+          day:         DAYS[i],
+          projectCode: (row.querySelector('.tsf-proj') || {}).value || '',
+          shiftStart:  ss,
+          rest1Start:  row.querySelector('.tsf-rest1s').value,
+          rest1End:    row.querySelector('.tsf-rest1e').value,
+          mealStart:   ms,
+          mealEnd:     me,
+          mealWaiver:  waiverEl ? waiverEl.value : '',
+          rest2Start:  row.querySelector('.tsf-rest2s').value,
+          rest2End:    row.querySelector('.tsf-rest2e').value,
+          shiftEnd:    se,
+          hoursWorked: Math.round(h * 100) / 100,
+          is7thDay:    isCA && is7thChecked && (i === 6)
+        });
+      });
+
+      if (!days.some(function (d) { return d.shiftStart || d.shiftEnd; })) {
+        showSt('error', 'Please fill in at least one day\'s shift times.');
+        return;
+      }
     }
 
     if (IS_DEMO) {
@@ -2198,9 +2382,9 @@
       body: JSON.stringify({
         ts_type:           tsType,
         week_start:        weekStartEl.value,
-        employee_id:       empIdEl      ? empIdEl.value.trim()      : '',
-        work_state:        stateEl      ? stateEl.value.trim().toUpperCase() : (isCA ? 'CA' : ''),
-        manager_name:      managerEl    ? managerEl.value.trim()    : '',
+        employee_id:       empIdEl      ? empIdEl.value.trim()   : '',
+        department:        deptEl       ? deptEl.value.trim()    : '',
+        manager_name:      managerEl    ? managerEl.value.trim() : '',
         pto_hours:         ptoEl        ? parseFloat(ptoEl.value || '0') : 0,
         employee_sig:      empSigEl     ? empSigEl.value.trim()     : '',
         employee_sig_date: empSigDateEl ? empSigDateEl.value        : '',
