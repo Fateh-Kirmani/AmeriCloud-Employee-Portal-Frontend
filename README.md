@@ -1,7 +1,7 @@
 # AmeriCloud Employee Portal
 
 Internal employee self-service portal for AmeriCloud Telecom Solutions.
-Live at: https://portal.americloudtelecom.com
+Live at: https://americloud-employee-portal.vercel.app
 
 ## Local preview
 
@@ -16,9 +16,7 @@ The `#demo` bypass shows all nav sections (including Manager Approvals and HR Da
 
 ## Deployment
 
-RunCloud auto-deploys from this repo on every push to `main`.
-See `deploy/nginx-runcloud.conf` for the Nginx hardening config.
-Apply it manually in RunCloud → Web App → Nginx Config after each change to that file.
+Vercel auto-deploys from this repo on every push to `master`.
 
 ## Handbook Sign-off Setup (DocuSign + SharePoint + Power Automate)
 
@@ -270,7 +268,7 @@ Safety and incident reports submitted by employees are stored in a SharePoint li
 - [ ] Set `MSAL_CLIENT_ID` and `MSAL_TENANT_ID` in `portal.js`
 - [ ] Set `GROUP_MANAGERS` and `GROUP_HR` object IDs in `portal.js`
 - [ ] Remove `#demo` bypass block from `portal.js` (the top `if` block)
-- [ ] Uncomment HSTS line in `deploy/nginx-runcloud.conf` after SSL is confirmed
+- [ ] Confirm SSL / HTTPS is working on Vercel
 - [ ] Test sign-in with a real M365 account on the live subdomain
 - [ ] Test role-gated nav: Manager sees "Manager Approvals", HR sees "HR Dashboard"
 - [ ] Test timesheet upload as a regular employee
