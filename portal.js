@@ -989,12 +989,7 @@
 
   function renderSignoffTable(rows, bodyEl) {
     if (!rows || rows.length === 0) {
-      var notSetup = !isConfigured()
-        || !PORTAL_CONFIG.handbookSignoffListId
-        || PORTAL_CONFIG.handbookSignoffListId === 'YOUR-HANDBOOK-SIGNOFF-LIST-ID';
-      bodyEl.innerHTML = notSetup
-        ? '<p class="portal-ts-empty">Sign-off tracking is not configured yet. See README for setup instructions.</p>'
-        : '<p class="portal-ts-empty">No employees found. Fill in the staff roster in portal-config.js.</p>';
+      bodyEl.innerHTML = '<p class="portal-ts-empty">No sign-offs recorded yet.</p>';
       return;
     }
 
