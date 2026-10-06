@@ -388,8 +388,47 @@
     },
   ];
 
-  var _tourStep   = 0;
-  var _tourInited = false;
+  var _TOUR_STEPS_OFFSHORE = [
+    {
+      sel:   '#tsf-week-start',
+      title: 'Week Starting Date',
+      body:  'Set this to the Sunday that begins your work week. The daily dates fill in automatically — confirm they look right before submitting.',
+    },
+    {
+      sel:   '.tsf-code1',
+      title: 'Project Codes — up to 3 per day',
+      body:  'Enter up to three codes per day, one per Code column. Use the project code your manager assigned. Leave Code 2 and Code 3 blank if you only worked one code that day.',
+    },
+    {
+      sel:   '.tsf-hrs1',
+      title: 'Hours — half-hour increments only',
+      body:  'Enter hours in half-hour increments: 3.5 = 3 hrs 30 min, 8.0 = 8 hrs. Each Hrs field applies to the code in the same column. Leave it 0 if the matching code is blank.',
+    },
+    {
+      sel:   '.tsf-code2',
+      title: 'Non-Billable Codes',
+      body:  'For non-billable time (leave, training, admin) use an LBR or BDV code. Click "Non-Billable Codes" above the table to see the full list. Any code starting with LBR or BDV is counted as non-billable in the summary.',
+    },
+    {
+      sel:   '.tsf-shift-start',
+      title: 'Start and End Times — reference only',
+      body:  'Enter your shift start and end times in 24-hour format (e.g. 0930, 1800). These are for your manager\'s reference only — your totals are driven by the hours columns, not these times.',
+    },
+    {
+      sel:   '.portal-ts-form-summary',
+      title: 'Calculated Summary — do not type here',
+      body:  'Total Hours, Non-Billable Hours, Project Hours, and the Over-40 indicator are all filled in automatically as you enter data above. Never type directly into these fields.',
+    },
+    {
+      sel:   '#tsf-emp-sig',
+      title: 'Employee Attestation',
+      body:  'Type your full legal name here to sign. This is required on every timesheet — never leave it blank.',
+    },
+  ];
+
+  var _activeTourSteps = _TOUR_STEPS;
+  var _tourStep        = 0;
+  var _tourInited      = false;
 
   function _initTour() {
     if (_tourInited) return;
@@ -399,7 +438,7 @@
     var endBtn  = document.getElementById('ts-tour-end');
     var overlay = document.getElementById('ts-tour-overlay');
     if (nextBtn) nextBtn.addEventListener('click', function () {
-      if (_tourStep < _TOUR_STEPS.length - 1) { _tourStep++; _showTourStep(); }
+      if (_tourStep < _activeTourSteps.length - 1) { _tourStep++; _showTourStep(); }
       else _endTour();
     });
     if (prevBtn) prevBtn.addEventListener('click', function () {
@@ -427,21 +466,21 @@
   }
 
   function _showTourStep() {
-    var step = _TOUR_STEPS[_tourStep];
+    var step = _activeTourSteps[_tourStep];
     var el = null;
     step.sel.split(',').forEach(function (s) { if (!el) el = document.querySelector(s.trim()); });
     if (!el) {
-      if (_tourStep < _TOUR_STEPS.length - 1) { _tourStep++; _showTourStep(); } else _endTour();
+      if (_tourStep < _activeTourSteps.length - 1) { _tourStep++; _showTourStep(); } else _endTour();
       return;
     }
     document.getElementById('ts-tour-cur').textContent   = _tourStep + 1;
-    document.getElementById('ts-tour-total').textContent = _TOUR_STEPS.length;
+    document.getElementById('ts-tour-total').textContent = _activeTourSteps.length;
     document.getElementById('ts-tour-title').textContent = step.title;
     document.getElementById('ts-tour-body').textContent  = step.body;
     var prevBtn = document.getElementById('ts-tour-prev');
     var nextBtn = document.getElementById('ts-tour-next');
     if (prevBtn) prevBtn.disabled    = (_tourStep === 0);
-    if (nextBtn) nextBtn.textContent = (_tourStep === _TOUR_STEPS.length - 1) ? 'Finish' : 'Next →';
+    if (nextBtn) nextBtn.textContent = (_tourStep === _activeTourSteps.length - 1) ? 'Finish' : 'Next →';
     el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     setTimeout(function () { _positionTour(el); }, 380);
   }
@@ -1892,6 +1931,7 @@
       html += '<div class="portal-ts-form-note">'
         + '<p>Enter up to three project or LBR codes per day with their hours. <strong>Hours are in half-hour increments</strong> (e.g. 3.5 = 3 hrs 30 min). Start and End times are for reference only and do not drive calculations.</p>'
         + '<button type="button" class="portal-ts-codes-btn" id="btn-ts-codes-' + tsType + '">Non-Billable Codes</button>'
+        + '<button type="button" class="portal-ts-tour-btn" id="btn-ts-tour-' + tsType + '">&#9654; Quick tour</button>'
         + '</div>';
     } else {
       html += '<div class="portal-ts-form-note">'
@@ -2046,9 +2086,12 @@
 
     panelEl.innerHTML = html;
 
-    // Wire tour button (Standard / CA only)
+    // Wire tour button
     var tourBtnEl = panelEl.querySelector('#btn-ts-tour-' + tsType);
-    if (tourBtnEl) tourBtnEl.addEventListener('click', startTsTour);
+    if (tourBtnEl) tourBtnEl.addEventListener('click', function () {
+      _activeTourSteps = isOffshore ? _TOUR_STEPS_OFFSHORE : _TOUR_STEPS;
+      startTsTour();
+    });
 
     // Date label + Week End wiring
     function updateDateLabels() {
