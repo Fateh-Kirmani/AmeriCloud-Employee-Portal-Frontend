@@ -360,6 +360,7 @@ var PORTAL_CONFIG = {
       'smrai@americloudtelecom.com',
       'mwaheed@americloudtelecom.com',
       'fghulam@americloudtelecom.com',
+      'mmallu@americloudtelecom.com',
     ]},
     'jaraneta@americloudtelecom.com':    { name: 'Joselito Araneta',        role: 'employee' },
     'gpolloso@americloudtelecom.com':    { name: 'Gary S. Polloso',          role: 'employee' },
@@ -378,6 +379,7 @@ var PORTAL_CONFIG = {
     'smrai@americloudtelecom.com':       { name: 'Smriti Rai',               role: 'employee' },
     'mwaheed@americloudtelecom.com':     { name: 'Maira Waheed',             role: 'employee' },
     'fghulam@americloudtelecom.com':     { name: 'Fahad Ghulam',             role: 'employee' },
+    'mmallu@americloudtelecom.com':      { name: 'Manideep Mallu',            role: 'employee' },
 
     // ── SERVICE DELIVERY ─────────────────────────────────────────────────────
     'akhan@americloudtelecom.com':    { name: 'Ammar Khan',                role: 'manager', team: [
