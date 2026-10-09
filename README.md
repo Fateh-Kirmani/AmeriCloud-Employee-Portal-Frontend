@@ -251,6 +251,67 @@ Safety and incident reports submitted by employees are stored in a SharePoint li
 
 ---
 
+## Timesheet → SharePoint Inbox Upload Setup
+
+When an employee submits a timesheet, the backend generates the filled Excel and uploads it to:
+
+    Timesheets/{Department}/{Country}/Inbox/{EmpID} - {Name} - Week Ending mm-dd-yyyy.xlsx
+
+Department comes from the form's Department field; Country comes from the employee's `country` in the `portal-config.js` directory. The upload only happens if both match an existing folder (BBU Swaps, Construction, Design, Exempt, Integration, Optimization, Overhead, RF Data Collection / US, Pakistan, India). Otherwise it is skipped, so stray folders never get created. A failed upload never blocks the submission. Resubmitting the same week replaces the file in Inbox.
+
+Until all the environment variables below are set, the upload is turned off and nothing else changes.
+
+### Step 1 — Add the Graph application permission
+
+1. Go to [https://entra.microsoft.com](https://entra.microsoft.com) → **App registrations** → open the portal app (the one whose Client ID is in `AZURE_CLIENT_ID`)
+2. **API permissions → Add a permission → Microsoft Graph → Application permissions** (not Delegated)
+3. Search `Files.ReadWrite.All` → check it → **Add permissions**
+4. Click **Grant admin consent for AmeriCloud Telecom** → Yes. The status column should show a green check.
+
+### Step 2 — Create a client secret
+
+1. Same app registration → **Certificates & secrets → Client secrets → New client secret**
+2. Description: `portal-api-sharepoint`, Expires: 24 months → **Add**
+3. Copy the **Value** column right away. It is only shown once. This is `AZURE_CLIENT_SECRET`.
+4. Set a calendar reminder to rotate it before it expires. Uploads will stop silently when it does.
+
+### Step 3 — Get the Site ID and Drive ID
+
+1. Open [Graph Explorer](https://developer.microsoft.com/en-us/graph/graph-explorer) and sign in with your admin account
+2. Open the Timesheets library in SharePoint and note the site part of the URL, e.g. `https://americloudtelecom.sharepoint.com/sites/ACTelecomSolutions/...`
+3. Run (replace the site path with yours):
+   ```
+   GET https://graph.microsoft.com/v1.0/sites/americloudtelecom.sharepoint.com:/sites/ACTelecomSolutions
+   ```
+   Copy the `id` field. This is `SP_SITE_ID`.
+4. Run:
+   ```
+   GET https://graph.microsoft.com/v1.0/sites/{SP_SITE_ID}/drives
+   ```
+   Find the drive whose `webUrl` ends in the library that contains the department folders (it may be named "Timesheets" or "Documents", depending on whether Timesheets is its own library or a folder inside HR). Copy its `id`. This is `SP_DRIVE_ID`.
+5. Run `GET https://graph.microsoft.com/v1.0/drives/{SP_DRIVE_ID}/root/children`.
+   - If the department folders (BBU Swaps, Construction, …) are listed directly, leave `SP_BASE_PATH` unset.
+   - If you see a parent folder instead (e.g. `Timesheets`, or `HR`), open it with `GET https://graph.microsoft.com/v1.0/drives/{SP_DRIVE_ID}/root:/Timesheets:/children` and keep going until you reach the folder that contains the department folders. That path (e.g. `Timesheets` or `HR/Timesheets`) is your `SP_BASE_PATH`.
+
+### Step 4 — Add environment variables in Vercel (backend project)
+
+Vercel → **americloud-portal-api** project → **Settings → Environment Variables** → add for Production:
+
+| Name | Value |
+|---|---|
+| `AZURE_CLIENT_SECRET` | secret value from Step 2 |
+| `SP_SITE_ID` | from Step 3.3 |
+| `SP_DRIVE_ID` | from Step 3.4 |
+| `SP_BASE_PATH` | only if needed, from Step 3.5 (e.g. `Timesheets`) |
+
+(`AZURE_TENANT_ID` and `AZURE_CLIENT_ID` are already set.) Then go to **Deployments → ⋯ → Redeploy** so the new variables take effect.
+
+### Step 5 — Test
+
+Submit a timesheet as an employee whose department has a SharePoint folder (e.g. a BBU Swaps employee). The file should appear in `BBU Swaps/{Country}/Inbox` within a few seconds. If it doesn't, check Vercel → backend project → **Logs** for a line starting `SharePoint upload`.
+
+---
+
 ## Before launch checklist
 
 - [ ] Complete handbook sign-off setup (see "Handbook Sign-off Setup" above)

@@ -2452,6 +2452,10 @@
     submitBtn.disabled = true;
     showSt('uploading', 'Submitting timesheet…');
 
+    var dirEntry = (PORTAL_CONFIG.directory || []).find(function (e) {
+      return (e.email || '').toLowerCase() === (userEmail || '').toLowerCase();
+    });
+
     apiCall('/timesheets/form/submit', {
       method: 'POST',
       body: JSON.stringify({
@@ -2459,6 +2463,7 @@
         week_start:        weekStartEl.value,
         employee_id:       empIdEl      ? empIdEl.value.trim()   : '',
         department:        deptEl       ? deptEl.value.trim()    : '',
+        country:           (dirEntry && dirEntry.country) ? dirEntry.country : '',
         manager_name:      managerEl    ? managerEl.value.trim() : '',
         pto_hours:         ptoEl        ? parseFloat(ptoEl.value || '0') : 0,
         employee_sig:      empSigEl     ? empSigEl.value.trim()     : '',
