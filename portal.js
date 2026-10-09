@@ -2396,21 +2396,45 @@
           h = Math.max(0, tot / 60);
         }
         var waiverEl = row.querySelector('.tsf-meal-waiver');
+        var waiver   = waiverEl ? waiverEl.value : '';
+        var r1s      = row.querySelector('.tsf-rest1s').value;
+        var r1e      = row.querySelector('.tsf-rest1e').value;
+        var r2s      = row.querySelector('.tsf-rest2s').value;
+        var r2e      = row.querySelector('.tsf-rest2e').value;
+        var reg = 0, ot1x = 0, ot2x = 0, mm = 0, mr = 0;
+        if (isCA && h > 0) {
+          var dayIs7th = is7thChecked && (i === 6);
+          if (dayIs7th) {
+            ot1x = Math.min(h, 8); ot2x = Math.max(0, h - 8);
+          } else {
+            reg  = Math.min(h, 8);
+            ot1x = Math.max(0, Math.min(h - 8, 4));
+            ot2x = Math.max(0, h - 12);
+          }
+          mm = (h > 5 && waiver.toUpperCase() !== 'Y' && (!ms || !me)) ? 1 : 0;
+          mr = ((h > 3.5 && (!r1s || !r1e)) || (h > 6 && (!r2s || !r2e))) ? 1 : 0;
+        }
         days.push({
-          date:        dateStr,
-          day:         DAYS[i],
-          projectCode: (row.querySelector('.tsf-proj') || {}).value || '',
-          shiftStart:  ss,
-          rest1Start:  row.querySelector('.tsf-rest1s').value,
-          rest1End:    row.querySelector('.tsf-rest1e').value,
-          mealStart:   ms,
-          mealEnd:     me,
-          mealWaiver:  waiverEl ? waiverEl.value : '',
-          rest2Start:  row.querySelector('.tsf-rest2s').value,
-          rest2End:    row.querySelector('.tsf-rest2e').value,
-          shiftEnd:    se,
-          hoursWorked: Math.round(h * 100) / 100,
-          is7thDay:    isCA && is7thChecked && (i === 6)
+          date:         dateStr,
+          day:          DAYS[i],
+          projectCode:  (row.querySelector('.tsf-proj') || {}).value || '',
+          shiftStart:   ss,
+          rest1Start:   r1s,
+          rest1End:     r1e,
+          mealStart:    ms,
+          mealEnd:      me,
+          mealWaiver:   waiver,
+          rest2Start:   r2s,
+          rest2End:     r2e,
+          shiftEnd:     se,
+          hoursWorked:  Math.round(h * 100) / 100,
+          is7thDay:     isCA && is7thChecked && (i === 6),
+          reg:          Math.round(reg  * 100) / 100,
+          ot1x:         Math.round(ot1x * 100) / 100,
+          ot2x:         Math.round(ot2x * 100) / 100,
+          missedMealHr: mm,
+          missedRestHr: mr,
+          premiumHrs:   mm + mr
         });
       });
 
