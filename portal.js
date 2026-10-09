@@ -2106,8 +2106,17 @@
 
     function toMins(t) {
       if (!t) return null;
+      var digits = t.replace(/[^0-9]/g, '');
+      if (digits.length === 3) digits = '0' + digits;
+      if (digits.length === 4) {
+        var h = parseInt(digits.slice(0, 2), 10);
+        var m = parseInt(digits.slice(2, 4), 10);
+        return (isNaN(h) || isNaN(m)) ? null : h * 60 + m;
+      }
       var p = t.split(':');
-      return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+      if (p.length !== 2) return null;
+      var hh = parseInt(p[0], 10), mm = parseInt(p[1], 10);
+      return (isNaN(hh) || isNaN(mm)) ? null : hh * 60 + mm;
     }
 
     function calcDayHours(row) {
@@ -2251,6 +2260,16 @@
       }
     }
 
+    panelEl.querySelectorAll('.tsf-time-input').forEach(function (inp) {
+      inp.addEventListener('input', function () {
+        var v = this.value.replace(/[^0-9:]/g, '');
+        if (/^\d{4}$/.test(v)) {
+          this.value = v.slice(0, 2) + ':' + v.slice(2);
+        } else if (/^\d{2}[^:]/.test(v)) {
+          this.value = v.slice(0, 2) + ':' + v.slice(2);
+        }
+      });
+    });
     panelEl.querySelectorAll('.tsf-time, .tsf-meal-waiver, .tsf-hrs1, .tsf-hrs2, .tsf-hrs3').forEach(function (el) {
       el.addEventListener('change', recalcAll);
       el.addEventListener('input',  recalcAll);
