@@ -2532,7 +2532,7 @@
 
       var actionCell = '';
       if (isHR) {
-        actionCell = '<span class="portal-ts-nolink">—</span>';
+        actionCell = '<button type="button" class="portal-tsf-act-btn portal-tsf-dl-btn" data-tsf-id="' + row.id + '" title="Download Excel">&#8595; Excel</button>';
       } else {
         actionCell = st === 'pending'
           ? '<div class="portal-pto-actions" id="tsf-act-' + row.id + '">'
@@ -2664,6 +2664,25 @@
             console.error('TSF action error:', err);
             if (actEl) actEl.querySelectorAll('button').forEach(function (b) { b.disabled = false; });
           });
+      });
+    });
+
+    bodyEl.querySelectorAll('.portal-tsf-dl-btn').forEach(function (dlBtn) {
+      dlBtn.addEventListener('click', function () {
+        var id = dlBtn.dataset.tsfId;
+        dlBtn.disabled = true; dlBtn.textContent = '…';
+        getApiToken().then(function (token) {
+          return fetch(API_BASE + '/timesheets/form/' + id + '/excel', { headers: { 'Authorization': 'Bearer ' + token } });
+        }).then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.blob();
+        }).then(function (blob) {
+          var url = URL.createObjectURL(blob);
+          var dl = document.createElement('a'); dl.href = url; dl.download = 'timesheet-' + id + '.xlsx';
+          document.body.appendChild(dl); dl.click(); document.body.removeChild(dl);
+          setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        }).catch(function () { alert('Could not generate Excel. Please try again.'); })
+          .then(function () { dlBtn.disabled = false; dlBtn.textContent = '↓ Excel'; });
       });
     });
 
@@ -2801,7 +2820,7 @@
         + '<button type="button" class="tsfd-reject-btn portal-ts-form-clear-btn">Reject</button>'
         + '<button type="button" class="tsfd-approve-btn portal-ts-form-submit-btn">Approve &amp; Sign</button>'
         + '</div>';
-    } else if (viewRole === 'hr') {
+    } else if (viewRole === 'manager' || viewRole === 'hr') {
       html += '<div class="portal-ts-form-submit-row" style="margin-top:16px">'
         + '<button type="button" class="tsfd-excel-btn portal-ts-form-submit-btn">Download Excel</button>'
         + '</div>';
