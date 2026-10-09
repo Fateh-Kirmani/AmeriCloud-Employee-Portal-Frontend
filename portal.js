@@ -2791,71 +2791,6 @@
   }
 
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // Timesheet upload
-  // ══════════════════════════════════════════════════════════════════════════
-  function setupTimesheetUpload(userEmail, userDisplayName) {
-    var pairs = [
-      { btnId: 'btn-submit-ca',  inputId: 'ts-file-ca'  },
-      { btnId: 'btn-submit-std', inputId: 'ts-file-std' }
-    ];
-    var statusEl = document.getElementById('ts-upload-status');
-
-    pairs.forEach(function (p) {
-      var btn   = document.getElementById(p.btnId);
-      var input = document.getElementById(p.inputId);
-      if (!btn || !input) return;
-
-      btn.addEventListener('click', function () {
-        input.value = '';
-        input.click();
-      });
-
-      input.addEventListener('change', function () {
-        var file = this.files[0];
-        if (!file) return;
-
-        if (file.size > 10 * 1024 * 1024) {
-          showStatus('error', 'File exceeds 10 MB. Please contact IT if you need help compressing it.');
-          return;
-        }
-
-        if (IS_DEMO) {
-          showStatus('success', 'Demo mode: "' + file.name + '" would be uploaded.');
-          return;
-        }
-
-        setBtnState(btn, 'uploading');
-        showStatus('uploading', 'Uploading ' + file.name + '…');
-
-        uploadTimesheetFile(file, userEmail, userDisplayName)
-          .then(function () {
-            setBtnState(btn, 'success');
-            showStatus('success', '✓ ' + file.name + ' submitted successfully.');
-            setTimeout(function () { setBtnState(btn, 'idle'); }, 3000);
-          })
-          .catch(function (err) {
-            console.error('Upload error:', err);
-            setBtnState(btn, 'error');
-            showStatus('error', 'Upload failed. Please try again or contact IT.');
-            setTimeout(function () { setBtnState(btn, 'idle'); }, 4000);
-          });
-      });
-    });
-
-    function setBtnState(btn, state) {
-      btn.classList.remove('is-uploading', 'is-success', 'is-error');
-      btn.disabled = (state === 'uploading');
-      if (state !== 'idle') btn.classList.add('is-' + state);
-    }
-
-    function showStatus(type, msg) {
-      statusEl.hidden    = false;
-      statusEl.className = 'portal-ts-status portal-ts-status--' + type;
-      statusEl.textContent = msg;
-      if (type === 'success') setTimeout(function () { statusEl.hidden = true; }, 5000);
-    }
-  }
 
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -3014,25 +2949,6 @@
   }
 
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // Backend: upload a timesheet file
-  // ══════════════════════════════════════════════════════════════════════════
-  function uploadTimesheetFile(file, userEmail, userDisplayName) {
-    var date     = new Date().toISOString().slice(0, 10);
-    var newName  = date + ' - ' + userDisplayName + ' - ' + file.name;
-    var renamed  = new File([file], newName, { type: file.type });
-    var fd       = new FormData();
-    fd.append('file', renamed);
-    return getApiToken().then(function (token) {
-      return fetch(API_BASE + '/timesheets/', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + token },
-        body: fd
-      });
-    }).then(function (r) {
-      if (!r.ok) throw new Error('Upload HTTP ' + r.status);
-    });
-  }
 
 
   // ══════════════════════════════════════════════════════════════════════════

@@ -831,20 +831,33 @@ var PORTAL_CONFIG = {
     "afateh@americloudtelecom.com": {
       name: "Mohammad Abdul Fateh",
       role: "employee",
+      employeeId: "ID163",
+      manager: "Nishant Jawale",
     },
     "nkhan@americloudtelecom.com": {
       name: "Nasrulla Ataulla",
       role: "employee",
+      employeeId: "ID104",
+      manager: "Nishant Jawale",
     },
     "nrasool@americloudtelecom.com": {
       name: "Nadeem Rasool",
       role: "employee",
+      employeeId: "ID170",
+      manager: "Nishant Jawale",
     },
     "aavecilla@americloudtelecom.com": {
       name: "Arnel Avecilla",
       role: "employee",
+      employeeId: "ID176",
+      manager: "Nishant Jawale",
     },
-    "jmounir@americloudtelecom.com": { name: "Jihad Mounir", role: "employee" },
+    "jmounir@americloudtelecom.com": {
+      name: "Jihad Mounir",
+      role: "employee",
+      employeeId: "ID131",
+      manager: "Nishant Jawale",
+    },
     "hsharma@americloudtelecom.com": {
       name: "Hirdesh Sharma",
       role: "employee",
@@ -854,6 +867,8 @@ var PORTAL_CONFIG = {
     "nbihan@americloudtelecom.com": {
       name: "Narender Bihan",
       role: "manager",
+      employeeId: "ID107",
+      manager: "Esteban Fernandez",
       team: [
         "nbakhshi@americloudtelecom.com",
         "hshoaib@americloudtelecom.com",
@@ -863,14 +878,20 @@ var PORTAL_CONFIG = {
     "nbakhshi@americloudtelecom.com": {
       name: "Naaman Bakhshi",
       role: "employee",
+      employeeId: "ID106",
+      manager: "Narender Bihan",
     },
     "hshoaib@americloudtelecom.com": {
       name: "Humzah Shoaib",
       role: "employee",
+      employeeId: "ID187",
+      manager: "Narender Bihan",
     },
     "pkuisangiam@americloudtelecom.com": {
       name: "Pongthep Kuisangiam",
       role: "employee",
+      employeeId: "ID190",
+      manager: "Narender Bihan",
     },
 
     // ── INTEGRATION ──────────────────────────────────────────────────────────
@@ -887,14 +908,23 @@ var PORTAL_CONFIG = {
         "ssarkar@americloudtelecom.com",
       ],
     },
-    "apena@americloudtelecom.com": { name: "Alexis Pena", role: "employee" },
+    "apena@americloudtelecom.com": {
+      name: "Alexis Pena",
+      role: "employee",
+      employeeId: "ID147",
+      manager: "Petterson Eden",
+    },
     "mfahmed@americloudtelecom.com": {
       name: "Mohammed Furquan Ahmed",
       role: "employee",
+      employeeId: "ID146",
+      manager: "Petterson Eden",
     },
     "ransari@americloudtelecom.com": {
       name: "Mohammed Rayyan Ansari",
       role: "employee",
+      employeeId: "ID102",
+      manager: "Petterson Eden",
     },
     "agupta@americloudtelecom.com": { name: "Akshay Gupta", role: "employee" },
     "anayan@americloudtelecom.com": { name: "Apurv Nayan", role: "employee" },
@@ -968,10 +998,14 @@ var PORTAL_CONFIG = {
     "qkhadher@americloudtelecom.com": {
       name: "Qais Khadher",
       role: "employee",
+      employeeId: "ID122",
+      manager: "Chandra Mohan Pal",
     },
     "anwankwo@americloudtelecom.com": {
       name: "Amaechi Nwankwo",
       role: "employee",
+      employeeId: "ID134",
+      manager: "Chandra Mohan Pal",
     },
     "pumar@americloudtelecom.com": { name: "Pallavi Umar", role: "employee" },
     "rbhat@americloudtelecom.com": { name: "Rajesh Bhat", role: "employee" },
@@ -1035,45 +1069,75 @@ var PORTAL_CONFIG = {
     "jaraneta@americloudtelecom.com": {
       name: "Joselito Araneta",
       role: "employee",
+      employeeId: "ID143",
+      manager: "Mohammed Hussain",
     },
     "gpolloso@americloudtelecom.com": {
       name: "Gary S. Polloso",
       role: "employee",
+      employeeId: "ID181",
+      manager: "Mohammed Hussain",
     },
     "fnicasio@americloudtelecom.com": {
       name: "Ferdinand Nicasio",
       role: "employee",
+      employeeId: "ID144",
+      manager: "Mohammed Hussain",
     },
     "dlapada@americloudtelecom.com": {
       name: "Daniel Lapada",
       role: "employee",
+      employeeId: "ID160",
+      manager: "Mohammed Hussain",
     },
     "mbommakanti@americloudtelecom.com": {
       name: "Manish Bommakanti",
       role: "employee",
+      employeeId: "ID172",
+      manager: "Mohammed Hussain",
     },
     "abautista@americloudtelecom.com": {
       name: "Abelino Bautista",
       role: "employee",
+      employeeId: "ID177",
+      manager: "Mohammed Hussain",
     },
     "smkolla@americloudtelecom.com": {
       name: "Sai Manikanta Kolla",
       role: "employee",
+      employeeId: "ID159",
+      manager: "Mohammed Hussain",
     },
-    "ptijing@americloudtelecom.com": { name: "Peter Tijing", role: "employee" },
+    "ptijing@americloudtelecom.com": {
+      name: "Peter Tijing",
+      role: "employee",
+      employeeId: "ID162",
+      manager: "Mohammed Hussain",
+    },
     "svyadala@americloudtelecom.com": {
       name: "Sri Vishnu Yadala",
       role: "employee",
+      employeeId: "ID164",
+      manager: "Mohammed Hussain",
     },
     "ajkumar@americloudtelecom.com": {
       name: "Ajay Kumar Andapally",
       role: "employee",
+      employeeId: "ID182",
+      manager: "Mohammed Hussain",
     },
     "dpottunuri@americloudtelecom.com": {
       name: "Dinesh Pottunuri",
       role: "employee",
+      employeeId: "ID171",
+      manager: "Mohammed Hussain",
     },
-    "jfaux@americloudtelecom.com": { name: "James Faux", role: "employee" },
+    "jfaux@americloudtelecom.com": {
+      name: "James Faux",
+      role: "employee",
+      employeeId: "ID168",
+      manager: "Mohammed Hussain",
+    },
     "fakhan@americloudtelecom.com": {
       name: "Mohammed Faizan Khan",
       role: "employee",
@@ -1088,6 +1152,8 @@ var PORTAL_CONFIG = {
     "mmallu@americloudtelecom.com": {
       name: "Manideep Mallu",
       role: "employee",
+      employeeId: "ID192",
+      manager: "Mohammed Hussain",
     },
 
     // ── SERVICE DELIVERY ─────────────────────────────────────────────────────
@@ -1152,6 +1218,12 @@ var PORTAL_CONFIG = {
       name: "Syed Muhammad Fateh Kirmani",
       role: "manager",
       team: ["fkirmani@americloudtelecom.com"],
+    },
+    "yamenkilani@americloudtelecom.com": {
+      name: "Yamen Zeid Al Kilani",
+      role: "employee",
+      employeeId: "ID186",
+      manager: "Mateen Hussain",
     },
     "mhaq@americloudtelecom.com": { name: "Mati ul Haq", role: "employee" },
     "mmohammed@americloud.net": { name: "Mustafa Mohammed", role: "employee" },
