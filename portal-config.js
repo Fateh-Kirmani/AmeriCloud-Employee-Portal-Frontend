@@ -1217,6 +1217,7 @@ var PORTAL_CONFIG = {
     "fkirmani@americloudtelecom.com": {
       name: "Syed Muhammad Fateh Kirmani",
       role: "manager",
+      manager: "Mateen Hussain",
       team: ["fkirmani@americloudtelecom.com"],
     },
     "yamenkilani@americloudtelecom.com": {
