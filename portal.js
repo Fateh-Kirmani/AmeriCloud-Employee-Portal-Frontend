@@ -2096,7 +2096,9 @@
       var weEl = panelEl.querySelector('#tsf-week-end');
       if (weEl) {
         var sat = new Date(sun); sat.setDate(sat.getDate() + 6);
-        weEl.value = sat.toISOString().slice(0, 10);
+        weEl.value = sat.getFullYear() + '-'
+          + String(sat.getMonth() + 1).padStart(2, '0') + '-'
+          + String(sat.getDate()).padStart(2, '0');
       }
     }
     var wsInput = panelEl.querySelector('#tsf-week-start');
